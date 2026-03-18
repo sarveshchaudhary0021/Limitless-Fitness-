@@ -9,16 +9,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
-    body { background-color: var(--bg-1); color: var(--text-1); font-family: 'Inter', sans-serif; padding: 2rem;}
+    body { background-color: var(--bg); color: var(--text-1); font-family: 'Inter', sans-serif; padding: 2rem; transition: background 0.3s, color 0.3s; }
     .pricing-container { max-width: 1000px; margin: 0 auto; text-align: center; }
     .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
-    .price-card { background: var(--bg-2); padding: 2.5rem 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border); transition: var(--transition); display:flex; flex-direction:column; }
-    .price-card:hover { transform: translateY(-5px); border-color: var(--primary-color); box-shadow: 0 10px 30px rgba(0, 200, 150, 0.1); }
-    .popular { border-color: var(--primary-color); position: relative; }
-    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: var(--bg-1); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
     .price { font-size: 2.5rem; font-weight: 800; color: var(--text-1); margin: 1rem 0; }
     .features { list-style: none; padding: 0; margin: 1.5rem 0 2rem; color: var(--text-2); text-align: left; flex-grow: 1;}
     .features li { margin-bottom: 0.8rem; display: flex; align-items:flex-start; gap:8px;}
+    .popular { border-color: var(--primary-color) !important; position: relative; }
+    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; z-index: 10; }
     @media(max-width: 768px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -140,5 +138,6 @@
     }
   </script>
   <script src="cursor.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
