@@ -62,7 +62,30 @@ async function initDB() {
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
+        subscription_plan VARCHAR(50) DEFAULT 'free',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Added check for subscription_plan column if table already exists
+    try {
+      await pool.query('ALTER TABLE users ADD COLUMN subscription_plan VARCHAR(50) DEFAULT "free"');
+    } catch (e) {
+      // Column might already exist
+    }
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS payments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        order_id VARCHAR(255) NOT NULL,
+        payment_id VARCHAR(255) NOT NULL,
+        signature VARCHAR(255) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        plan_name VARCHAR(100) NOT NULL,
+        status VARCHAR(50) DEFAULT 'success',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
 
@@ -306,8 +329,8 @@ app.post('/api/auth/login', async (req, res) => {
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) return res.status(401).json({ error: 'Invalid credentials.' });
 
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, subscription_plan: user.subscription_plan } });
   } catch (err) {
     res.status(500).json({ error: 'Login failed.' });
   }
@@ -358,38 +381,73 @@ app.post('/api/payment/create-order', authenticateToken, async (req, res) => {
   try {
     const { amount, plan } = req.body;
     
-    // Create an order instance
+    if (!amount || isNaN(amount)) {
+      return res.status(400).json({ error: 'Valid amount is required.' });
+    }
+
+    if (process.env.RAZORPAY_KEY_ID === 'dummy_key') {
+       console.warn('⚠️ Warning: Razorpay Key ID is set to dummy_key. Payments will not work.');
+    }
+
     const options = {
-      amount: amount * 100, // Razorpay takes amount in subunits (paise)
+      amount: Math.round(amount * 100), // Ensure it is an integer
       currency: 'INR',
       receipt: `rcpt_${req.user.id}_${Date.now()}`
     };
 
     const order = await razorpay.orders.create(options);
-    
-    // We send the public key_id safely to the frontend checkout along with order details
     res.json({ success: true, order, key_id: process.env.RAZORPAY_KEY_ID || 'dummy_key' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to create Razorpay secure order.' });
+    console.error('❌ Razorpay Order Error:', err.message);
+    res.status(500).json({ error: 'Failed to create Razorpay secure order. ' + (err.description || err.message) });
   }
 });
 
-app.post('/api/payment/verify', authenticateToken, (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-  const secret = process.env.RAZORPAY_KEY_SECRET || 'dummy_secret';
+app.post('/api/payment/verify', authenticateToken, async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, plan_name, amount } = req.body;
+    
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ error: 'Missing payment verification details.' });
+    }
 
-  // Generate SHA256 HMAC cryptographic signature to verify payment validity securely
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
-  const expectedSignature = crypto.createHmac('sha256', secret)
-                                  .update(body.toString())
-                                  .digest('hex');
+    const secret = process.env.RAZORPAY_KEY_SECRET || 'dummy_secret';
 
-  if (expectedSignature === razorpay_signature) {
-    // Verified securely! Real app would UPDATE subscription_status for user in DB here
-    res.json({ success: true, message: 'Payment cryptographically verified successfully.' });
-  } else {
-    res.status(400).json({ success: false, error: 'Invalid security signature.' });
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const expectedSignature = crypto.createHmac('sha256', secret)
+                                    .update(body.toString())
+                                    .digest('hex');
+
+    if (expectedSignature === razorpay_signature) {
+      await pool.query(
+        'INSERT INTO payments (user_id, order_id, payment_id, signature, amount, plan_name) VALUES (?, ?, ?, ?, ?, ?)',
+        [req.user.id, razorpay_order_id, razorpay_payment_id, razorpay_signature, amount, plan_name]
+      );
+
+      await pool.query(
+        'UPDATE users SET subscription_plan = ? WHERE id = ?',
+        [plan_name, req.user.id]
+      );
+
+      res.json({ success: true, message: 'Payment verified and status updated.' });
+    } else {
+      console.error('❌ Signature Verification Failed for user ID:', req.user.id);
+      res.status(400).json({ success: false, error: 'Invalid security signature.' });
+    }
+  } catch (err) {
+    console.error('❌ Verification Error:', err.message);
+    res.status(500).json({ error: 'Server error during verification. Please contact support.' });
+  }
+});
+
+// GET user status
+app.get('/api/user/status', authenticateToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT name, email, subscription_plan FROM users WHERE id = ?', [req.user.id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'User not found.' });
+    res.json({ success: true, user: rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch user status.' });
   }
 });
 

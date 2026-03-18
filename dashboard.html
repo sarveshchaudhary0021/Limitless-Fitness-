@@ -23,7 +23,7 @@
   <nav class="dash-nav">
     <div class="nav-container" style="width:100%; display:flex; justify-content:space-between; align-items:center;">
       <a href="index.html" style="text-decoration:none;">
-        <h2 style="margin: 0;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> Limitless <span style="font-weight:400; color:var(--text-2);">Dashboard</span></h2>
+        <h2 style="margin: 0;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> Limitless <span style="font-weight:400; color:var(--text-2);">Dashboard</span> <span id="proBadge" style="display:none; background:var(--primary-color); color:white; font-size:0.7rem; padding:2px 8px; border-radius:10px; vertical-align:middle; margin-left:10px;">PRO</span></h2>
       </a>
       <div class="nav-actions">
         <a href="generator.html" class="btn btn-glass" style="padding: 0.5rem 1rem;"><i class="fas fa-brain"></i> Generator</a>
@@ -69,6 +69,19 @@
   <script>
     const token = localStorage.getItem('limitless_token');
     if (!token) window.location.href = 'login.html';
+
+    async function checkStatus() {
+      try {
+        const res = await fetch('/api/user/status', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        if (data.success && data.user.subscription_plan !== 'free') {
+          document.getElementById('proBadge').style.display = 'inline-block';
+          document.getElementById('proBadge').textContent = data.user.subscription_plan.toUpperCase();
+        }
+      } catch (err) { console.error(err); }
+    }
 
     let progressChart;
 
@@ -188,6 +201,7 @@
     }
 
     // Init
+    checkStatus();
     loadHistory();
   </script>
   <script src="cursor.js"></script>

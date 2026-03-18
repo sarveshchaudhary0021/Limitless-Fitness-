@@ -116,12 +116,21 @@
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature
+                razorpay_signature: response.razorpay_signature,
+                plan_name: planName,
+                amount: amount
               })
             });
             const verifyData = await verifyRes.json();
             if (verifyData.success) {
               alert('Payment Verification Successful! Welcome to Limitless Pro.');
+              // Update local storage user object if exists
+              const userStr = localStorage.getItem('limitless_user');
+              if (userStr) {
+                const user = JSON.parse(userStr);
+                user.subscription_plan = planName;
+                localStorage.setItem('limitless_user', JSON.stringify(user));
+              }
               window.location.href = 'dashboard.html';
             } else {
               alert('Payment security verification failed. Signature mismatch.');
@@ -133,7 +142,8 @@
         rzp1.open();
 
       } catch (err) {
-        alert('Could not bridge to Razorpay checkout API. Ensure your Node.js backend server is actively running.');
+        console.error(err);
+        alert('Could not bridge to Razorpay checkout API. Details: ' + err.message);
       }
     }
   </script>
