@@ -8,14 +8,14 @@
   <script src="theme-init.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { background-color: var(--bg-1); color: var(--text-1); padding: 2rem; font-family: 'Inter', sans-serif;}
+    body { background-color: var(--bg); color: var(--text-1); padding: 2rem; font-family: 'Inter', sans-serif; transition: background 0.3s, color 0.3s; }
     .container { max-width: 800px; margin: 0 auto; }
-    .gen-card { background: var(--bg-2); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; box-shadow: var(--shadow-md);}
+    .gen-card { background: var(--bg-2); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 1px solid var(--border); }
     .form-group { margin-bottom: 1.5rem; }
     .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-2); font-weight: 600; font-size: 0.9rem;}
-    .form-control { font-family: 'Inter', sans-serif; width: 100%; padding: 0.8rem; background: var(--bg-1); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-md); box-sizing: border-box; transition: var(--transition);}
-    .form-control:focus { outline: none; border-color: var(--primary-color); }
-    .plan-result { display: none; margin-top: 2rem; padding: 2rem; background: var(--primary-color-10); border: 1px solid var(--primary-color-20); border-radius: var(--radius-lg); animation: slideUp 0.5s ease-out forwards; }
+    .form-control { font-family: 'Inter', sans-serif; width: 100%; padding: 0.8rem 1.2rem; background: var(--bg-1); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-md); box-sizing: border-box; transition: var(--transition); outline: none; }
+    .form-control:focus { border-color: var(--primary-color); background: var(--bg); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
+    .plan-result { display: none; margin-top: 2rem; padding: 2rem; background: var(--bg-2); border: 1px solid var(--primary-color); border-radius: var(--radius-lg); animation: slideUp 0.5s ease-out forwards; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>

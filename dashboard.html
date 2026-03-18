@@ -9,12 +9,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { background-color: var(--bg-1); color: var(--text-1); font-family: 'Inter', sans-serif; }
-    .dash-nav { padding: 1rem 2rem; background: var(--bg-2); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    body { background-color: var(--bg); color: var(--text-1); font-family: 'Inter', sans-serif; transition: background 0.3s, color 0.3s; }
+    .dash-nav { padding: 1rem 2rem; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100; }
     .dash-container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
-    .card { background: var(--bg-2); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
-    .form-control { width: 100%; padding: 0.8rem; background: var(--bg-1); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-md); box-sizing: border-box; margin-bottom: 1rem; }
+    .form-control { width: 100%; padding: 0.8rem 1.2rem; background: var(--bg-2); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-md); box-sizing: border-box; margin-bottom: 1.2rem; transition: all 0.3s; outline: none; font-size: 0.95rem; }
+    .form-control:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); background: var(--bg); }
     .log-btn { width: 100%; padding: 1rem; font-size: 1rem; }
+    h2, h3 { letter-spacing: -0.5px; }
     @media (max-width: 768px) { .dash-container { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -97,9 +98,13 @@
       const ctx = document.getElementById('progressChart').getContext('2d');
       if (progressChart) progressChart.destroy();
 
-      // Create deeply aesthetic gradient for the bars
+      const style = getComputedStyle(document.documentElement);
+      const primaryColor = style.getPropertyValue('--primary-color').trim();
+      const textColor = style.getPropertyValue('--text-2').trim();
+      const gridColor = style.getPropertyValue('--border').trim();
+
       const gradient = ctx.createLinearGradient(0, 0, 0, 320);
-      gradient.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim());
+      gradient.addColorStop(0, primaryColor);
       gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
 
       progressChart = new Chart(ctx, {
@@ -110,7 +115,7 @@
             label: 'Total Lifted Volume (kg)',
             data: volumes.length ? volumes : [0],
             backgroundColor: gradient,
-            hoverBackgroundColor: '#00e6aa',
+            hoverBackgroundColor: '#00c896',
             borderRadius: 6,
             barPercentage: 0.5,
             borderSkipped: false
@@ -122,9 +127,9 @@
           plugins: { 
             legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(15, 23, 42, 0.95)',
-              titleColor: '#00c896',
-              bodyColor: '#f8fafc',
+              backgroundColor: style.getPropertyValue('--btn-bg').trim(),
+              titleColor: primaryColor,
+              bodyColor: style.getPropertyValue('--btn-text').trim(),
               padding: 12,
               cornerRadius: 8,
               displayColors: false,
@@ -133,14 +138,14 @@
           },
           scales: {
             x: { 
-              ticks: { color: '#64748b', font: { family: 'Inter' } }, 
+              ticks: { color: textColor, font: { family: 'Inter' } }, 
               grid: { display: false },
               border: { display: false }
             },
             y: { 
               beginAtZero: true,
-              ticks: { color: '#64748b', font: { family: 'Inter' }, padding: 10 }, 
-              grid: { color: 'rgba(100, 116, 139, 0.15)', drawBorder: false },
+              ticks: { color: textColor, font: { family: 'Inter' }, padding: 10 }, 
+              grid: { color: gridColor, drawBorder: false },
               border: { display: false }
             }
           },
