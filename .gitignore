@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.db
+.gemini/
+.agent/
+.agents/
+brain/
+dist/
+build/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Limitless Fitness</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="theme-init.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { 
+      background: radial-gradient(circle at top right, var(--bg-2) 0%, var(--bg) 100%); 
+      display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; 
+      font-family: 'Inter', sans-serif; overflow: hidden;
+    }
+    .auth-card { 
+      background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border); padding: 3rem; border-radius: var(--radius-lg); 
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 100%; max-width: 420px; text-align: center; 
+      position: relative; z-index: 1;
+    }
+    .auth-card::before {
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 60%);
+      pointer-events: none; z-index: -1;
+    }
+    .auth-input { 
+      box-sizing: border-box; width: 100%; padding: 1rem 1.25rem; border: 1px solid var(--border); 
+      border-radius: var(--radius-md); background: var(--bg); color: var(--text-1); 
+      margin-bottom: 1.25rem; font-family: 'Inter', sans-serif; font-size: 0.95rem;
+      transition: all var(--transition);
+    }
+    .auth-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); background: var(--bg-2); }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle-btn" aria-label="Toggle theme" style="position: absolute; top: 2rem; right: 2rem; z-index: 1000;">
+    <span class="theme-icon">🌙</span>
+  </button>
+
+  <div class="auth-card glass-card">
+    <a href="index.html" style="text-decoration: none;">
+      <h2 style="margin-bottom: 0.5rem;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> <span class="gradient-text">Welcome Back</span></h2>
+    </a>
+    <p style="color: var(--text-2); margin-bottom: 2rem; font-size:0.95rem;">Log into your Limitless Dashboard</p>
+    
+    <form id="loginForm">
+      <input type="email" id="email" class="auth-input" placeholder="Email Address" required>
+      <input type="password" id="password" class="auth-input" placeholder="Password" required>
+      <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+    </form>
+    
+    <p style="margin-top: 1.5rem; color: var(--text-2); font-size: 0.9rem;">
+      Don't have an account? <a href="signup.html" style="color: var(--primary-color); font-weight:600; text-decoration:none;">Join Now</a>
+    </p>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = e.target.querySelector('button');
+      
+      btn.innerText = 'Signing In...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+          localStorage.setItem('limitless_token', data.token);
+          localStorage.setItem('limitless_user', JSON.stringify(data.user));
+          window.location.href = 'dashboard.html';
+        } else {
+          alert('Login failed: ' + data.error);
+          btn.innerText = 'Sign In';
+          btn.disabled = false;
+        }
+      } catch (err) { 
+        alert('Server connection error. Please try again later.'); 
+        btn.innerText = 'Sign In';
+        btn.disabled = false;
+      }
+    });
+  </script>
+  <script src="cursor.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

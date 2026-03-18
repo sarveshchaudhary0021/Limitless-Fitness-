@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Limitless Fitness – Transform your body with premium workout plans, detailed diet & medical guides, and yoga library. Start your journey today." />
+  <title>Limitless – Forge Your Best Self</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="style.css" />
+  <script src="theme-init.js"></script>
+</head>
+<body>
+
+  <!-- ░░ LOADER ░░ -->
+  <div id="loader">
+    <div class="loader-inner">
+      <div class="loader-logo">LIMITLESS</div>
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Custom cursor managed intrinsically by cursor.js -->
+
+  <!-- ░░ NAVBAR ░░ -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <a class="nav-logo" href="#hero">
+        <i class="fa-solid fa-infinity"></i> Limit<span>less</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#exercises">Guides</a></li>
+        <li><a href="pricing.html" class="nav-premium-link"><i class="fas fa-crown"></i> Pro</a></li>
+        <li><a href="login.html" class="nav-login-btn">Sign In</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ░░ HERO ░░ -->
+  <section id="hero">
+    <canvas id="particleCanvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-badge animate-fade-up">
+        <span class="pulse-icon"></span> Dynamic Coaching Platform
+      </div>
+      <h1 class="hero-title animate-fade-up delay-1">
+        Break Boundaries.<br/><span class="gradient-text">Forge an Iron Will.</span>
+      </h1>
+      <p class="hero-subtitle animate-fade-up delay-2">
+        A high-performance workspace for elite physical transformation.<br/>
+        Track volume, master rituals, and surpass your peak.
+      </p>
+      <div class="hero-actions animate-fade-up delay-3">
+        <a href="signup.html" class="btn btn-primary btn-glow">
+          Get Started
+        </a>
+        <a href="pricing.html" class="btn btn-glass">
+          View Pro Plans
+        </a>
+      </div>
+      <div class="hero-stats animate-fade-up delay-4">
+        <div class="stat-item">
+          <span class="stat-num" data-target="15000">0</span><span class="stat-plus">+</span>
+          <p>Members</p>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num" data-target="50">0</span><span class="stat-plus">+</span>
+          <p>Exercises</p>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num" data-target="98">0</span><span class="stat-plus">%</span>
+          <p>Satisfaction</p>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ░░ FEATURES ░░ -->
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Limitless Ecosystem</span>
+        <h2>Precision Tools for <span class="gradient-text">Elite Results</span></h2>
+        <p>A unified suite designed for high-performance physical optimization.</p>
+      </div>
+      <div class="features-grid">
+        <!-- Card 1 -->
+        <div class="glass-card reveal">
+          <div class="feature-icon" style="--c:#00c896">
+            <i class="fas fa-dumbbell"></i>
+          </div>
+          <h3>Dynamic Workouts</h3>
+          <p>Algorithmically layered protocols spanning Hypertrophy, Powerlifting, and Metabolic Conditioning.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="glass-card reveal delay-1">
+          <div class="feature-icon" style="--c:#3b82f6">
+            <i class="fas fa-brain"></i>
+          </div>
+          <h3>AI Ritual Generator</h3>
+          <p>Constructs hyper-personalized diet & training maps based on your regional cuisine and biometrics.</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="glass-card reveal delay-2">
+          <div class="feature-icon" style="--c:#a259ff">
+            <i class="fas fa-chart-pie"></i>
+          </div>
+          <h3>Advanced Analytics</h3>
+          <p>Deep-dive volume tracking and growth heatmaps to visualize your progressive overload journey.</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="glass-card reveal delay-3">
+          <div class="feature-icon" style="--c:#f43f5e">
+            <i class="fas fa-shield-halved"></i>
+          </div>
+          <h3>Signature Integrity</h3>
+          <p>Enterprise-grade security for your personal data and premium Razorpay transaction verification.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ WORKOUTS ░░ -->
+  <section id="workouts" class="section section-dark">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Training Plans</span>
+        <h2>Choose Your <span class="gradient-text">Battle Plan</span></h2>
+        <p>Three science-backed programmes. One goal — to make you unstoppable.</p>
+      </div>
+      <div id="workoutsGrid" class="workouts-grid">
+        <!-- Injected via JS -->
+        <div class="workout-skeleton"></div>
+        <div class="workout-skeleton"></div>
+        <div class="workout-skeleton"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ DIET & HEALTH ░░ -->
+  <section id="diet" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Nutrition & Health</span>
+        <h2>Fuel Your <span class="gradient-text">Body</span></h2>
+        <p>Expert dietary plans and critical medical guidelines for safe training.</p>
+      </div>
+      
+      <div class="features-grid" style="margin-bottom: 3rem;">
+        <div class="feature-card reveal">
+          <div class="feature-icon"><i class="fas fa-leaf"></i></div>
+          <h3>Vegan Plan</h3>
+          <p><strong>Focus:</strong> Plant-based proteins (lentils, tofu, chickpeas).</p>
+          <ul style="margin-top:1rem; color:var(--text-2); list-style:none; line-height:1.8;">
+            <li><i class="fas fa-check" style="color:#10b981; margin-right:8px;"></i> High fiber for digestion</li>
+            <li><i class="fas fa-check" style="color:#10b981; margin-right:8px;"></i> Rich in antioxidants</li>
+            <li><i class="fas fa-xmark" style="color:#ef4444; margin-right:8px;"></i> Avoid highly processed faux meats</li>
+          </ul>
+        </div>
+        <div class="feature-card reveal delay-1">
+          <div class="feature-icon"><i class="fas fa-drumstick-bite"></i></div>
+          <h3>Veg / Non-Veg Plan</h3>
+          <p><strong>Focus:</strong> Balanced macro intake (chicken, eggs, paneer).</p>
+          <ul style="margin-top:1rem; color:var(--text-2); list-style:none; line-height:1.8;">
+            <li><i class="fas fa-check" style="color:#10b981; margin-right:8px;"></i> High quality amino acids</li>
+            <li><i class="fas fa-check" style="color:#10b981; margin-right:8px;"></i> Dairy & eggs for dense nutrition</li>
+            <li><i class="fas fa-xmark" style="color:#ef4444; margin-right:8px;"></i> Avoid excess red meat and fried items</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bmi-wrapper reveal delay-2">
+        <div class="bmi-scale-card">
+          <h3 style="color:#ef4444; display:flex; align-items:center; gap:8px;"><i class="fas fa-heartbeat"></i> Medical: Hypertension (BP)</h3>
+          <p style="color:var(--text-2); margin-bottom:1rem;"><strong>Training:</strong> Focus on steady-state cardio. Avoid heavy isometric holds, 1RM lifting, or exercises where your head is below your heart (e.g., decline bench, heavy deadlifts).</p>
+          <p style="color:var(--text-2);"><strong>Diet:</strong> Follow DASH diet principles. Strict sodium restriction. Increase potassium-rich foods like bananas and spinach.</p>
+        </div>
+        <div class="bmi-scale-card reveal delay-3">
+          <h3 style="color:#ef4444; display:flex; align-items:center; gap:8px;"><i class="fas fa-stethoscope"></i> Medical: Heart Conditions</h3>
+          <p style="color:var(--text-2); margin-bottom:1rem;"><strong>Training:</strong> Extremely light to moderate aerobic activity. ALWAYS consult a cardiologist before starting. Avoid high-intensity interval training (HIIT). Stop if you feel dizzy or have chest pain.</p>
+          <p style="color:var(--text-2);"><strong>Diet:</strong> Mediterranean diet focus. Eat Omega-3 rich foods. Strictly avoid trans fats, excess saturated fats, and high-sugar drinks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ GYM GUIDELINES ░░ -->
+  <section id="guidelines" class="section section-dark">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Gym Etiquette</span>
+        <h2>What to <span class="gradient-text">Avoid</span></h2>
+        <p>Keep yourself and others safe. Discipline is the core of Limitless.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+           <h3 style="color:#f59e0b; display:flex; align-items:center; gap:8px;"><i class="fas fa-exclamation-triangle"></i> Ego Lifting</h3>
+           <p>Lifting heavier than you can handle with strict form leads to severe injuries. Focus on muscle contraction, not momentum.</p>
+        </div>
+        <div class="feature-card reveal delay-1">
+           <h3 style="color:#f59e0b; display:flex; align-items:center; gap:8px;"><i class="fas fa-mobile-alt"></i> Phone Camping</h3>
+           <p>Don't sit on machines during peak hours scrolling through social media. Rest efficiently and let others work in.</p>
+        </div>
+        <div class="feature-card reveal delay-2">
+           <h3 style="color:#f59e0b; display:flex; align-items:center; gap:8px;"><i class="fas fa-dumbbell"></i> Leaving Weights</h3>
+           <p>Re-rack your weights after use. Leaving plates on the bar or dumbbells on the floor is dangerous and disrespectful.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ EXERCISES & YOGA ░░ -->
+  <section id="exercises" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Exercise Library</span>
+        <h2>Master Every <span class="gradient-text">Movement</span></h2>
+        <p>Filter by category and find the perfect exercises for your session.</p>
+      </div>
+      <div class="filter-tabs reveal" id="filterTabs">
+        <button class="filter-btn active" data-cat="all">All</button>
+        <button class="filter-btn" data-cat="strength"><i class="fas fa-dumbbell"></i> Strength</button>
+        <button class="filter-btn" data-cat="cardio"><i class="fas fa-heart-pulse"></i> Cardio</button>
+        <button class="filter-btn" data-cat="core"><i class="fas fa-circle-dot"></i> Core</button>
+        <button class="filter-btn" data-cat="yoga"><i class="fas fa-om"></i> Yoga</button>
+      </div>
+      <div id="exercisesGrid" class="exercises-grid">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ BMI CALCULATOR ░░ -->
+  <section id="bmi" class="section section-dark">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Health Check</span>
+        <h2>Know Your <span class="gradient-text">Numbers</span></h2>
+        <p>Calculate your BMI and get personalised fitness advice instantly.</p>
+      </div>
+      <div class="bmi-wrapper reveal">
+        <div class="bmi-form-card">
+          <div class="bmi-unit-toggle">
+            <button class="unit-btn active" id="btnMetric" data-unit="metric">Metric</button>
+            <button class="unit-btn" id="btnImperial" data-unit="imperial">Imperial</button>
+          </div>
+          <div class="bmi-inputs">
+            <div class="input-group">
+              <label for="bmiWeight">Weight</label>
+              <div class="input-wrap">
+                <input type="number" id="bmiWeight" placeholder="70" min="1" max="500" />
+                <span class="input-unit" id="weightUnit">kg</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="bmiHeight">Height</label>
+              <div class="input-wrap">
+                <input type="number" id="bmiHeight" placeholder="175" min="1" max="300" />
+                <span class="input-unit" id="heightUnit">cm</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" id="calcBmi">
+            <i class="fas fa-calculator"></i> Calculate BMI
+          </button>
+          <div id="bmiResult" class="bmi-result hidden">
+            <div class="bmi-gauge-container">
+              <svg class="bmi-gauge" viewBox="0 0 200 110">
+                <path d="M 10 100 A 90 90 0 0 1 190 100" fill="none" stroke="#2a2a3a" stroke-width="18" stroke-linecap="round"/>
+                <path id="gaugeArc" d="M 10 100 A 90 90 0 0 1 190 100" fill="none" stroke="#00c896" stroke-width="18" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283"/>
+              </svg>
+              <div class="bmi-value-center">
+                <span id="bmiNumber">--</span>
+                <small>BMI</small>
+              </div>
+            </div>
+            <div id="bmiCategory" class="bmi-category"></div>
+            <p id="bmiAdvice" class="bmi-advice"></p>
+          </div>
+        </div>
+        <div class="bmi-scale-card">
+          <h3>BMI Scale Reference</h3>
+          <div class="bmi-scale-item">
+            <div class="scale-dot" style="background:#4fc3f7"></div>
+            <div class="scale-info">
+              <span>Underweight</span>
+              <strong>&lt; 18.5</strong>
+            </div>
+          </div>
+          <div class="bmi-scale-item">
+            <div class="scale-dot" style="background:#00c896"></div>
+            <div class="scale-info">
+              <span>Normal Weight</span>
+              <strong>18.5 – 24.9</strong>
+            </div>
+          </div>
+          <div class="bmi-scale-item">
+            <div class="scale-dot" style="background:#ff9800"></div>
+            <div class="scale-info">
+              <span>Overweight</span>
+              <strong>25 – 29.9</strong>
+            </div>
+          </div>
+          <div class="bmi-scale-item">
+            <div class="scale-dot" style="background:#e63946"></div>
+            <div class="scale-info">
+              <span>Obese</span>
+              <strong>≥ 30</strong>
+            </div>
+          </div>
+          <div class="bmi-tips">
+            <h4><i class="fas fa-lightbulb"></i> Pro Tips</h4>
+            <p>BMI is a useful screening tool but doesn't account for muscle mass. Combine with body-fat % for the full picture.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ TESTIMONIALS ░░ -->
+  <section id="testimonials" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Real Results</span>
+        <h2>Stories That <span class="gradient-text">Inspire</span></h2>
+        <p>Don't take our word for it — hear from our growing community.</p>
+      </div>
+      <div class="testimonial-slider reveal">
+        <div id="testimonialTrack" class="testimonial-track">
+          <!-- Injected via JS -->
+        </div>
+        <div class="slider-controls">
+          <button class="slider-btn" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+          <div class="slider-dots" id="sliderDots"></div>
+          <button class="slider-btn" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ CONTACT ░░ -->
+  <section id="contact" class="section section-dark">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Get In Touch</span>
+        <h2>Ready to Start Your <span class="gradient-text">Journey?</span></h2>
+        <p>Tell us your goal and we'll point you in the right direction.</p>
+      </div>
+      <div class="contact-wrapper">
+        <div class="contact-info reveal">
+          <div class="c-info-item">
+            <div class="c-info-icon"><i class="fas fa-envelope"></i></div>
+            <div>
+              <strong>Email Us</strong>
+              <p>sarveshchaudhary8027@gmail.com</p>
+            </div>
+          </div>
+          <div class="c-info-item">
+            <div class="c-info-icon"><i class="fas fa-phone"></i></div>
+            <div>
+              <strong>Call Us</strong>
+              <p>+91 7355958027</p>
+            </div>
+          </div>
+          <div class="c-info-item">
+            <div class="c-info-icon"><i class="fas fa-location-dot"></i></div>
+            <div>
+              <strong>Find Us</strong>
+              <p>Lucknow, India</p>
+            </div>
+          </div>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+        <form id="contactForm" class="contact-form reveal delay-2">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" id="cName" placeholder="Sarvesh Chaudhary" required />
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="cEmail" placeholder="sarveshchaudhary8027@gmail.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Your Fitness Goal</label>
+            <select id="cGoal">
+              <option value="weight-loss">Weight Loss</option>
+              <option value="muscle-gain">Muscle Gain</option>
+              <option value="endurance">Build Endurance</option>
+              <option value="flexibility">Improve Flexibility</option>
+              <option value="general">General Fitness</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea id="cMessage" placeholder="Tell us more about your goals..." rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full btn-glow">
+            <i class="fas fa-paper-plane"></i> Send Message
+          </button>
+          <div id="formFeedback" class="form-feedback hidden"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer id="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">Limit<span>less</span></div>
+          <p>Forging champions since 2024.<br/>Your health. Your journey. Your legacy.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#workouts">Workouts</a></li>
+            <li><a href="#exercises">Exercises</a></li>
+            <li><a href="#bmi">BMI Tool</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Plans</h4>
+          <ul>
+            <li><a href="#workouts">Beginner</a></li>
+            <li><a href="#workouts">Intermediate</a></li>
+            <li><a href="#workouts">Advanced</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Newsletter</h4>
+          <p>Get weekly tips and workout inspiration.</p>
+          <div class="newsletter-form">
+            <input type="email" placeholder="your@email.com" />
+            <button class="btn-icon"><i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Limitless Fitness. All rights reserved.</p>
+        <p>Built with ❤️ for champions.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

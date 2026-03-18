@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Plans - Limitless</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="theme-init.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    body { background-color: var(--bg-1); color: var(--text-1); font-family: 'Inter', sans-serif; padding: 2rem;}
+    .pricing-container { max-width: 1000px; margin: 0 auto; text-align: center; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
+    .price-card { background: var(--bg-2); padding: 2.5rem 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border); transition: var(--transition); display:flex; flex-direction:column; }
+    .price-card:hover { transform: translateY(-5px); border-color: var(--primary-color); box-shadow: 0 10px 30px rgba(0, 200, 150, 0.1); }
+    .popular { border-color: var(--primary-color); position: relative; }
+    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: var(--bg-1); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+    .price { font-size: 2.5rem; font-weight: 800; color: var(--text-1); margin: 1rem 0; }
+    .features { list-style: none; padding: 0; margin: 1.5rem 0 2rem; color: var(--text-2); text-align: left; flex-grow: 1;}
+    .features li { margin-bottom: 0.8rem; display: flex; align-items:flex-start; gap:8px;}
+    @media(max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="pricing-container">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <a href="index.html" style="text-decoration:none;">
+        <h2 style="margin:0;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> Limitless <span class="gradient-text">Pro</span></h2>
+      </a>
+      <button class="theme-toggle-btn" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+    </div>
+    <p style="color: var(--text-2); margin-top:1.5rem; font-size: 1.1rem; max-width: 600px; margin-inline: auto;">Elevate your baseline. High-performance protocols for $PRO members.</p>
+
+    <div class="grid">
+      <!-- Monthly -->
+      <div class="glass-card">
+        <h3>Initiate</h3>
+        <div class="price">₹999<span style="font-size:1rem; color:var(--text-3); font-weight:400;">/mo</span></div>
+        <ul class="features">
+          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Smart Generator Access</li>
+          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Interactive Tracker</li>
+          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Standard Support</li>
+        </ul>
+        <button class="btn btn-primary btn-full" onclick="payWithRazorpay(999, 'Initiate Monthly')">Select Plan</button>
+      </div>
+
+      <!-- 6 Months -->
+      <div class="glass-card popular" style="border-color: var(--primary-color);">
+        <div class="popular-badge">MOST POPULAR</div>
+        <h3>Momentum</h3>
+        <div class="price">₹4,999<span style="font-size:1rem; color:var(--text-3); font-weight:400;">/6mo</span></div>
+        <ul class="features">
+          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> All Initiate Features</li>
+          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Priority Support</li>
+          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Advanced Heatmaps</li>
+        </ul>
+        <button class="btn btn-primary btn-full btn-glow" onclick="payWithRazorpay(4999, 'Momentum 6-Months')">Select Plan</button>
+      </div>
+
+      <!-- Annual -->
+      <div class="glass-card">
+        <h3>Limitless</h3>
+        <div class="price">₹8,999<span style="font-size:1rem; color:var(--text-3); font-weight:400;">/yr</span></div>
+        <ul class="features">
+          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> All Momentum Features</li>
+          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Weekly Video Reviews</li>
+          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Elite Discord Access</li>
+        </ul>
+        <button class="btn btn-primary btn-full" onclick="payWithRazorpay(8999, 'Limitless Annual')">Select Plan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function payWithRazorpay(amount, planName) {
+      const token = localStorage.getItem('limitless_token');
+      if (!token) {
+        alert('Please create a free account or sign in to purchase a Limitless Pro plan.');
+        window.location.href = 'signup.html';
+        return;
+      }
+
+      try {
+        // Step 1: Create order on the backend securely
+        const res = await fetch('/api/payment/create-order', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token 
+          },
+          body: JSON.stringify({ amount: amount, plan: planName })
+        });
+        
+        const data = await res.json();
+        
+        if (!data.success) {
+          alert('Error initializing payment. Check backend connection.');
+          return;
+        }
+
+        // Step 2: Open Razorpay Checkout automatically
+        const options = {
+          "key": data.key_id, // Fetching public key from backend naturally
+          "amount": data.order.amount, 
+          "currency": "INR",
+          "name": "Limitless Fitness",
+          "description": planName + " Subscription",
+          "order_id": data.order.id, 
+          "handler": async function (response) {
+            
+            // Step 3: Verify cryptographic signature on backend
+            const verifyRes = await fetch('/api/payment/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              alert('Payment Verification Successful! Welcome to Limitless Pro.');
+              window.location.href = 'dashboard.html';
+            } else {
+              alert('Payment security verification failed. Signature mismatch.');
+            }
+          },
+          "theme": { "color": "#00c896" }
+        };
+        const rzp1 = new Razorpay(options);
+        rzp1.open();
+
+      } catch (err) {
+        alert('Could not bridge to Razorpay checkout API. Ensure your Node.js backend server is actively running.');
+      }
+    }
+  </script>
+  <script src="cursor.js"></script>
+</body>
+</html>

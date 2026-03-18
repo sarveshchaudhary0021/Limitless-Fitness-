@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Limitless Fitness</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="theme-init.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background-color: var(--bg-1); color: var(--text-1); font-family: 'Inter', sans-serif; }
+    .dash-nav { padding: 1rem 2rem; background: var(--bg-2); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    .dash-container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
+    .card { background: var(--bg-2); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+    .form-control { width: 100%; padding: 0.8rem; background: var(--bg-1); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-md); box-sizing: border-box; margin-bottom: 1rem; }
+    .log-btn { width: 100%; padding: 1rem; font-size: 1rem; }
+    @media (max-width: 768px) { .dash-container { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="dash-nav">
+    <div class="nav-container" style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+      <a href="index.html" style="text-decoration:none;">
+        <h2 style="margin: 0;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> Limitless <span style="font-weight:400; color:var(--text-2);">Dashboard</span></h2>
+      </a>
+      <div class="nav-actions">
+        <a href="generator.html" class="btn btn-glass" style="padding: 0.5rem 1rem;"><i class="fas fa-brain"></i> Generator</a>
+        <button class="theme-toggle-btn" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <button onclick="logout()" class="btn btn-outline" style="padding: 0.5rem 1rem; border-color: #f43f5e; color:#f43f5e;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dash-container">
+    <div class="glass-card">
+      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-plus-circle"></i> Log Workout</h3>
+      <p style="color:var(--text-2); font-size:0.9rem; margin-bottom: 1.5rem;">Track your progressive overload instantly.</p>
+      
+      <form id="logForm">
+        <select id="exercise" class="form-control" required>
+          <option value="">Select Exercise...</option>
+          <option value="Bench Press">Bench Press</option>
+          <option value="Squat">Squat</option>
+          <option value="Deadlift">Deadlift</option>
+          <option value="Pull-Up">Pull-Up</option>
+          <option value="Overhead Press">Overhead Press</option>
+        </select>
+        <div style="display:flex; gap:0.5rem;">
+          <input type="number" id="sets" class="form-control" placeholder="Sets" min="1" required>
+          <input type="number" id="reps" class="form-control" placeholder="Reps" min="1" required>
+        </div>
+        <input type="number" id="weight" class="form-control" placeholder="Weight (kg)" min="0" step="0.5" required>
+        <button type="submit" class="btn btn-primary btn-full btn-glow">Save Workout</button>
+      </form>
+    </div>
+
+    <div class="glass-card">
+      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-chart-line"></i> Analytics & Volume</h3>
+      <div style="width: 100%; height: 320px; position:relative;">
+        <canvas id="progressChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('limitless_token');
+    if (!token) window.location.href = 'login.html';
+
+    let progressChart;
+
+    // Fetch and render chart
+    async function loadHistory() {
+      try {
+        const res = await fetch('/api/workouts/history', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          const dates = [...new Set(data.logs.map(log => log.date))];
+          
+          // Group cumulative volume per day
+          const volumeData = dates.map(date => {
+            const dayLogs = data.logs.filter(l => l.date === date);
+            return dayLogs.reduce((sum, log) => sum + (log.sets * log.reps * log.weight), 0);
+          });
+
+          renderChart(dates, volumeData);
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    function renderChart(dates, volumes) {
+      const ctx = document.getElementById('progressChart').getContext('2d');
+      if (progressChart) progressChart.destroy();
+
+      // Create deeply aesthetic gradient for the bars
+      const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+      gradient.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim());
+      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
+
+      progressChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: dates.length ? dates : ['No Data'],
+          datasets: [{
+            label: 'Total Lifted Volume (kg)',
+            data: volumes.length ? volumes : [0],
+            backgroundColor: gradient,
+            hoverBackgroundColor: '#00e6aa',
+            borderRadius: 6,
+            barPercentage: 0.5,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { 
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.95)',
+              titleColor: '#00c896',
+              bodyColor: '#f8fafc',
+              padding: 12,
+              cornerRadius: 8,
+              displayColors: false,
+              titleFont: { family: 'Inter', size: 14 }
+            }
+          },
+          scales: {
+            x: { 
+              ticks: { color: '#64748b', font: { family: 'Inter' } }, 
+              grid: { display: false },
+              border: { display: false }
+            },
+            y: { 
+              beginAtZero: true,
+              ticks: { color: '#64748b', font: { family: 'Inter' }, padding: 10 }, 
+              grid: { color: 'rgba(100, 116, 139, 0.15)', drawBorder: false },
+              border: { display: false }
+            }
+          },
+          animation: {
+            duration: 1200,
+            easing: 'easeOutQuart'
+          }
+        }
+      });
+    }
+
+    document.getElementById('logForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        exercise: document.getElementById('exercise').value,
+        sets: document.getElementById('sets').value,
+        reps: document.getElementById('reps').value,
+        weight: document.getElementById('weight').value
+      };
+
+      try {
+        const res = await fetch('/api/workouts/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          e.target.reset();
+          loadHistory(); // reload chart dynamically
+        } else {
+          alert('Failed to log');
+        }
+      } catch (err) { alert('Error logging'); }
+    });
+
+    function logout() {
+      localStorage.removeItem('limitless_token');
+      localStorage.removeItem('limitless_user');
+      window.location.href = 'index.html';
+    }
+
+    // Init
+    loadHistory();
+  </script>
+  <script src="cursor.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

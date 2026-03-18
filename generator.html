@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Generator - Limitless</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="theme-init.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background-color: var(--bg-1); color: var(--text-1); padding: 2rem; font-family: 'Inter', sans-serif;}
+    .container { max-width: 800px; margin: 0 auto; }
+    .gen-card { background: var(--bg-2); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; box-shadow: var(--shadow-md);}
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-2); font-weight: 600; font-size: 0.9rem;}
+    .form-control { font-family: 'Inter', sans-serif; width: 100%; padding: 0.8rem; background: var(--bg-1); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-md); box-sizing: border-box; transition: var(--transition);}
+    .form-control:focus { outline: none; border-color: var(--primary-color); }
+    .plan-result { display: none; margin-top: 2rem; padding: 2rem; background: var(--primary-color-10); border: 1px solid var(--primary-color-20); border-radius: var(--radius-lg); animation: slideUp 0.5s ease-out forwards; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 3rem;">
+      <a href="index.html" style="text-decoration:none;">
+        <h2 style="margin: 0;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> Limitless <span style="font-weight:400; color:var(--text-2);">Generator</span></h2>
+      </a>
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-outline" style="padding: 0.5rem 1rem;"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <button class="theme-toggle-btn" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="glass-card" id="generatorCard">
+      <p style="color: var(--text-2); margin-bottom: 2rem; line-height:1.6; font-size: 0.95rem;">Our algorithmic engine crafts a high-performance protocol based on your biometrics, regional cuisine, and cultural modifiers.</p>
+      
+      <form id="generatorForm">
+        <div style="display:flex; gap: 1.5rem; margin-bottom: 1.5rem;">
+          <div class="form-group" style="flex:1; margin-bottom: 0;">
+            <label>Age</label>
+            <input type="number" id="age" class="form-control" placeholder="25" min="14" max="100" required>
+          </div>
+          <div class="form-group" style="flex:1; margin-bottom: 0;">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight" class="form-control" placeholder="75" min="30" max="250" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Transformation Goal</label>
+          <select id="goal" class="form-control" required>
+            <option value="muscle-gain">Hypertrophy (Muscle Gain)</option>
+            <option value="fat-loss">Cutting (Fat Loss)</option>
+            <option value="maintain">Body Recomposition</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Dietary Paradigm</label>
+          <select id="pref" class="form-control" required>
+            <option value="veg">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+            <option value="non-veg">Omnivore (Non-Veg)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Cultural Modifiers</label>
+          <select id="region" class="form-control" required>
+            <option value="indian">Indian (Spices & Staples)</option>
+            <option value="western">Western Standard (Pantry)</option>
+            <option value="jain">Jain (No Onion/Garlic)</option>
+            <option value="halal">Halal Certified Sources</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-glow" style="padding: 1rem; font-size:1rem; margin-top:1rem;"><i class="fas fa-bolt"></i> Generate Master Plan</button>
+      </form>
+    </div>
+
+    <div id="planResult" class="plan-result glass-card" style="margin-top: 2rem; background: var(--bg-2); border-color: var(--primary-color);">
+      <h3 style="margin-bottom: 1rem; color: var(--primary-color); font-weight: 700;">Your Limitless Protocol</h3>
+      <div style="font-size: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; margin-bottom: 1.5rem; color: var(--text-1);">
+        <strong>🔥 Daily Target:</strong> <span id="resCalories" style="font-weight:800; color:var(--primary-color);"></span> Kcal
+      </div>
+      
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+          <h4 style="margin-bottom: 1rem; color: var(--text-1); display:flex; align-items:center; gap:8px;"><i class="fas fa-utensils" style="color:var(--primary-color);"></i> Diet Structure</h4>
+          <ul id="resDiet" style="color: var(--text-2); line-height: 1.8; padding-left: 1.2rem; font-size: 0.9rem;"></ul>
+        </div>
+        <div>
+          <h4 style="margin-bottom: 1rem; color: var(--text-1); display:flex; align-items:center; gap:8px;"><i class="fas fa-dumbbell" style="color:var(--primary-color);"></i> Training Split</h4>
+          <ul id="resRoutine" style="color: var(--text-2); line-height: 1.8; padding-left: 1.2rem; font-size: 0.9rem;"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('generatorForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.innerText = 'Calculating Variables...'; btn.disabled = true;
+
+      const payload = {
+        age: document.getElementById('age').value,
+        weight: document.getElementById('weight').value,
+        goal: document.getElementById('goal').value,
+        dietParams: {
+          preference: document.getElementById('pref').value,
+          region: document.getElementById('region').value
+        }
+      };
+
+      try {
+        const res = await fetch('/api/generate-plan', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          document.getElementById('resCalories').innerText = data.plan.targetCalories;
+          document.getElementById('resDiet').innerHTML = data.plan.dailyDiet.map(d => `<li>${d}</li>`).join('');
+          document.getElementById('resRoutine').innerHTML = data.plan.weeklyRoutine.map(r => `<li>${r}</li>`).join('');
+          
+          document.getElementById('planResult').style.display = 'block';
+          document.getElementById('planResult').scrollIntoView({ behavior: 'smooth' });
+        }
+      } catch (err) {
+        alert('Generation engine failed to connect.');
+      }
+      btn.innerHTML = '<i class="fas fa-bolt"></i> Generate Master Plan'; btn.disabled = false;
+    });
+  </script>
+  <script src="cursor.js"></script>
+</body>
+</html>
