@@ -1,0 +1,65 @@
+/* Nav */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 0; transition: background var(--transition), backdrop-filter var(--transition); }
+.nav.scrolled { background: rgba(10,10,11,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 12px 0; border-bottom: 1px solid var(--border); }
+.nav__inner { display: flex; align-items: center; gap: 40px; justify-content: space-between; }
+.nav__logo { font-family: var(--font-display); font-size: 24px; letter-spacing: 3px; color: var(--accent); flex: 1; text-decoration: none; }
+.nav__links { display: flex; list-style: none; gap: 32px; margin: 0; padding: 0; align-items: center; }
+.nav__links a { font-size: 14px; font-weight: 500; color: var(--text-lo); transition: color var(--transition); text-decoration: none; }
+.nav__links a:hover { color: var(--text-hi); }
+.nav__actions { display: flex; align-items: center; gap: 12px; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-mid); padding: 8px 16px; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 14px; font-weight: 500; cursor: pointer; transition: all var(--transition); text-decoration: none; display: inline-block; }
+.btn-ghost:hover { border-color: var(--border-hover); color: var(--text-hi); }
+.btn-primary { background: var(--accent); color: #0A0A0B; padding: 9px 20px; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all var(--transition); letter-spacing: 0.02em; text-decoration: none; display: inline-block; }
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.nav__hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+.nav__hamburger span { display: block; width: 22px; height: 2px; background: var(--text-hi); border-radius: 2px; transition: all var(--transition); }
+@media (max-width: 768px) { .nav__links { display: none; } .nav__hamburger { display: flex; } }
+
+/* Hero */
+.hero { min-height: 100vh; display: flex; align-items: center; padding-top: 80px; background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232,255,71,0.08) 0%, transparent 60%); }
+.hero__title { font-size: clamp(64px, 10vw, 120px); line-height: 0.95; color: var(--text-hi); margin: 16px 0 24px; font-family: var(--font-display); letter-spacing: 0.04em; }
+.hero__title--accent { color: var(--accent); }
+.hero__sub { font-size: 18px; color: var(--text-lo); max-width: 480px; margin-bottom: 36px; line-height: 1.6; }
+.hero__ctas { display: flex; gap: 12px; margin-bottom: 56px; flex-wrap: wrap; }
+.btn-large { padding: 14px 28px; font-size: 16px; }
+.hero__stats { display: flex; gap: 48px; border-top: 1px solid var(--border); padding-top: 32px; }
+.stat__num { font-family: var(--font-display); font-size: 42px; color: var(--accent); display: block; line-height: 1; }
+.stat__label { font-size: 13px; color: var(--text-lo); margin-top: 4px; display: block; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Features */
+.features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 56px; }
+.feature-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 28px; transition: all var(--transition); }
+.feature-card:hover { border-color: var(--accent); background: var(--bg-card-hover); transform: translateY(-4px); box-shadow: 0 0 0 1px var(--accent), 0 16px 40px rgba(232,255,71,0.06); }
+.feature-card__icon { width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--accent-dim); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: var(--accent); }
+.feature-card__title { font-family: var(--font-display); font-size: 22px; color: var(--text-hi); margin-bottom: 10px; letter-spacing: 0.06em; }
+.feature-card__desc { font-size: 14px; color: var(--text-lo); line-height: 1.7; margin: 0; }
+
+/* Exercises */
+.exercise-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+.filter-btn { padding: 8px 20px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-lo); font-family: var(--font-body); font-size: 14px; font-weight: 500; cursor: pointer; transition: all var(--transition); }
+.filter-btn.active, .filter-btn:hover { background: var(--accent); color: #0A0A0B; border-color: var(--accent); }
+.exercise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.exercise-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; transition: all var(--transition); }
+.exercise-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+.exercise-card__cat { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.exercise-card__name { font-family: var(--font-display); font-size: 20px; color: var(--text-hi); margin-bottom: 6px; letter-spacing: 0.04em; }
+.exercise-card__muscle { font-size: 13px; color: var(--text-lo); margin: 0; }
+.exercise-card.hidden { display: none; }
+
+/* BMI */
+.bmi-gauge-wrap { position: relative; width: 200px; margin: 0 auto 16px; }
+.bmi-arc { display: block; margin: 0 auto; }
+.bmi-num-overlay { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); text-align: center; }
+.bmi-num-overlay span { font-family: var(--font-display); font-size: 40px; color: var(--text-hi); display: block; line-height: 1; }
+.bmi-num-overlay small { font-size: 12px; color: var(--text-lo); text-transform: uppercase; letter-spacing: 0.1em; }
+.bmi-label { text-align: center; font-size: 16px; font-weight: 600; margin-top: 8px; }
+
+/* Contact Form Overrides */
+.contact-form input, .contact-form select, .contact-form textarea {
+  width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 14px 16px; color: var(--text-hi); font-family: var(--font-body); font-size: 15px;
+  outline: none; transition: border-color var(--transition); margin-bottom: 14px;
+}
+.contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--accent); }
+.contact-form textarea { min-height: 140px; resize: vertical; margin-bottom: 5px; }
+.char-counter { font-size: 12px; color: var(--text-lo); text-align: right; margin-bottom: 14px; }

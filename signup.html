@@ -1,97 +1,446 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Join Us - Limitless Fitness</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="theme-init.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Join Limitless — Create Your Account</title>
+  <meta name="description" content="Create your free Limitless Fitness account and start your transformation today." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/global.css" />
+  <link rel="stylesheet" href="styles/auth.css" />
+
   <style>
-    body { 
-      background: radial-gradient(circle at top right, var(--bg-2) 0%, var(--bg) 100%); 
-      display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; 
-      font-family: 'Inter', sans-serif; overflow: hidden;
+    /* ── Plan pre-select pill (from pricing.html redirect) ── */
+    .plan-pill {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(232,255,71,0.25);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 20px;
     }
-    .auth-card { 
-      background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border); padding: 3rem; border-radius: var(--radius-lg); 
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 100%; max-width: 420px; text-align: center; 
-      position: relative; z-index: 1;
+    .plan-pill.visible { display: flex; }
+    .plan-pill svg { flex-shrink: 0; }
+
+    /* ── Goal buttons (replace <select>) ── */
+    .goal-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-lo);
+      margin-bottom: 10px;
+      display: block;
     }
-    .auth-card::before {
-      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 60%);
-      pointer-events: none; z-index: -1;
+    .goal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
     }
-    .auth-input { 
-      box-sizing: border-box; width: 100%; padding: 1rem 1.25rem; border: 1px solid var(--border); 
-      border-radius: var(--radius-md); background: var(--bg); color: var(--text-1); 
-      margin-bottom: 1.25rem; font-family: 'Inter', sans-serif; font-size: 0.95rem;
+    .goal-btn {
+      padding: 9px 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-lo);
+      cursor: pointer;
       transition: all var(--transition);
+      text-align: center;
+      line-height: 1.3;
     }
-    .auth-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); background: var(--bg-2); }
+    .goal-btn:hover {
+      border-color: var(--border-hover);
+      color: var(--text-hi);
+    }
+    .goal-btn.selected {
+      background: var(--accent-dim);
+      border-color: rgba(232,255,71,0.4);
+      color: var(--accent);
+    }
+    /* Hidden actual select kept for form serialization */
+    #goal-select { display: none; }
+
+    /* ── Checklist requirements ── */
+    .pw-reqs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: -6px;
+      margin-bottom: 14px;
+    }
+    .pw-req {
+      font-size: 11px;
+      color: var(--text-lo);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.25s ease;
+    }
+    .pw-req svg {
+      width: 12px; height: 12px;
+      flex-shrink: 0;
+      opacity: 0.4;
+      transition: opacity 0.25s ease, stroke 0.25s ease;
+    }
+    .pw-req.met {
+      color: var(--success);
+    }
+    .pw-req.met svg {
+      opacity: 1;
+      stroke: var(--success);
+    }
   </style>
 </head>
 <body>
-  <button class="theme-toggle-btn" aria-label="Toggle theme" style="position: absolute; top: 2rem; right: 2rem; z-index: 1000;">
-    <span class="theme-icon">🌙</span>
-  </button>
+<div class="auth-page">
 
-  <div class="auth-card glass-card">
-    <a href="index.html" style="text-decoration: none;">
-      <h2 style="margin-bottom: 0.5rem;"><i class="fa-solid fa-bolt" style="color:var(--primary-color);"></i> <span class="gradient-text">Become Limitless</span></h2>
-    </a>
-    <p style="color: var(--text-2); margin-bottom: 2rem; font-size:0.95rem;">Create your free account to track workouts</p>
-    
-    <form id="signupForm">
-      <input type="text" id="name" class="auth-input" placeholder="Full Name (e.g., John Doe)" required>
-      <input type="email" id="email" class="auth-input" placeholder="Secure Email Address" required>
-      <input type="password" id="password" class="auth-input" placeholder="Strong Password" required>
-      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
-    </form>
-    
-    <p style="margin-top: 1.5rem; color: var(--text-2); font-size: 0.9rem;">
-      Already have an account? <a href="login.html" style="color: var(--primary-color); font-weight:600; text-decoration:none;">Sign In</a>
-    </p>
+  <!-- ══════════════════════════════════
+       LEFT — Brand panel
+  ══════════════════════════════════ -->
+  <div class="auth-brand">
+    <div class="auth-brand__top">
+      <a href="index.html" class="auth-logo">LIMITLESS</a>
+    </div>
+
+    <div class="auth-brand__body">
+      <h1 class="auth-brand__headline">
+        BECOME<br>
+        <em>LIMITLESS.</em><br>
+        START FREE.
+      </h1>
+      <p class="auth-brand__sub">
+        Join 1,200+ members already training smarter. Your free account includes the full exercise library, BMI tools, and your first workout plan.
+      </p>
+      <div class="auth-brand__stats">
+        <div>
+          <span class="auth-brand__stat-num">Free</span>
+          <span class="auth-brand__stat-label">To start</span>
+        </div>
+        <div>
+          <span class="auth-brand__stat-num">2 min</span>
+          <span class="auth-brand__stat-label">To sign up</span>
+        </div>
+        <div>
+          <span class="auth-brand__stat-num">0</span>
+          <span class="auth-brand__stat-label">Credit card needed</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-brand__accent-bar"></div>
   </div>
 
-  <script>
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const btn = e.target.querySelector('button');
+  <!-- ══════════════════════════════════
+       RIGHT — Signup form
+  ══════════════════════════════════ -->
+  <div class="auth-form-side">
 
-      btn.innerText = 'Creating Account...';
-      btn.disabled = true;
-      
-      try {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST', 
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password })
-        });
-        const data = await res.json();
-        
-        if (res.ok) {
-          localStorage.setItem('limitless_token', data.token);
-          localStorage.setItem('limitless_user', JSON.stringify(data.user));
-          window.location.href = 'dashboard.html';
-        } else {
-          alert('Registration Failed: ' + data.error);
-          btn.innerText = 'Create Account';
-          btn.disabled = false;
-        }
-      } catch (err) { 
-        alert('Server connection error. Please try again later.'); 
-        btn.innerText = 'Create Account';
-        btn.disabled = false;
-      }
+    <a href="index.html" class="auth-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back to home
+    </a>
+
+    <div class="auth-form-wrap">
+
+      <h2 class="auth-form-title">Create account</h2>
+      <p class="auth-form-sub">Join thousands building their best self</p>
+
+      <!-- Plan pre-select pill (shown when redirected from pricing) -->
+      <div class="plan-pill" id="plan-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/>
+          <path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/>
+          <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>
+        </svg>
+        <span id="plan-pill-text">Plan selected</span>
+      </div>
+
+      <!-- Error banner -->
+      <div class="auth-error" id="form-error"></div>
+
+      <form id="signup-form" onsubmit="handleSignupSubmit(event)" novalidate>
+
+        <!-- Full name -->
+        <div class="field-wrap">
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Full name"
+            autocomplete="name"
+            required
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="field-wrap">
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Email address"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="field-wrap field-wrap--password">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create a password"
+            autocomplete="new-password"
+            required
+          />
+          <button
+            type="button"
+            class="pw-toggle"
+            id="pw-toggle-signup"
+            aria-label="Show password"
+            onclick="togglePw('password','signup')"
+          >
+            <svg id="eye-signup" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Password strength bar -->
+        <div class="strength-wrap">
+          <div class="strength-track">
+            <div class="strength-fill" id="strength-fill"></div>
+          </div>
+          <div class="strength-label" id="strength-label">Enter a password</div>
+        </div>
+
+        <!-- Password requirements checklist -->
+        <div class="pw-reqs">
+          <div class="pw-req" id="req-len">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            8+ characters
+          </div>
+          <div class="pw-req" id="req-upper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Uppercase letter
+          </div>
+          <div class="pw-req" id="req-num">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Number
+          </div>
+          <div class="pw-req" id="req-special">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Special character
+          </div>
+        </div>
+
+        <!-- Fitness goal selector -->
+        <label class="goal-label">Your fitness goal</label>
+        <div class="goal-grid" id="goal-grid">
+          <button type="button" class="goal-btn" data-value="Weight Loss"        onclick="selectGoal(this)">Weight Loss</button>
+          <button type="button" class="goal-btn" data-value="Muscle Gain"        onclick="selectGoal(this)">Muscle Gain</button>
+          <button type="button" class="goal-btn" data-value="Build Endurance"    onclick="selectGoal(this)">Build Endurance</button>
+          <button type="button" class="goal-btn" data-value="Improve Flexibility" onclick="selectGoal(this)">Flexibility</button>
+          <button type="button" class="goal-btn" data-value="General Fitness"    onclick="selectGoal(this)" style="grid-column:span 2">General Fitness</button>
+        </div>
+        <!-- Hidden select — value synced by JS for backend -->
+        <select id="goal-select" name="goal" tabindex="-1" aria-hidden="true">
+          <option value="">Select goal</option>
+          <option value="Weight Loss">Weight Loss</option>
+          <option value="Muscle Gain">Muscle Gain</option>
+          <option value="Build Endurance">Build Endurance</option>
+          <option value="Improve Flexibility">Improve Flexibility</option>
+          <option value="General Fitness">General Fitness</option>
+        </select>
+
+        <!-- Submit -->
+        <button type="submit" class="auth-submit" id="signup-btn">
+          <span class="auth-submit__text">Create Account &rarr;</span>
+          <div class="auth-submit__dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
+
+      </form>
+
+      <p class="auth-terms">
+        By creating an account you agree to our
+        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+      </p>
+
+      <div class="auth-switch">
+        Already have an account?&nbsp;
+        <a href="login.html">Sign in &rarr;</a>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /.auth-page -->
+
+<script src="auth-client.js"></script>
+<script>
+/* ── Eye icon SVG strings ────────────────────── */
+const EYE_OPEN = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+const EYE_OFF  = `<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+
+function togglePw(inputId, suffix) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById('eye-' + suffix);
+  const isHidden = input.type === 'password';
+  input.type     = isHidden ? 'text' : 'password';
+  icon.innerHTML = isHidden ? EYE_OFF : EYE_OPEN;
+  input.focus();
+}
+
+/* ── Password strength meter ─────────────────── */
+const LEVELS = [
+  { w: '0%',   c: 'var(--border)',   t: 'Enter a password',  tc: 'var(--text-lo)' },
+  { w: '25%',  c: 'var(--danger)',   t: 'Too weak',          tc: 'var(--danger)' },
+  { w: '50%',  c: 'var(--warning)',  t: 'Could be stronger', tc: 'var(--warning)' },
+  { w: '75%',  c: '#63D68D',         t: 'Good password',     tc: '#63D68D' },
+  { w: '100%', c: 'var(--accent)',   t: 'Strong password',   tc: 'var(--accent)' },
+];
+
+document.getElementById('password').addEventListener('input', function () {
+  const v = this.value;
+  let score = 0;
+  const hasLen     = v.length >= 8;
+  const hasUpper   = /[A-Z]/.test(v);
+  const hasNum     = /[0-9]/.test(v);
+  const hasSpecial = /[^A-Za-z0-9]/.test(v);
+
+  if (hasLen)     score++;
+  if (hasUpper)   score++;
+  if (hasNum)     score++;
+  if (hasSpecial) score++;
+
+  /* Req checklist */
+  document.getElementById('req-len').classList.toggle('met', hasLen);
+  document.getElementById('req-upper').classList.toggle('met', hasUpper);
+  document.getElementById('req-num').classList.toggle('met', hasNum);
+  document.getElementById('req-special').classList.toggle('met', hasSpecial);
+
+  /* Strength bar */
+  const fill  = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  const lvl   = v.length === 0 ? LEVELS[0] : LEVELS[score] || LEVELS[4];
+  fill.style.width      = lvl.w;
+  fill.style.background = lvl.c;
+  label.textContent     = lvl.t;
+  label.style.color     = lvl.tc;
+});
+
+/* ── Goal selector ───────────────────────────── */
+function selectGoal(btn) {
+  document.querySelectorAll('.goal-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('goal-select').value = btn.dataset.value;
+}
+
+/* ── Plan pill from URL param ─────────────────── */
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const plan   = params.get('plan');
+  if (plan) {
+    const pill = document.getElementById('plan-pill');
+    const names = { initiate: 'Initiate — ₹999/mo', momentum: 'Momentum — ₹4,999/6mo', limitless: 'Limitless — ₹8,999/yr' };
+    document.getElementById('plan-pill-text').textContent =
+      'Plan selected: ' + (names[plan] || plan);
+    pill.classList.add('visible');
+  }
+})();
+
+/* ── Signup submit handler ───────────────────── */
+async function handleSignupSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('signup-btn');
+  const err = document.getElementById('form-error');
+
+  err.textContent = '';
+  err.classList.remove('show');
+
+  /* Client-side guard */
+  const pw = document.getElementById('password').value;
+  if (pw.length < 8) {
+    err.textContent = 'Password must be at least 8 characters.';
+    err.classList.add('show');
+    return;
+  }
+  if (!/[A-Z]/.test(pw)) {
+    err.textContent = 'Password must contain at least one uppercase letter.';
+    err.classList.add('show');
+    return;
+  }
+  if (!/[0-9]/.test(pw)) {
+    err.textContent = 'Password must contain at least one number.';
+    err.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:     document.getElementById('name').value.trim(),
+        email:    document.getElementById('email').value.trim(),
+        password: pw,
+      }),
     });
-  </script>
-  <script src="cursor.js"></script>
-  <script src="script.js"></script>
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Signup failed.');
+
+    /* Success — redirect to dashboard (or plan upgrade if plan param present) */
+    const params = new URLSearchParams(window.location.search);
+    const plan   = params.get('plan');
+    window.location.href = plan ? `pricing.html?plan=${plan}` : 'dashboard.html';
+
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+/* ── Redirect if already logged in ──────────── */
+(async () => {
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/me', {
+      credentials: 'include',
+    });
+    if (res.ok) window.location.replace('dashboard.html');
+  } catch {}
+})();
+</script>
 </body>
 </html>

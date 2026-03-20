@@ -1,153 +1,1067 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Premium Plans - Limitless</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="theme-init.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pro Plans — Limitless Fitness</title>
+  <meta name="description" content="Choose the plan that fits your transformation. Limitless Fitness Pro plans from ₹999/mo." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/global.css" />
+
   <style>
-    body { background-color: var(--bg); color: var(--text-1); font-family: 'Inter', sans-serif; padding: 2rem; transition: background 0.3s, color 0.3s; }
-    .pricing-container { max-width: 1000px; margin: 0 auto; text-align: center; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
-    .price { font-size: 2.5rem; font-weight: 800; color: var(--text-1); margin: 1rem 0; }
-    .features { list-style: none; padding: 0; margin: 1.5rem 0 2rem; color: var(--text-2); text-align: left; flex-grow: 1;}
-    .features li { margin-bottom: 0.8rem; display: flex; align-items:flex-start; gap:8px;}
-    .popular { border-color: var(--primary-color) !important; position: relative; }
-    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; z-index: 10; }
-    @media(max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+    /* ══════════════════════════════════════════
+       PAGE BASE
+    ══════════════════════════════════════════ */
+    body { overflow-x: hidden; }
+
+    /* ── Sticky nav ──────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 18px 0;
+      background: rgba(10,10,11,0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav__inner {
+      display: flex; align-items: center;
+      max-width: var(--max-width); margin: 0 auto; padding: 0 24px;
+      gap: 24px;
+    }
+    .nav__logo {
+      font-family: var(--font-display); font-size: 20px;
+      letter-spacing: 4px; color: var(--accent); flex: 1;
+    }
+    .nav__back {
+      font-size: 13px; font-weight: 500; color: var(--text-lo);
+      display: flex; align-items: center; gap: 6px;
+      transition: color var(--transition);
+    }
+    .nav__back:hover { color: var(--text-hi); }
+    .nav__back svg { transition: transform var(--transition); }
+    .nav__back:hover svg { transform: translateX(-3px); }
+    .nav__cta {
+      padding: 8px 18px; background: var(--accent); color: #0A0A0B;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 700;
+      transition: all var(--transition); border: none; cursor: pointer;
+      font-family: var(--font-body);
+    }
+    .nav__cta:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+    /* ══════════════════════════════════════════
+       HERO BAND
+    ══════════════════════════════════════════ */
+    .pricing-hero {
+      padding: 120px 0 64px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .pricing-hero__glow {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 500px;
+      background: radial-gradient(ellipse at center, rgba(232,255,71,0.09) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .pricing-hero__grid {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(42,42,48,0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(42,42,48,0.4) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 0%, black 20%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 0%, black 20%, transparent 75%);
+    }
+    .pricing-hero__inner { position: relative; z-index: 1; }
+    .pricing-hero__tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 100px;
+      border: 1px solid rgba(232,255,71,0.25);
+      background: rgba(232,255,71,0.07);
+      font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 22px;
+      animation: fadeUp 0.6s var(--ease) both;
+    }
+    .pricing-hero__tag-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100%{ opacity:1; transform:scale(1); }
+      50%    { opacity:.5; transform:scale(.75); }
+    }
+    .pricing-hero__title {
+      font-size: clamp(52px, 7vw, 88px);
+      line-height: 0.95; margin-bottom: 20px;
+      animation: fadeUp 0.6s var(--ease) 0.08s both;
+    }
+    .pricing-hero__title em {
+      font-style: normal; color: var(--accent); display: block;
+    }
+    .pricing-hero__sub {
+      font-size: 17px; color: var(--text-lo);
+      line-height: 1.75; max-width: 520px;
+      margin: 0 auto 36px;
+      animation: fadeUp 0.6s var(--ease) 0.16s both;
+    }
+
+    /* ── Billing toggle ──────────────────────── */
+    .billing-toggle {
+      display: inline-flex; align-items: center; gap: 14px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 100px; padding: 5px 5px 5px 18px;
+      margin-bottom: 64px;
+      animation: fadeUp 0.6s var(--ease) 0.24s both;
+    }
+    .billing-toggle__label {
+      font-size: 13px; font-weight: 600; color: var(--text-lo);
+    }
+    .billing-toggle__label.active { color: var(--text-hi); }
+    .billing-toggle__switch {
+      position: relative; width: 44px; height: 24px;
+      background: var(--border); border-radius: 100px;
+      cursor: pointer; border: none;
+      transition: background var(--transition);
+    }
+    .billing-toggle__switch.yearly { background: var(--accent); }
+    .billing-toggle__thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--text-hi);
+      transition: transform var(--transition);
+      pointer-events: none;
+    }
+    .billing-toggle__switch.yearly .billing-toggle__thumb { transform: translateX(20px); }
+    .billing-save {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      padding: 4px 12px; border-radius: 100px;
+      background: rgba(232,255,71,0.15); color: var(--accent);
+      border: 1px solid rgba(232,255,71,0.25);
+    }
+
+    /* ══════════════════════════════════════════
+       PRICING CARDS
+    ══════════════════════════════════════════ */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 1040px;
+      margin: 0 auto;
+      align-items: start;
+      padding: 0 24px;
+    }
+
+    .plan {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      position: relative;
+      transition: all 0.35s var(--ease);
+    }
+    .plan:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-hover);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+    }
+
+    /* Popular card — scaled up, accent border */
+    .plan--popular {
+      border-color: rgba(232,255,71,0.45);
+      background: linear-gradient(160deg, rgba(232,255,71,0.05) 0%, var(--bg-card) 40%);
+      transform: translateY(-8px);
+      box-shadow: 0 0 0 1px rgba(232,255,71,0.2), 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .plan--popular:hover {
+      transform: translateY(-14px);
+      box-shadow: 0 0 0 1px rgba(232,255,71,0.4), 0 32px 72px rgba(232,255,71,0.1);
+    }
+
+    /* Popular badge */
+    .plan__badge {
+      position: absolute; top: -14px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent); color: #0A0A0B;
+      font-size: 10px; font-weight: 800;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 5px 18px; border-radius: 100px;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(232,255,71,0.4);
+    }
+
+    /* Plan name */
+    .plan__name {
+      font-size: 32px; letter-spacing: 0.06em;
+      color: var(--text-hi); margin-bottom: 4px;
+    }
+    .plan__tagline {
+      font-size: 13px; color: var(--text-lo); margin-bottom: 28px;
+    }
+
+    /* Price block */
+    .plan__price-block { margin-bottom: 28px; }
+    .plan__price {
+      display: flex; align-items: flex-end; gap: 4px; margin-bottom: 4px;
+    }
+    .plan__currency {
+      font-size: 22px; color: var(--text-mid); font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .plan__amount {
+      font-family: var(--font-display);
+      font-size: 56px; line-height: 1; color: var(--text-hi);
+      transition: opacity 0.2s ease;
+    }
+    .plan--popular .plan__amount { color: var(--accent); }
+    .plan__period {
+      font-size: 13px; color: var(--text-lo);
+      margin-bottom: 10px;
+    }
+    .plan__equiv {
+      font-size: 12px; color: var(--text-lo);
+      min-height: 18px;
+    }
+    .plan__equiv span { color: var(--success); font-weight: 600; }
+
+    /* Divider */
+    .plan__divider {
+      height: 1px; background: var(--border); margin: 24px 0;
+    }
+
+    /* Feature list */
+    .plan__features {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 13px;
+      margin-bottom: 32px;
+    }
+    .plan__feature {
+      display: flex; align-items: flex-start; gap: 11px;
+      font-size: 14px; color: var(--text-mid); line-height: 1.5;
+    }
+    .plan__feature-check {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(74,226,138,0.12);
+      border: 1px solid rgba(74,226,138,0.25);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+      color: var(--success);
+    }
+    .plan--popular .plan__feature-check {
+      background: rgba(232,255,71,0.12);
+      border-color: rgba(232,255,71,0.3);
+      color: var(--accent);
+    }
+    .plan__feature-check svg { width: 10px; height: 10px; }
+
+    /* Greyed-out "not included" */
+    .plan__feature--off {
+      opacity: 0.38;
+    }
+    .plan__feature--off .plan__feature-check {
+      background: var(--bg-card);
+      border-color: var(--border);
+      color: var(--text-lo);
+    }
+
+    /* CTA button */
+    .plan__btn {
+      width: 100%; padding: 15px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body); font-size: 15px; font-weight: 700;
+      letter-spacing: 0.03em; cursor: pointer;
+      transition: all var(--transition);
+      border: 1px solid var(--border);
+      background: transparent; color: var(--text-hi);
+    }
+    .plan__btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(232,255,71,0.04);
+    }
+    .plan--popular .plan__btn {
+      background: var(--accent); color: #0A0A0B;
+      border-color: var(--accent);
+      box-shadow: 0 4px 20px rgba(232,255,71,0.3);
+    }
+    .plan--popular .plan__btn:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 8px 28px rgba(232,255,71,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Loading state */
+    .plan__btn.loading {
+      opacity: 0.6; cursor: not-allowed; pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════
+       TRUST BAR
+    ══════════════════════════════════════════ */
+    .trust-bar {
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 32px;
+      padding: 32px 24px;
+      max-width: 860px; margin: 48px auto 0;
+      border-top: 1px solid var(--border);
+    }
+    .trust-item {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 13px; color: var(--text-lo); font-weight: 500;
+    }
+    .trust-item svg { color: var(--accent); flex-shrink: 0; }
+
+    /* ══════════════════════════════════════════
+       COMPARISON TABLE
+    ══════════════════════════════════════════ */
+    .compare-section {
+      padding: 80px 24px;
+      max-width: 1000px; margin: 0 auto;
+    }
+    .compare-title {
+      font-size: clamp(32px, 4vw, 48px); text-align: center;
+      margin-bottom: 8px;
+    }
+    .compare-sub {
+      text-align: center; font-size: 15px; color: var(--text-lo);
+      margin-bottom: 48px;
+    }
+    .compare-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 14px;
+    }
+    .compare-table thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-table th {
+      padding: 16px 20px; text-align: left;
+      font-family: var(--font-display); font-size: 18px;
+      letter-spacing: 0.05em; color: var(--text-hi);
+      font-weight: 400;
+    }
+    .compare-table th:first-child { color: var(--text-lo); font-size: 14px; }
+    .compare-table th.popular-col { color: var(--accent); }
+    .compare-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(42,42,48,0.6);
+      color: var(--text-mid);
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+    .compare-table td:first-child { color: var(--text-lo); font-size: 13px; }
+    .compare-table td.popular-col { color: var(--accent); font-weight: 600; }
+    .check-yes { color: var(--success); font-size: 16px; }
+    .check-no  { color: var(--border-hover); font-size: 16px; }
+
+    /* ══════════════════════════════════════════
+       FAQ ACCORDION
+    ══════════════════════════════════════════ */
+    .faq-section {
+      padding: 64px 24px 96px;
+      max-width: 720px; margin: 0 auto;
+    }
+    .faq-title {
+      font-size: clamp(32px, 4vw, 48px);
+      text-align: center; margin-bottom: 48px;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-question {
+      width: 100%; background: none; border: none;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 0; text-align: left; cursor: pointer;
+      gap: 16px;
+    }
+    .faq-question__text {
+      font-size: 15px; font-weight: 600;
+      color: var(--text-hi); line-height: 1.4; flex: 1;
+      transition: color var(--transition);
+    }
+    .faq-question:hover .faq-question__text { color: var(--accent); }
+    .faq-question__icon {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--bg-card); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-lo); flex-shrink: 0;
+      transition: all var(--transition);
+      font-size: 16px; line-height: 1;
+    }
+    .faq-item.open .faq-question__icon {
+      background: var(--accent-dim);
+      border-color: rgba(232,255,71,0.3);
+      color: var(--accent);
+      transform: rotate(45deg);
+    }
+    .faq-answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s var(--ease), padding 0.3s ease;
+    }
+    .faq-answer.open {
+      max-height: 300px;
+      padding-bottom: 20px;
+    }
+    .faq-answer p {
+      font-size: 14px; color: var(--text-lo); line-height: 1.8;
+    }
+    .faq-answer a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+    /* ══════════════════════════════════════════
+       CTA BAND
+    ══════════════════════════════════════════ */
+    .cta-band {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 72px 24px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-band::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(232,255,71,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-band__inner { position: relative; z-index: 1; }
+    .cta-band__title {
+      font-size: clamp(40px, 5vw, 64px); margin-bottom: 16px;
+    }
+    .cta-band__title em { font-style: normal; color: var(--accent); }
+    .cta-band__sub {
+      font-size: 16px; color: var(--text-lo); margin-bottom: 36px;
+    }
+    .cta-band__actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .cta-band__btn-primary {
+      padding: 15px 32px; background: var(--accent); color: #0A0A0B;
+      border: none; border-radius: var(--radius-sm);
+      font-family: var(--font-body); font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .cta-band__btn-primary:hover {
+      background: var(--accent-hover); transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,255,71,0.3);
+    }
+    .cta-band__btn-ghost {
+      padding: 15px 32px; background: transparent;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--text-mid); font-family: var(--font-body);
+      font-size: 16px; font-weight: 600; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .cta-band__btn-ghost:hover {
+      border-color: var(--border-hover); color: var(--text-hi);
+    }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    .footer-mini {
+      padding: 24px; text-align: center;
+      font-size: 13px; color: var(--text-lo);
+    }
+    .footer-mini a { color: var(--text-lo); margin: 0 12px; }
+    .footer-mini a:hover { color: var(--accent); }
+
+    /* ══════════════════════════════════════════
+       SHARED ANIMATIONS
+    ══════════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    @media (max-width: 860px) {
+      .plans-grid { grid-template-columns: 1fr; max-width: 420px; }
+      .plan--popular { transform: none; }
+      .compare-table { font-size: 12px; }
+      .compare-table th, .compare-table td { padding: 12px 10px; }
+    }
   </style>
 </head>
 <body>
-  <div class="pricing-container">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <a href="index.html" style="text-decoration:none;">
-        <h2 style="margin:0;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> Limitless <span class="gradient-text">Pro</span></h2>
-      </a>
-      <button class="theme-toggle-btn" aria-label="Toggle theme">
-        <span class="theme-icon">🌙</span>
+
+<!-- ══ NAV ═══════════════════════════════════ -->
+<nav class="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">LIMITLESS</a>
+    <a href="index.html" class="nav__back">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back
+    </a>
+    <a href="login.html"><button class="nav__cta">Sign In</button></a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══════════════════════════════════ -->
+<section class="pricing-hero">
+  <div class="pricing-hero__glow"></div>
+  <div class="pricing-hero__grid"></div>
+  <div class="pricing-hero__inner container">
+
+    <div class="pricing-hero__tag">
+      <span class="pricing-hero__tag-dot"></span>
+      Pro Plans
+    </div>
+
+    <h1 class="pricing-hero__title">
+      ELEVATE YOUR<br><em>BASELINE.</em>
+    </h1>
+    <p class="pricing-hero__sub">
+      High-performance protocols for members who are serious about results.
+      Start free, upgrade anytime — no lock-ins, cancel whenever.
+    </p>
+
+    <!-- Billing toggle -->
+    <div class="billing-toggle" id="billing-toggle">
+      <span class="billing-toggle__label active" id="lbl-monthly">Monthly</span>
+      <button
+        class="billing-toggle__switch"
+        id="toggle-switch"
+        onclick="toggleBilling()"
+        aria-label="Switch billing period"
+      >
+        <span class="billing-toggle__thumb"></span>
       </button>
+      <span class="billing-toggle__label" id="lbl-yearly">Yearly</span>
+      <span class="billing-save" id="save-badge" style="display:none">Save up to 25%</span>
     </div>
-    <p style="color: var(--text-2); margin-top:1.5rem; font-size: 1.1rem; max-width: 600px; margin-inline: auto;">Elevate your baseline. High-performance protocols for $PRO members.</p>
 
-    <div class="grid">
-      <!-- Monthly -->
-      <div class="glass-card">
-        <h3>Initiate</h3>
-        <div class="price">₹999<span style="font-size:1rem; color:var(--text-3); font-weight:400;">/mo</span></div>
-        <ul class="features">
-          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Smart Generator Access</li>
-          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Interactive Tracker</li>
-          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Standard Support</li>
-        </ul>
-        <button class="btn btn-primary btn-full" onclick="payWithRazorpay(999, 'Initiate Monthly')">Select Plan</button>
-      </div>
+  </div>
+</section>
 
-      <!-- 6 Months -->
-      <div class="glass-card popular" style="border-color: var(--primary-color);">
-        <div class="popular-badge">MOST POPULAR</div>
-        <h3>Momentum</h3>
-        <div class="price">₹4,999<span style="font-size:1rem; color:var(--text-3); font-weight:400;">/6mo</span></div>
-        <ul class="features">
-          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> All Initiate Features</li>
-          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Priority Support</li>
-          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Advanced Heatmaps</li>
-        </ul>
-        <button class="btn btn-primary btn-full btn-glow" onclick="payWithRazorpay(4999, 'Momentum 6-Months')">Select Plan</button>
-      </div>
+<!-- ══ PLANS ══════════════════════════════════ -->
+<div class="plans-grid" id="plans-grid">
 
-      <!-- Annual -->
-      <div class="glass-card">
-        <h3>Limitless</h3>
-        <div class="price">₹8,999<span style="font-size:1rem; color:var(--text-3); font-weight:400;">/yr</span></div>
-        <ul class="features">
-          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> All Momentum Features</li>
-          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Weekly Video Reviews</li>
-          <li><i class="fas fa-check-circle" style="color:var(--primary-color);"></i> Elite Discord Access</li>
-        </ul>
-        <button class="btn btn-primary btn-full" onclick="payWithRazorpay(8999, 'Limitless Annual')">Select Plan</button>
+  <!-- ── INITIATE ── -->
+  <div class="plan reveal" id="plan-initiate">
+    <h3 class="plan__name">Initiate</h3>
+    <p class="plan__tagline">Everything you need to begin</p>
+
+    <div class="plan__price-block">
+      <div class="plan__price">
+        <span class="plan__currency">₹</span>
+        <span class="plan__amount" id="price-initiate">999</span>
       </div>
+      <div class="plan__period" id="period-initiate">per month</div>
+      <div class="plan__equiv" id="equiv-initiate">&nbsp;</div>
     </div>
+
+    <div class="plan__divider"></div>
+
+    <ul class="plan__features">
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        AI Ritual Generator access
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Interactive workout tracker
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Exercise library — 85+ moves
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        BMI &amp; progress tracking
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Standard support
+      </li>
+      <li class="plan__feature plan__feature--off">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </span>
+        Advanced heatmaps
+      </li>
+      <li class="plan__feature plan__feature--off">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </span>
+        Video reviews
+      </li>
+    </ul>
+
+    <button class="plan__btn" onclick="selectPlan('initiate')" id="btn-initiate">
+      Get Started
+    </button>
   </div>
 
-  <script>
-    async function payWithRazorpay(amount, planName) {
-      const token = localStorage.getItem('limitless_token');
-      if (!token) {
-        alert('Please create a free account or sign in to purchase a Limitless Pro plan.');
-        window.location.href = 'signup.html';
-        return;
-      }
+  <!-- ── MOMENTUM (Popular) ── -->
+  <div class="plan plan--popular reveal reveal-delay-1" id="plan-momentum">
+    <div class="plan__badge">Most Popular</div>
 
-      try {
-        // Step 1: Create order on the backend securely
-        const res = await fetch('/api/payment/create-order', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token 
-          },
-          body: JSON.stringify({ amount: amount, plan: planName })
-        });
-        
-        const data = await res.json();
-        
-        if (!data.success) {
-          alert('Error initializing payment. Check backend connection.');
-          return;
-        }
+    <h3 class="plan__name">Momentum</h3>
+    <p class="plan__tagline">For athletes serious about progress</p>
 
-        // Step 2: Open Razorpay Checkout automatically
-        const options = {
-          "key": data.key_id, // Fetching public key from backend naturally
-          "amount": data.order.amount, 
-          "currency": "INR",
-          "name": "Limitless Fitness",
-          "description": planName + " Subscription",
-          "order_id": data.order.id, 
-          "handler": async function (response) {
-            
-            // Step 3: Verify cryptographic signature on backend
-            const verifyRes = await fetch('/api/payment/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                plan_name: planName,
-                amount: amount
-              })
-            });
-            const verifyData = await verifyRes.json();
-            if (verifyData.success) {
-              alert('Payment Verification Successful! Welcome to Limitless Pro.');
-              // Update local storage user object if exists
-              const userStr = localStorage.getItem('limitless_user');
-              if (userStr) {
-                const user = JSON.parse(userStr);
-                user.subscription_plan = planName;
-                localStorage.setItem('limitless_user', JSON.stringify(user));
-              }
-              window.location.href = 'dashboard.html';
-            } else {
-              alert('Payment security verification failed. Signature mismatch.');
-            }
-          },
-          "theme": { "color": "#00c896" }
-        };
-        const rzp1 = new Razorpay(options);
-        rzp1.open();
+    <div class="plan__price-block">
+      <div class="plan__price">
+        <span class="plan__currency">₹</span>
+        <span class="plan__amount" id="price-momentum">4,999</span>
+      </div>
+      <div class="plan__period" id="period-momentum">per 6 months</div>
+      <div class="plan__equiv" id="equiv-momentum">
+        <span style="color:var(--success);font-weight:600">₹833/mo</span> — save ₹1,159
+      </div>
+    </div>
 
-      } catch (err) {
-        console.error(err);
-        alert('Could not bridge to Razorpay checkout API. Details: ' + err.message);
-      }
+    <div class="plan__divider"></div>
+
+    <ul class="plan__features">
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Everything in Initiate
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Priority support
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Advanced volume heatmaps
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Nutrition plan generator
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Progress photo vault
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Streak &amp; milestone badges
+      </li>
+      <li class="plan__feature plan__feature--off">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </span>
+        Video reviews
+      </li>
+    </ul>
+
+    <button class="plan__btn" onclick="selectPlan('momentum')" id="btn-momentum">
+      Get Momentum
+    </button>
+  </div>
+
+  <!-- ── LIMITLESS ── -->
+  <div class="plan reveal reveal-delay-2" id="plan-limitless">
+    <h3 class="plan__name">Limitless</h3>
+    <p class="plan__tagline">The complete elite experience</p>
+
+    <div class="plan__price-block">
+      <div class="plan__price">
+        <span class="plan__currency">₹</span>
+        <span class="plan__amount" id="price-limitless">8,999</span>
+      </div>
+      <div class="plan__period" id="period-limitless">per year</div>
+      <div class="plan__equiv" id="equiv-limitless">
+        <span style="color:var(--success);font-weight:600">₹750/mo</span> — save ₹2,989
+      </div>
+    </div>
+
+    <div class="plan__divider"></div>
+
+    <ul class="plan__features">
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Everything in Momentum
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Weekly video reviews
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Elite Discord access
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        1-on-1 coach messaging
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Custom meal planning
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Early feature access
+      </li>
+      <li class="plan__feature">
+        <span class="plan__feature-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        Priority onboarding call
+      </li>
+    </ul>
+
+    <button class="plan__btn" onclick="selectPlan('limitless')" id="btn-limitless">
+      Go Limitless
+    </button>
+  </div>
+
+</div><!-- /.plans-grid -->
+
+<!-- ══ TRUST BAR ══════════════════════════════ -->
+<div class="trust-bar reveal">
+  <div class="trust-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    Secure Razorpay payments
+  </div>
+  <div class="trust-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Cancel anytime
+  </div>
+  <div class="trust-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    24h support response
+  </div>
+  <div class="trust-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    No hidden fees
+  </div>
+  <div class="trust-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Instant activation
+  </div>
+</div>
+
+<!-- ══ COMPARISON TABLE ═══════════════════════ -->
+<section class="compare-section">
+  <h2 class="compare-title reveal">Compare Plans</h2>
+  <p class="compare-sub reveal reveal-delay-1">Every feature, side by side.</p>
+
+  <div class="reveal reveal-delay-2" style="overflow-x:auto">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Initiate</th>
+          <th class="popular-col">Momentum</th>
+          <th>Limitless</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AI Ritual Generator</td>
+          <td><span class="check-yes">✓</span></td>
+          <td class="popular-col"><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Exercise library (85+)</td>
+          <td><span class="check-yes">✓</span></td>
+          <td class="popular-col"><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Interactive workout tracker</td>
+          <td><span class="check-yes">✓</span></td>
+          <td class="popular-col"><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>BMI &amp; health tracking</td>
+          <td><span class="check-yes">✓</span></td>
+          <td class="popular-col"><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Advanced volume heatmaps</td>
+          <td><span class="check-no">—</span></td>
+          <td class="popular-col"><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Nutrition plan generator</td>
+          <td><span class="check-no">—</span></td>
+          <td class="popular-col"><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Progress photo vault</td>
+          <td><span class="check-no">—</span></td>
+          <td class="popular-col"><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Weekly video reviews</td>
+          <td><span class="check-no">—</span></td>
+          <td class="popular-col"><span class="check-no">—</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>1-on-1 coach messaging</td>
+          <td><span class="check-no">—</span></td>
+          <td class="popular-col"><span class="check-no">—</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Elite Discord access</td>
+          <td><span class="check-no">—</span></td>
+          <td class="popular-col"><span class="check-no">—</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Support level</td>
+          <td>Standard</td>
+          <td class="popular-col">Priority</td>
+          <td>Dedicated</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ FAQ ════════════════════════════════════ -->
+<section class="faq-section">
+  <h2 class="faq-title reveal">Frequently asked</h2>
+
+  <div id="faq-list">
+
+    <div class="faq-item reveal">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span class="faq-question__text">Can I switch plans later?</span>
+        <span class="faq-question__icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>Yes — you can upgrade or downgrade at any time from your account settings. Upgrades take effect immediately and are prorated. Downgrades take effect at the end of your current billing period.</p>
+      </div>
+    </div>
+
+    <div class="faq-item reveal reveal-delay-1">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span class="faq-question__text">What payment methods are accepted?</span>
+        <span class="faq-question__icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>We use Razorpay which supports all major Indian payment methods — UPI (PhonePe, Google Pay, Paytm), credit/debit cards (Visa, Mastercard, RuPay), net banking, and EMI options on select cards.</p>
+      </div>
+    </div>
+
+    <div class="faq-item reveal reveal-delay-2">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span class="faq-question__text">Is there a free trial?</span>
+        <span class="faq-question__icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>Your free account gives you permanent access to the exercise library, BMI calculator, and basic workout tracking with no time limit. Paid plans include all Pro features from day one — no trial period required.</p>
+      </div>
+    </div>
+
+    <div class="faq-item reveal reveal-delay-3">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span class="faq-question__text">How does the AI Ritual Generator work?</span>
+        <span class="faq-question__icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>You fill in your biometrics (age, weight, height), your goal, and your region within India. The generator creates a 7-day personalised plan using regional Indian foods — dal, paneer, roti, regional vegetables — that hits your exact macro targets. Plans can be regenerated anytime.</p>
+      </div>
+    </div>
+
+    <div class="faq-item reveal">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span class="faq-question__text">How do I cancel my subscription?</span>
+        <span class="faq-question__icon">+</span>
+      </button>
+      <div class="faq-answer">
+        <p>Go to Dashboard → Account Settings → Subscription → Cancel. Your plan stays active until the end of the billing period. No questions asked, no retention emails. You can also <a href="index.html#contact">contact us</a> and we will handle it within 24 hours.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ CTA BAND ════════════════════════════════ -->
+<section class="cta-band">
+  <div class="cta-band__inner">
+    <h2 class="cta-band__title reveal">
+      START YOUR<br><em>JOURNEY TODAY.</em>
+    </h2>
+    <p class="cta-band__sub reveal reveal-delay-1">
+      Join 1,200+ members already training smarter. Free account, upgrade anytime.
+    </p>
+    <div class="cta-band__actions reveal reveal-delay-2">
+      <button class="cta-band__btn-primary" onclick="window.location.href='signup.html'">
+        Create Free Account →
+      </button>
+      <button class="cta-band__btn-ghost" onclick="window.location.href='index.html#contact'">
+        Talk to us first
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER MINI ════════════════════════════ -->
+<footer class="footer-mini">
+  <p style="margin-bottom:12px">
+    <a href="index.html">Home</a>
+    <a href="index.html#features">Features</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="login.html">Sign In</a>
+  </p>
+  <p>&copy; 2026 Limitless Fitness. All rights reserved. Lucknow, India.</p>
+</footer>
+
+<script src="js/animations.js" defer></script>
+<script>
+/* ══════════════════════════════════════════
+   BILLING TOGGLE
+══════════════════════════════════════════ */
+let isYearly = false;
+
+const PRICES = {
+  monthly:  { initiate: { amount: '999',   period: 'per month',    equiv: '' },
+               momentum:  { amount: '4,999', period: 'per 6 months', equiv: '<span style="color:var(--success);font-weight:600">₹833/mo</span> — save ₹1,159' },
+               limitless: { amount: '8,999', period: 'per year',     equiv: '<span style="color:var(--success);font-weight:600">₹750/mo</span> — save ₹2,989' } },
+  yearly:   { initiate: { amount: '9,588', period: 'per year',     equiv: '<span style="color:var(--success);font-weight:600">₹799/mo</span> — save ₹2,400 vs monthly' },
+               momentum:  { amount: '8,499', period: 'per year',     equiv: '<span style="color:var(--success);font-weight:600">₹708/mo</span> — best value' },
+               limitless: { amount: '8,999', period: 'per year',     equiv: '<span style="color:var(--success);font-weight:600">₹750/mo</span> — save ₹2,989' } },
+};
+
+function toggleBilling() {
+  isYearly = !isYearly;
+  const sw   = document.getElementById('toggle-switch');
+  const lblM = document.getElementById('lbl-monthly');
+  const lblY = document.getElementById('lbl-yearly');
+  const badge = document.getElementById('save-badge');
+
+  sw.classList.toggle('yearly', isYearly);
+  lblM.classList.toggle('active', !isYearly);
+  lblY.classList.toggle('active',  isYearly);
+  badge.style.display = isYearly ? 'inline-block' : 'none';
+
+  const data = isYearly ? PRICES.yearly : PRICES.monthly;
+  ['initiate','momentum','limitless'].forEach(plan => {
+    const el = data[plan];
+    const amountEl = document.getElementById('price-' + plan);
+    const periodEl = document.getElementById('period-' + plan);
+    const equivEl  = document.getElementById('equiv-'  + plan);
+
+    /* Fade out → update → fade in */
+    amountEl.style.opacity = '0';
+    setTimeout(() => {
+      amountEl.textContent  = el.amount;
+      periodEl.textContent  = el.period;
+      equivEl.innerHTML     = el.equiv || '&nbsp;';
+      amountEl.style.opacity = '1';
+    }, 150);
+  });
+}
+
+/* ══════════════════════════════════════════
+   PLAN SELECTION → RAZORPAY / AUTH
+══════════════════════════════════════════ */
+async function selectPlan(planId) {
+  const btn = document.getElementById('btn-' + planId);
+  btn.classList.add('loading');
+  btn.textContent = 'Loading…';
+
+  try {
+    /* Check if user is logged in */
+    const me = await fetch('http://localhost:5000/api/auth/me', {
+      credentials: 'include',
+    });
+
+    if (!me.ok) {
+      /* Not logged in — send to signup with plan pre-selected */
+      window.location.href = `signup.html?plan=${planId}`;
+      return;
     }
-  </script>
-  <script src="cursor.js"></script>
-  <script src="script.js"></script>
+
+    /* Logged in — kick off Razorpay subscription */
+    window.location.href = `http://localhost:5000/api/payments/create-subscription?plan=${planId}`;
+
+  } catch {
+    /* Network error — fallback to signup */
+    window.location.href = `signup.html?plan=${planId}`;
+  }
+}
+
+/* ══════════════════════════════════════════
+   FAQ ACCORDION
+══════════════════════════════════════════ */
+function toggleFaq(btn) {
+  const item   = btn.closest('.faq-item');
+  const answer = item.querySelector('.faq-answer');
+  const isOpen = item.classList.contains('open');
+
+  /* Close all */
+  document.querySelectorAll('.faq-item.open').forEach(el => {
+    el.classList.remove('open');
+    el.querySelector('.faq-answer').classList.remove('open');
+  });
+
+  /* Open clicked (if it was closed) */
+  if (!isOpen) {
+    item.classList.add('open');
+    answer.classList.add('open');
+  }
+}
+
+/* ══════════════════════════════════════════
+   HIGHLIGHT PLAN FROM URL PARAM
+   (e.g. from index.html CTA buttons)
+══════════════════════════════════════════ */
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const plan   = params.get('plan');
+  if (plan) {
+    const el = document.getElementById('plan-' + plan);
+    if (el) {
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+      el.style.outline = '2px solid var(--accent)';
+      el.style.outlineOffset = '4px';
+      setTimeout(() => { el.style.outline = ''; el.style.outlineOffset = ''; }, 2500);
+    }
+  }
+})();
+</script>
 </body>
 </html>

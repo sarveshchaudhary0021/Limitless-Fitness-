@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Limitless Fitness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/global.css">
   <link rel="stylesheet" href="style.css">
   <script src="theme-init.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,7 +28,7 @@
   <nav class="dash-nav">
     <div class="nav-container" style="width:100%; display:flex; justify-content:space-between; align-items:center;">
       <a href="index.html" style="text-decoration:none;">
-        <h2 style="margin: 0;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> Limitless <span style="font-weight:400; color:var(--text-2);">Dashboard</span> <span id="proBadge" style="display:none; background:var(--primary-color); color:white; font-size:0.7rem; padding:2px 8px; border-radius:10px; vertical-align:middle; margin-left:10px;">PRO</span></h2>
+        <h2 style="margin: 0;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> Limitless <span style="font-weight:400; color:var(--text-2);">Dashboard</span> <span id="user-name" style="margin-left:8px; font-size:1rem; color:var(--primary-color);"></span> <span id="proBadge" style="display:none; background:var(--primary-color); color:white; font-size:0.7rem; padding:2px 8px; border-radius:10px; vertical-align:middle; margin-left:10px;">PRO</span></h2>
       </a>
       <div class="nav-actions">
         <a href="generator.html" class="btn btn-glass" style="padding: 0.5rem 1rem;"><i class="fas fa-brain"></i> Generator</a>
@@ -341,6 +346,13 @@
     checkStatus();
     loadTodayRoutine();
     loadAnalytics();
+
+    (async () => {
+      if (typeof authGuard === 'function') {
+        const user = await authGuard();
+        if (user) document.getElementById('user-name').textContent = user.name;
+      }
+    })();
   </script>
   <script src="cursor.js"></script>
   <script src="script.js"></script>

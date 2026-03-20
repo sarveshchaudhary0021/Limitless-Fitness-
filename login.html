@@ -1,95 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Limitless Fitness</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="theme-init.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body { 
-      background: radial-gradient(circle at top right, var(--bg-2) 0%, var(--bg) 100%); 
-      display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; 
-      font-family: 'Inter', sans-serif; overflow: hidden;
-    }
-    .auth-card { 
-      background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border); padding: 3rem; border-radius: var(--radius-lg); 
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 100%; max-width: 420px; text-align: center; 
-      position: relative; z-index: 1;
-    }
-    .auth-card::before {
-      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 60%);
-      pointer-events: none; z-index: -1;
-    }
-    .auth-input { 
-      box-sizing: border-box; width: 100%; padding: 1rem 1.25rem; border: 1px solid var(--border); 
-      border-radius: var(--radius-md); background: var(--bg); color: var(--text-1); 
-      margin-bottom: 1.25rem; font-family: 'Inter', sans-serif; font-size: 0.95rem;
-      transition: all var(--transition);
-    }
-    .auth-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); background: var(--bg-2); }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Limitless Fitness</title>
+  <meta name="description" content="Sign in to your Limitless Fitness account and continue your transformation." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/global.css" />
+  <link rel="stylesheet" href="styles/auth.css" />
 </head>
 <body>
-  <button class="theme-toggle-btn" aria-label="Toggle theme" style="position: absolute; top: 2rem; right: 2rem; z-index: 1000;">
-    <span class="theme-icon">🌙</span>
-  </button>
+<div class="auth-page">
 
-  <div class="auth-card glass-card">
-    <a href="index.html" style="text-decoration: none;">
-      <h2 style="margin-bottom: 0.5rem;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> <span class="gradient-text">Welcome Back</span></h2>
-    </a>
-    <p style="color: var(--text-2); margin-bottom: 2rem; font-size:0.95rem;">Log into your Limitless Dashboard</p>
-    
-    <form id="loginForm">
-      <input type="email" id="email" class="auth-input" placeholder="Email Address" required>
-      <input type="password" id="password" class="auth-input" placeholder="Password" required>
-      <button type="submit" class="btn btn-primary btn-full">Sign In</button>
-    </form>
-    
-    <p style="margin-top: 1.5rem; color: var(--text-2); font-size: 0.9rem;">
-      Don't have an account? <a href="signup.html" style="color: var(--primary-color); font-weight:600; text-decoration:none;">Join Now</a>
-    </p>
+  <!-- ══════════════════════════════════
+       LEFT — Brand panel
+  ══════════════════════════════════ -->
+  <div class="auth-brand">
+    <div class="auth-brand__top">
+      <a href="index.html" class="auth-logo">LIMITLESS</a>
+    </div>
+
+    <div class="auth-brand__body">
+      <h1 class="auth-brand__headline">
+        YOUR<br>
+        IRON WILL<br>
+        <em>AWAITS.</em>
+      </h1>
+      <p class="auth-brand__sub">
+        Elite tools for elite results. Sign in to continue your transformation journey.
+      </p>
+      <div class="auth-brand__stats">
+        <div>
+          <span class="auth-brand__stat-num">1,200+</span>
+          <span class="auth-brand__stat-label">Members</span>
+        </div>
+        <div>
+          <span class="auth-brand__stat-num">85+</span>
+          <span class="auth-brand__stat-label">Exercises</span>
+        </div>
+        <div>
+          <span class="auth-brand__stat-num">98%</span>
+          <span class="auth-brand__stat-label">Satisfaction</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-brand__accent-bar"></div>
   </div>
 
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const btn = e.target.querySelector('button');
-      
-      btn.innerText = 'Signing In...';
-      btn.disabled = true;
+  <!-- ══════════════════════════════════
+       RIGHT — Login form
+  ══════════════════════════════════ -->
+  <div class="auth-form-side">
 
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST', 
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        
-        if (res.ok) {
-          localStorage.setItem('limitless_token', data.token);
-          localStorage.setItem('limitless_user', JSON.stringify(data.user));
-          window.location.href = 'dashboard.html';
-        } else {
-          alert('Login failed: ' + data.error);
-          btn.innerText = 'Sign In';
-          btn.disabled = false;
-        }
-      } catch (err) { 
-        alert('Server connection error. Please try again later.'); 
-        btn.innerText = 'Sign In';
-        btn.disabled = false;
-      }
+    <a href="index.html" class="auth-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back to home
+    </a>
+
+    <div class="auth-form-wrap">
+
+      <h2 class="auth-form-title">Welcome back</h2>
+      <p class="auth-form-sub">Sign in to your Limitless account</p>
+
+      <!-- Error banner — shown by handleLogin on failure -->
+      <div class="auth-error" id="form-error"></div>
+
+      <form id="login-form" onsubmit="handleLogin(event)" novalidate>
+
+        <!-- Email -->
+        <div class="field-wrap">
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Email address"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="field-wrap field-wrap--password">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+          />
+          <button
+            type="button"
+            class="pw-toggle"
+            id="pw-toggle-login"
+            aria-label="Show password"
+            onclick="togglePw('password','pw-toggle-login')"
+          >
+            <!-- Eye icon — swaps to eye-off via JS -->
+            <svg id="eye-login" width="18" height="18" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Forgot password link -->
+        <a href="forgot-password.html" class="auth-forgot">Forgot password?</a>
+
+        <!-- Submit -->
+        <button type="submit" class="auth-submit" id="login-btn">
+          <span class="auth-submit__text">Sign In</span>
+          <div class="auth-submit__dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
+
+      </form>
+
+      <div class="auth-switch">
+        Don't have an account?&nbsp;
+        <a href="signup.html">Create one free &rarr;</a>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /.auth-page -->
+
+<script src="auth-client.js"></script>
+<script>
+/* ── Show/hide password toggle ───────────────── */
+const EYE_OPEN = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+const EYE_OFF  = `<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+
+function togglePw(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById('eye-' + btnId.replace('pw-toggle-', ''));
+  const isHidden = input.type === 'password';
+  input.type     = isHidden ? 'text' : 'password';
+  icon.innerHTML = isHidden ? EYE_OFF : EYE_OPEN;
+  input.focus();
+}
+
+/* ── Override handleLogin to manage button state ─ */
+const _origLogin = window.handleLogin;
+window.handleLogin = async function (e) {
+  e.preventDefault();
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('form-error');
+
+  err.textContent = '';
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email:    document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+      }),
     });
-  </script>
-  <script src="cursor.js"></script>
-  <script src="script.js"></script>
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Login failed.');
+    window.location.href = 'dashboard.html';
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    document.getElementById('password').value = '';
+    document.getElementById('password').focus();
+  }
+};
+
+/* ── Redirect if already authenticated ────────── */
+(async () => {
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/me', {
+      credentials: 'include',
+    });
+    if (res.ok) window.location.replace('dashboard.html');
+  } catch {}
+})();
+</script>
 </body>
 </html>

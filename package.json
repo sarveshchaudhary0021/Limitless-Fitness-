@@ -9,13 +9,40 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.8.0",
     "body-parser": "^1.20.2",
-    "cors": "^2.8.5",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
-    "express": "^4.18.2",
+    "express": "^4.22.1",
+    "express-rate-limit": "^8.3.1",
+    "express-validator": "^7.3.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.20.0",
-    "razorpay": "^2.9.6"
+    "nodemailer": "^8.0.3",
+    "nodemon": "^3.1.14",
+    "pg": "^8.20.0",
+    "razorpay": "^2.9.6",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0",
+    "zod": "^4.3.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sarveshchaudhary0021/Limitless-Fitness-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sarveshchaudhary0021/Limitless-Fitness-/issues"
+  },
+  "homepage": "https://github.com/sarveshchaudhary0021/Limitless-Fitness-#readme",
+  "devDependencies": {
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2"
   }
 }
