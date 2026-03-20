@@ -6,147 +6,299 @@
   <title>Limitless — Break Boundaries. Forge an Iron Will.</title>
   <meta name="description" content="A high-performance workspace for elite physical transformation. Track volume, master rituals, and surpass your peak." />
 
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
 
+  <!-- Styles -->
   <link rel="stylesheet" href="styles/tokens.css" />
   <link rel="stylesheet" href="styles/global.css" />
 
   <style>
     /* ══════════════════════════════════════════
-       HERO — particle canvas
+       NAVIGATION
+    ══════════════════════════════════════════ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      padding: 22px 0;
+      transition: background var(--transition-slow), backdrop-filter var(--transition-slow), padding var(--transition-slow), border-color var(--transition-slow);
+      border-bottom: 1px solid transparent;
+    }
+    .nav.scrolled {
+      background: rgba(10,10,11,0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 14px 0;
+      border-bottom-color: var(--border);
+    }
+    .nav__inner {
+      display: flex; align-items: center; gap: 0;
+    }
+    .nav__logo {
+      font-family: var(--font-display);
+      font-size: 22px; letter-spacing: 4px;
+      color: var(--accent);
+      flex: 1;
+      transition: opacity var(--transition);
+    }
+    .nav__logo:hover { opacity: 0.8; }
+    .nav__links {
+      display: flex; list-style: none; gap: 36px; margin-right: 36px;
+    }
+    .nav__links a {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-lo);
+      letter-spacing: 0.04em;
+      position: relative;
+      padding-bottom: 3px;
+    }
+    .nav__links a::after {
+      content: '';
+      position: absolute; bottom: -2px; left: 0; right: 0;
+      height: 1px; background: var(--accent);
+      transform: scaleX(0);
+      transition: transform var(--transition);
+      transform-origin: left;
+    }
+    .nav__links a:hover { color: var(--text-hi); }
+    .nav__links a:hover::after { transform: scaleX(1); }
+    .nav__actions { display: flex; align-items: center; gap: 10px; }
+    .nav__theme-btn {
+      width: 36px; height: 36px;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-lo);
+      font-size: 16px; transition: all var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav__theme-btn:hover { border-color: var(--border-hover); color: var(--text-hi); }
+    .nav__hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; padding: 6px; margin-left: 8px;
+    }
+    .nav__hamburger span {
+      display: block; width: 22px; height: 1.5px;
+      background: var(--text-hi); border-radius: 2px;
+      transition: all var(--transition);
+    }
+    .nav__hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav__hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav__hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    .nav__mobile-menu {
+      display: none;
+      position: fixed; inset: 0; top: 65px;
+      background: rgba(10,10,11,0.97);
+      backdrop-filter: blur(24px);
+      flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+      z-index: 199;
+    }
+    .nav__mobile-menu.open { display: flex; }
+    .nav__mobile-menu a {
+      font-family: var(--font-display); font-size: 42px;
+      letter-spacing: 0.06em; color: var(--text-mid);
+      transition: color var(--transition);
+    }
+    .nav__mobile-menu a:hover { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      .nav__links, .nav__actions .btn { display: none; }
+      .nav__hamburger { display: flex; }
+    }
+
+    /* ══════════════════════════════════════════
+       HERO
     ══════════════════════════════════════════ */
     .hero {
-      position: relative;
       min-height: 100svh;
       display: flex; align-items: center;
-      padding-top: 80px;
-      overflow: hidden;
-    }
-    #hero-canvas {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      display: block; pointer-events: none;
+      padding-top: 88px;
+      position: relative; overflow: hidden;
     }
     .hero__glow {
-      position: absolute; top: -15%; left: 50%; transform: translateX(-50%);
-      width: 1000px; height: 700px; pointer-events: none;
-      background: radial-gradient(ellipse at center,
-        rgba(56,189,248,0.07) 0%,
-        rgba(129,140,248,0.04) 45%,
-        transparent 70%);
+      position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+      width: 900px; height: 700px;
+      background: radial-gradient(ellipse at center, rgba(232,255,71,0.07) 0%, transparent 68%);
+      pointer-events: none;
     }
     .hero__grid-bg {
       position: absolute; inset: 0; pointer-events: none;
       background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 68px 68px;
-      mask-image: radial-gradient(ellipse 85% 85% at 50% 35%, black 25%, transparent 80%);
-      -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 35%, black 25%, transparent 80%);
+        linear-gradient(rgba(42,42,48,0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(42,42,48,0.4) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, black 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, black 30%, transparent 80%);
     }
-    .hero__content {
-      position: relative; z-index: 2;
-      max-width: 660px;
+    .hero__inner {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center; width: 100%;
     }
     .hero__eyebrow {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 22px;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
     }
     .hero__eyebrow-dot {
       width: 8px; height: 8px; border-radius: 50%;
       background: var(--accent);
-      box-shadow: 0 0 12px var(--accent-glow), 0 0 24px rgba(56,189,248,0.3);
-      animation: breathe 2.4s ease-in-out infinite;
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse-dot 2s ease-in-out infinite;
     }
-    @keyframes breathe {
-      0%,100%{ opacity:1; transform:scale(1); box-shadow:0 0 12px var(--accent-glow); }
-      50%    { opacity:.65; transform:scale(.8); box-shadow:0 0 6px var(--accent-glow); }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.8); }
     }
-    .hero__eyebrow-txt {
+    .hero__tag-text {
       font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
       text-transform: uppercase; color: var(--accent);
     }
     .hero__title {
-      font-size: clamp(72px, 9.5vw, 124px);
-      line-height: 0.92; color: var(--text-hi);
-      margin-bottom: 28px;
+      font-size: clamp(68px, 9vw, 116px);
+      line-height: 0.93; margin-bottom: 26px;
+      color: var(--text-hi);
     }
-    .hero__title-gradient {
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 50%, var(--accent-3) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .hero__title em {
+      font-style: normal; color: var(--accent);
       display: block;
     }
     .hero__sub {
-      font-size: 18px; color: var(--text-lo);
-      line-height: 1.78; max-width: 460px; margin-bottom: 44px;
+      font-size: 17px; color: var(--text-lo);
+      line-height: 1.75; max-width: 440px;
+      margin-bottom: 40px;
     }
     .hero__ctas {
-      display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 60px;
+      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 56px;
     }
     .hero__stats {
-      display: flex; gap: 44px;
-      border-top: 1px solid var(--border); padding-top: 32px;
+      display: flex; gap: 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 32px;
     }
     .hero__stat-num {
-      font-family: var(--font-display); font-size: 46px; line-height: 1;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-      display: block; margin-bottom: 5px;
+      font-family: var(--font-display);
+      font-size: 44px; line-height: 1;
+      color: var(--accent); display: block; margin-bottom: 4px;
     }
     .hero__stat-label {
-      font-size: 11px; font-weight: 700; color: var(--text-lo);
-      letter-spacing: 0.08em; text-transform: uppercase;
+      font-size: 12px; font-weight: 600;
+      color: var(--text-lo); letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
-    .hero__scroll-hint {
-      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--text-lo);
-      animation: float-hint 2.6s ease-in-out infinite;
+    .hero__visual {
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .hero__card-stack { position: relative; width: 320px; height: 380px; }
+    .hero__card {
+      position: absolute;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .hero__card--main {
+      width: 280px; top: 20px; left: 20px;
+      border-color: rgba(232,255,71,0.3);
       z-index: 2;
     }
-    .hero__scroll-line {
-      width: 1px; height: 44px;
-      background: linear-gradient(to bottom, var(--accent), transparent);
+    .hero__card--back {
+      width: 260px; top: 0; left: 40px;
+      opacity: 0.5; transform: rotate(4deg);
     }
-    @keyframes float-hint {
-      0%,100%{ transform:translateX(-50%) translateY(0); }
-      50%    { transform:translateX(-50%) translateY(10px); }
+    .hero__card-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+    }
+    .hero__card-title {
+      font-family: var(--font-display); font-size: 28px;
+      color: var(--text-hi); margin-bottom: 20px; letter-spacing: 0.04em;
+    }
+    .hero__card-progress { margin-bottom: 20px; }
+    .hero__card-progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--text-lo); margin-bottom: 8px;
+    }
+    .hero__card-bar {
+      height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+    }
+    .hero__card-bar-fill {
+      height: 100%; border-radius: 2px; background: var(--accent);
+      animation: bar-grow 2s var(--ease) forwards;
+    }
+    @keyframes bar-grow { from { width: 0; } to { width: var(--w); } }
+    .hero__card-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; border-top: 1px solid var(--border); padding-top: 16px;
+    }
+    .hero__card-stat-val {
+      font-family: var(--font-display); font-size: 24px; color: var(--text-hi);
+    }
+    .hero__card-stat-key {
+      font-size: 11px; color: var(--text-lo); margin-top: 2px;
+    }
+    .hero__scroll-hint {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      font-size: 11px; color: var(--text-lo); letter-spacing: 0.1em;
+      text-transform: uppercase; animation: bob 2.4s ease-in-out infinite;
+    }
+    .hero__scroll-line {
+      width: 1px; height: 40px; background: linear-gradient(to bottom, var(--accent), transparent);
+    }
+    @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+
+    @media (max-width: 900px) {
+      .hero__inner { grid-template-columns: 1fr; }
+      .hero__visual { display: none; }
     }
 
     /* ══════════════════════════════════════════
        FEATURES
     ══════════════════════════════════════════ */
     .features { background: var(--bg-surface); }
+    .features__header { margin-bottom: 56px; }
     .features__grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px; margin-top: 56px;
+      gap: 16px;
     }
     .feature-card {
-      padding: 32px; transition: all var(--transition-slow);
-    }
-    .feature-card__icon {
-      width: 48px; height: 48px; border-radius: var(--radius-md);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 24px; color: var(--accent);
-      background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(129,140,248,0.08));
-      border: 1px solid rgba(56,189,248,0.15);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 30px;
       transition: all var(--transition-slow);
+      position: relative; overflow: hidden;
     }
-    .feature-card:hover .feature-card__icon {
-      background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(129,140,248,0.15));
-      border-color: rgba(56,189,248,0.35);
-      box-shadow: 0 0 20px rgba(56,189,248,0.15);
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; background: var(--accent);
+      transform: scaleX(0);
+      transition: transform var(--transition-slow);
+    }
+    .feature-card:hover {
+      border-color: rgba(232,255,71,0.35);
+      background: var(--bg-card-hover);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(232,255,71,0.12);
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card__icon {
+      width: 46px; height: 46px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(232,255,71,0.2);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 22px; color: var(--accent);
     }
     .feature-card__title {
-      font-size: 23px; letter-spacing: 0.05em;
+      font-size: 22px; letter-spacing: 0.05em;
       color: var(--text-hi); margin-bottom: 10px;
     }
-    .feature-card__desc { font-size: 14px; color: var(--text-lo); line-height: 1.78; }
+    .feature-card__desc {
+      font-size: 14px; color: var(--text-lo); line-height: 1.75;
+    }
 
     /* ══════════════════════════════════════════
        TRAINING PLANS
@@ -154,9 +306,20 @@
     .plans__grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 18px; margin-top: 56px;
+      gap: 20px; margin-top: 56px;
     }
-    .plan-card { overflow: hidden; }
+    .plan-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all var(--transition-slow);
+    }
+    .plan-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-hover);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
     .plan-card__header {
       padding: 28px 28px 0;
       display: flex; align-items: flex-start; justify-content: space-between;
@@ -167,14 +330,20 @@
       border-radius: 100px; border: 1px solid var(--border);
       color: var(--text-lo);
     }
-    .plan-card__level--beginner { color: var(--success); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.07); }
-    .plan-card__level--inter    { color: var(--warning); border-color: rgba(251,146,60,0.3); background: rgba(251,146,60,0.07); }
-    .plan-card__level--advanced { color: var(--accent);  border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.07); }
-    .plan-card__icon { color: var(--accent-2); }
+    .plan-card__level--beginner   { color: var(--success); border-color: rgba(74,226,138,0.3); background: rgba(74,226,138,0.08); }
+    .plan-card__level--inter      { color: var(--warning); border-color: rgba(239,159,39,0.3); background: rgba(239,159,39,0.08); }
+    .plan-card__level--advanced   { color: var(--danger);  border-color: rgba(226,75,74,0.3);  background: rgba(226,75,74,0.08); }
+    .plan-card__icon { color: var(--accent); }
     .plan-card__body { padding: 20px 28px 28px; }
-    .plan-card__name { font-size: 27px; letter-spacing: 0.05em; color: var(--text-hi); margin-bottom: 8px; }
-    .plan-card__desc { font-size: 14px; color: var(--text-lo); line-height: 1.72; margin-bottom: 20px; }
-    .plan-card__meta { display: flex; gap: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+    .plan-card__name {
+      font-size: 26px; letter-spacing: 0.05em;
+      color: var(--text-hi); margin-bottom: 8px;
+    }
+    .plan-card__desc { font-size: 14px; color: var(--text-lo); line-height: 1.7; margin-bottom: 20px; }
+    .plan-card__meta {
+      display: flex; gap: 20px;
+      border-top: 1px solid var(--border); padding-top: 20px;
+    }
     .plan-card__meta-item { font-size: 13px; color: var(--text-lo); }
     .plan-card__meta-item strong { display: block; color: var(--text-hi); font-weight: 600; margin-bottom: 2px; }
 
@@ -187,27 +356,51 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px; margin-top: 56px;
     }
-    .nutrition-card { padding: 28px; }
+    .nutrition-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      transition: all var(--transition-slow);
+    }
+    .nutrition-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+    }
     .nutrition-card__tag {
       display: inline-block; font-size: 10px; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 4px 12px; border-radius: 100px; margin-bottom: 16px;
+      padding: 4px 12px; border-radius: 100px;
+      margin-bottom: 16px;
     }
-    .nutrition-card__tag--diet    { background: rgba(74,222,128,0.1); color: var(--success); border: 1px solid rgba(74,222,128,0.2); }
-    .nutrition-card__tag--medical { background: rgba(56,189,248,0.1); color: var(--accent);  border: 1px solid rgba(56,189,248,0.2); }
-    .nutrition-card__title { font-size: 21px; letter-spacing: 0.04em; color: var(--text-hi); margin-bottom: 8px; }
-    .nutrition-card__focus { font-size: 13px; color: var(--accent-2); font-weight: 600; margin-bottom: 14px; }
-    .nutrition-card__list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .nutrition-card__tag--diet    { background: rgba(74,226,138,0.12); color: var(--success); }
+    .nutrition-card__tag--medical { background: rgba(55,138,221,0.12); color: var(--info); }
+    .nutrition-card__title {
+      font-size: 20px; letter-spacing: 0.04em;
+      color: var(--text-hi); margin-bottom: 8px;
+    }
+    .nutrition-card__focus {
+      font-size: 13px; color: var(--accent);
+      font-weight: 600; margin-bottom: 14px;
+    }
+    .nutrition-card__list {
+      list-style: none; display: flex; flex-direction: column; gap: 8px;
+    }
     .nutrition-card__list li {
       font-size: 13px; color: var(--text-lo);
       padding-left: 18px; position: relative; line-height: 1.5;
     }
-    .nutrition-card__list li::before { content: '–'; position: absolute; left: 0; color: var(--border-hover); }
-    .nutrition-card__body { font-size: 13px; color: var(--text-lo); line-height: 1.7; }
+    .nutrition-card__list li::before {
+      content: '—'; position: absolute; left: 0;
+      color: var(--border-hover);
+    }
+    .nutrition-card__body {
+      font-size: 13px; color: var(--text-lo); line-height: 1.7;
+    }
     .nutrition-card__body strong { color: var(--text-mid); display: block; margin-bottom: 6px; font-weight: 600; }
     .nutrition-card__warning {
       margin-top: 14px; padding: 10px 12px;
-      background: rgba(251,146,60,0.07); border: 1px solid rgba(251,146,60,0.2);
+      background: rgba(239,159,39,0.08); border: 1px solid rgba(239,159,39,0.2);
       border-radius: var(--radius-xs); font-size: 12px; color: var(--warning);
     }
 
@@ -215,46 +408,69 @@
        GYM ETIQUETTE
     ══════════════════════════════════════════ */
     .etiquette__grid {
-      display: grid; grid-template-columns: repeat(3,1fr);
+      display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 16px; margin-top: 56px;
     }
-    .etiquette-card { padding: 28px; display: flex; gap: 18px; }
-    .etiquette-card:hover { border-color: rgba(248,113,113,0.3) !important; }
+    .etiquette-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 28px;
+      display: flex; gap: 18px;
+      transition: all var(--transition-slow);
+    }
+    .etiquette-card:hover { border-color: var(--danger); background: rgba(226,75,74,0.04); }
     .etiquette-card__x {
       width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.25);
+      background: rgba(226,75,74,0.12); border: 1px solid rgba(226,75,74,0.25);
       display: flex; align-items: center; justify-content: center;
-      color: var(--danger); font-size: 16px; font-weight: 700; flex-shrink: 0;
+      color: var(--danger); font-size: 18px; flex-shrink: 0;
+      font-weight: 700;
     }
-    .etiquette-card__title { font-size: 19px; letter-spacing: 0.04em; color: var(--text-hi); margin-bottom: 8px; }
+    .etiquette-card__title {
+      font-size: 18px; letter-spacing: 0.04em;
+      color: var(--text-hi); margin-bottom: 8px;
+    }
     .etiquette-card__desc { font-size: 13px; color: var(--text-lo); line-height: 1.65; }
+
     @media (max-width: 700px) { .etiquette__grid { grid-template-columns: 1fr; } }
 
     /* ══════════════════════════════════════════
        EXERCISE LIBRARY
     ══════════════════════════════════════════ */
     .exercises { background: var(--bg-surface); }
-    .exercise-filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 44px 0 28px; }
+    .exercise-filters {
+      display: flex; gap: 8px; flex-wrap: wrap; margin: 48px 0 32px;
+    }
     .filter-btn {
       padding: 8px 22px; border-radius: 100px;
-      border: 1px solid var(--border); background: transparent;
-      color: var(--text-lo); font-family: var(--font-body);
-      font-size: 13px; font-weight: 600; transition: all var(--transition);
+      border: 1px solid var(--border);
+      background: transparent; color: var(--text-lo);
+      font-family: var(--font-body); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all var(--transition);
+      letter-spacing: 0.03em;
     }
-    .filter-btn:hover {
-      border-color: rgba(56,189,248,0.4); color: var(--accent);
-      background: rgba(56,189,248,0.05);
-    }
+    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
     .filter-btn.active {
-      background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(129,140,248,0.12));
-      border-color: rgba(56,189,248,0.4); color: var(--accent);
+      background: var(--accent); color: #0A0A0B;
+      border-color: var(--accent);
     }
     .exercise-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 14px;
     }
-    .exercise-card { padding: 22px; }
+    .exercise-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      transition: all var(--transition-slow);
+      cursor: default;
+    }
+    .exercise-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+    }
     .exercise-card__cat {
       font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
       text-transform: uppercase; margin-bottom: 10px;
@@ -262,8 +478,11 @@
     .exercise-card__cat--strength { color: var(--warning); }
     .exercise-card__cat--cardio   { color: var(--danger); }
     .exercise-card__cat--core     { color: var(--accent); }
-    .exercise-card__cat--yoga     { color: var(--accent-3); }
-    .exercise-card__name { font-size: 20px; letter-spacing: 0.04em; color: var(--text-hi); margin-bottom: 6px; }
+    .exercise-card__cat--yoga     { color: var(--info); }
+    .exercise-card__name {
+      font-size: 19px; letter-spacing: 0.04em;
+      color: var(--text-hi); margin-bottom: 6px;
+    }
     .exercise-card__muscle { font-size: 12px; color: var(--text-lo); }
 
     /* ══════════════════════════════════════════
@@ -273,73 +492,83 @@
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 64px; align-items: start; margin-top: 56px;
     }
+    .bmi-form { }
     .bmi-toggle {
-      display: flex; padding: 4px; width: fit-content; margin-bottom: 28px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border); border-radius: 100px;
+      display: flex; background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 4px;
+      width: fit-content; margin-bottom: 28px;
     }
     .bmi-toggle button {
-      padding: 8px 22px; border-radius: 100px; border: none;
+      padding: 8px 20px; border-radius: 6px; border: none;
       background: transparent; color: var(--text-lo);
-      font-family: var(--font-body); font-size: 13px; font-weight: 600;
-      transition: all var(--transition);
+      font-size: 13px; font-weight: 600; transition: all var(--transition);
     }
-    .bmi-toggle button.active {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #03030C;
-    }
+    .bmi-toggle button.active { background: var(--accent); color: #0A0A0B; }
     .bmi-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
     .bmi-field label {
       display: block; font-size: 11px; font-weight: 700;
       letter-spacing: 0.08em; text-transform: uppercase;
       color: var(--text-lo); margin-bottom: 8px;
     }
-    .bmi-field__wrap { position: relative; }
+    .bmi-field__input-wrap { position: relative; }
     .bmi-field input {
       width: 100%; padding: 13px 48px 13px 16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border); border-radius: var(--radius-sm);
-      font-size: 17px; font-weight: 600; color: var(--text-hi);
-      transition: border-color var(--transition), box-shadow var(--transition);
-    }
-    .bmi-field input:focus {
-      outline: none; border-color: rgba(56,189,248,0.5);
-      box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+      font-size: 16px; font-weight: 600; color: var(--text-hi);
+      background: var(--bg-card);
     }
     .bmi-field__unit {
       position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-      font-size: 12px; color: var(--text-lo); pointer-events: none; font-weight: 600;
+      font-size: 12px; color: var(--text-lo); pointer-events: none;
+      font-weight: 600;
     }
     .bmi-submit {
-      width: 100%; padding: 16px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #03030C; border: none; border-radius: var(--radius-sm);
-      font-family: var(--font-body); font-size: 15px; font-weight: 700;
-      letter-spacing: 0.04em; transition: all var(--transition);
-      box-shadow: 0 8px 24px rgba(56,189,248,0.2);
+      width: 100%; padding: 15px;
+      background: var(--accent); color: #0A0A0B;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
+      transition: all var(--transition);
     }
-    .bmi-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(56,189,248,0.3); }
+    .bmi-submit:hover { background: var(--accent-hover); transform: translateY(-2px); }
 
-    .bmi-result-panel { padding: 36px; text-align: center; }
-    .bmi-result-panel.has-result { border-color: rgba(56,189,248,0.2) !important; }
-    .bmi-gauge { position: relative; width: 220px; height: 120px; margin: 0 auto 20px; }
+    .bmi-result-panel {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 36px;
+      text-align: center;
+      transition: all var(--transition-slow);
+    }
+    .bmi-result-panel.has-result { border-color: rgba(232,255,71,0.25); }
+    .bmi-gauge { position: relative; width: 220px; height: 120px; margin: 0 auto 24px; }
     .bmi-gauge svg { overflow: visible; }
-    .bmi-gauge__track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 12; stroke-linecap: round; }
+    .bmi-gauge__track {
+      fill: none; stroke: var(--border);
+      stroke-width: 12; stroke-linecap: round;
+    }
     .bmi-gauge__fill {
-      fill: none; stroke: var(--accent); stroke-width: 12; stroke-linecap: round;
-      stroke-dasharray: 314; stroke-dashoffset: 314;
-      transition: stroke-dashoffset 1.2s var(--ease), stroke 0.5s ease;
+      fill: none; stroke: var(--accent);
+      stroke-width: 12; stroke-linecap: round;
+      stroke-dasharray: 314;
+      stroke-dashoffset: 314;
+      transition: stroke-dashoffset 1.2s var(--ease), stroke 0.4s ease;
     }
     .bmi-gauge__value {
-      position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
-      font-family: var(--font-display); font-size: 54px; color: var(--text-hi); line-height: 1;
+      position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-display); font-size: 52px;
+      color: var(--text-hi); line-height: 1;
     }
-    .bmi-gauge__unit-lbl { font-size: 13px; color: var(--text-lo); margin-top: 8px; }
+    .bmi-gauge__unit-lbl {
+      font-size: 13px; color: var(--text-lo); margin-top: 8px;
+    }
     .bmi-status-label {
       display: inline-block; padding: 6px 20px; border-radius: 100px;
-      font-size: 14px; font-weight: 700; margin: 18px 0 22px; transition: all 0.4s ease;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.04em;
+      margin: 20px 0 24px; transition: all 0.4s ease;
     }
-    .bmi-scale-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+    .bmi-scale { margin-top: 8px; }
+    .bmi-scale-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+    }
     .bmi-scale-item {
       display: flex; justify-content: space-between;
       font-size: 12px; color: var(--text-lo);
@@ -347,11 +576,16 @@
     }
     .bmi-tip {
       margin-top: 20px; padding: 12px 14px;
-      background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.15);
-      border-radius: var(--radius-sm); font-size: 12px; color: var(--text-mid); line-height: 1.7;
+      background: var(--accent-dim); border: 1px solid rgba(232,255,71,0.15);
+      border-radius: var(--radius-sm);
+      font-size: 12px; color: var(--text-mid); line-height: 1.65;
     }
-    .bmi-default-msg { font-size: 15px; color: var(--text-lo); margin-top: 40px; line-height: 1.7; }
-    .bmi-default-msg em { color: var(--accent); font-style: normal; }
+    .bmi-default-msg {
+      font-size: 15px; color: var(--text-lo);
+      margin-top: 40px; line-height: 1.7;
+    }
+    .bmi-default-msg strong { color: var(--accent); font-style: normal; }
+
     @media (max-width: 860px) { .bmi__inner { grid-template-columns: 1fr; } }
 
     /* ══════════════════════════════════════════
@@ -359,23 +593,25 @@
     ══════════════════════════════════════════ */
     .testimonials { background: var(--bg-surface); }
     .testimonials__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 16px; margin-top: 56px;
     }
-    .testimonial-card { padding: 28px; }
-    .testimonial-card__stars {
-      font-size: 13px; letter-spacing: 3px; margin-bottom: 16px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .testimonial-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 28px;
+      transition: all var(--transition-slow);
     }
-    .testimonial-card__quote { font-size: 15px; color: var(--text-mid); line-height: 1.78; margin-bottom: 24px; font-style: italic; }
+    .testimonial-card:hover { transform: translateY(-3px); border-color: var(--border-hover); }
+    .testimonial-card__stars { color: var(--accent); font-size: 14px; margin-bottom: 16px; letter-spacing: 2px; }
+    .testimonial-card__quote {
+      font-size: 15px; color: var(--text-mid);
+      line-height: 1.75; margin-bottom: 24px;
+      font-style: italic;
+    }
     .testimonial-card__author { display: flex; align-items: center; gap: 12px; }
     .testimonial-card__avatar {
       width: 40px; height: 40px; border-radius: 50%;
-      background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(129,140,248,0.15));
-      border: 1px solid rgba(56,189,248,0.2);
+      background: var(--accent-dim); border: 1px solid rgba(232,255,71,0.2);
       display: flex; align-items: center; justify-content: center;
       font-family: var(--font-display); font-size: 16px; color: var(--accent);
     }
@@ -389,72 +625,60 @@
       display: grid; grid-template-columns: 1fr 1.4fr;
       gap: 80px; align-items: start;
     }
-    .contact__info-title { font-size: clamp(38px, 4vw, 54px); margin-bottom: 16px; }
-    .contact__info-sub { font-size: 16px; color: var(--text-lo); line-height: 1.78; margin-bottom: 40px; }
+    .contact__info-title { font-size: clamp(36px, 4vw, 52px); margin-bottom: 16px; }
+    .contact__info-sub { font-size: 16px; color: var(--text-lo); line-height: 1.75; margin-bottom: 40px; }
     .contact__details { display: flex; flex-direction: column; gap: 20px; }
-    .contact__detail { display: flex; align-items: center; gap: 14px; }
+    .contact__detail {
+      display: flex; align-items: center; gap: 14px;
+    }
     .contact__detail-icon {
-      width: 44px; height: 44px; border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(129,140,248,0.08));
-      border: 1px solid rgba(56,189,248,0.15);
+      width: 42px; height: 42px; border-radius: var(--radius-sm);
+      background: var(--accent-dim); border: 1px solid rgba(232,255,71,0.2);
       display: flex; align-items: center; justify-content: center;
       color: var(--accent); flex-shrink: 0;
     }
-    .contact__detail-label { font-size: 11px; color: var(--text-lo); font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 3px; }
+    .contact__detail-label { font-size: 11px; color: var(--text-lo); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 3px; }
     .contact__detail-value { font-size: 14px; color: var(--text-hi); font-weight: 500; }
+
     .contact-form { display: flex; flex-direction: column; gap: 14px; }
-    .contact-form input,
-    .contact-form select,
-    .contact-form textarea { @extend .glass-input; }
     .contact-form input,
     .contact-form select,
     .contact-form textarea {
       width: 100%; padding: 14px 16px;
-      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); font-size: 15px; color: var(--text-hi);
-      transition: border-color var(--transition), box-shadow var(--transition);
+      border-radius: var(--radius-sm);
     }
-    .contact-form input:focus,
-    .contact-form select:focus,
-    .contact-form textarea:focus {
-      outline: none; border-color: rgba(56,189,248,0.5);
-      box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
-    }
-    .contact-form input::placeholder,
-    .contact-form textarea::placeholder { color: var(--text-lo); }
-    .contact-form select option { background: var(--bg-card); }
     .contact-form textarea { min-height: 140px; resize: vertical; }
+    .contact-form select option { background: var(--bg-card); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .contact-form__submit {
-      padding: 16px; border: none; border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #03030C; font-family: var(--font-body);
-      font-size: 15px; font-weight: 700; letter-spacing: 0.04em;
-      transition: all var(--transition);
-      box-shadow: 0 8px 24px rgba(56,189,248,0.2);
+      padding: 15px; background: var(--accent); color: #0A0A0B;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 15px; font-weight: 700; transition: all var(--transition);
     }
-    .contact-form__submit:hover:not(:disabled) {
-      transform: translateY(-2px); box-shadow: 0 12px 32px rgba(56,189,248,0.3);
-    }
-    .contact-form__submit:disabled { opacity: 0.5; }
+    .contact-form__submit:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-2px); }
+    .contact-form__submit:disabled { opacity: 0.5; cursor: not-allowed; }
     .form-error {
-      background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25);
-      color: #FCA5A5; padding: 12px 14px; border-radius: var(--radius-sm);
+      background: rgba(226,75,74,0.1); border: 1px solid rgba(226,75,74,0.3);
+      color: #F09595; padding: 12px 14px; border-radius: var(--radius-sm);
       font-size: 13px; display: none;
     }
     .form-success-state {
-      text-align: center; padding: 52px 24px;
-      border: 1px solid rgba(74,222,128,0.2); border-radius: var(--radius-md);
-      background: rgba(74,222,128,0.04);
+      text-align: center; padding: 48px 24px;
+      background: var(--bg-card); border: 1px solid rgba(74,226,138,0.25);
+      border-radius: var(--radius-md);
     }
     .form-success-check {
       width: 56px; height: 56px; border-radius: 50%;
-      background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3);
+      background: rgba(74,226,138,0.12); border: 1px solid rgba(74,226,138,0.3);
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 16px; color: var(--success); font-size: 24px;
     }
-    .char-count { font-size: 11px; color: var(--text-lo); text-align: right; margin-top: -6px; }
-    @media (max-width: 860px) { .contact__inner { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
+    .char-count { font-size: 11px; color: var(--text-lo); text-align: right; margin-top: -8px; }
+
+    @media (max-width: 860px) {
+      .contact__inner { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
 
     /* ══════════════════════════════════════════
        FOOTER
@@ -469,12 +693,11 @@
       gap: 48px; margin-bottom: 56px;
     }
     .footer__brand-logo {
-      font-family: var(--font-display); font-size: 26px; letter-spacing: 4px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text; display: block; margin-bottom: 14px;
+      font-family: var(--font-display); font-size: 26px;
+      letter-spacing: 4px; color: var(--accent); display: block;
+      margin-bottom: 14px;
     }
-    .footer__brand-desc { font-size: 14px; color: var(--text-lo); line-height: 1.78; max-width: 260px; }
+    .footer__brand-desc { font-size: 14px; color: var(--text-lo); line-height: 1.75; max-width: 260px; }
     .footer__col-title {
       font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--text-lo); margin-bottom: 20px;
@@ -482,21 +705,18 @@
     .footer__links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
     .footer__links a { font-size: 14px; color: var(--text-lo); transition: color var(--transition); }
     .footer__links a:hover { color: var(--accent); }
-    .footer__newsletter-form { display: flex; gap: 8px; }
+    .footer__newsletter-form { display: flex; gap: 8px; margin-top: 0; }
     .footer__newsletter-input {
-      flex: 1; padding: 11px 14px; font-size: 13px; border-radius: var(--radius-sm);
-      background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text-hi);
-      transition: border-color var(--transition);
+      flex: 1; padding: 11px 14px;
+      font-size: 13px; border-radius: var(--radius-sm);
     }
-    .footer__newsletter-input:focus { outline: none; border-color: rgba(56,189,248,0.4); }
-    .footer__newsletter-input::placeholder { color: var(--text-lo); }
     .footer__newsletter-btn {
-      padding: 11px 18px; border: none; border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #03030C; font-family: var(--font-body); font-size: 13px; font-weight: 700;
-      transition: all var(--transition); white-space: nowrap;
+      padding: 11px 18px; background: var(--accent); color: #0A0A0B;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700; transition: all var(--transition);
+      white-space: nowrap;
     }
-    .footer__newsletter-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(56,189,248,0.25); }
+    .footer__newsletter-btn:hover { background: var(--accent-hover); }
     .footer__newsletter-sub { font-size: 12px; color: var(--text-lo); margin-top: 10px; }
     .footer__bottom {
       border-top: 1px solid var(--border); padding-top: 32px;
@@ -506,21 +726,24 @@
     .footer__copy span { color: var(--accent); }
     .back-to-top {
       width: 36px; height: 36px; border-radius: var(--radius-sm);
-      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-      color: var(--text-lo); display: flex; align-items: center;
-      justify-content: center; font-size: 16px; transition: all var(--transition);
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-lo); display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; transition: all var(--transition);
     }
-    .back-to-top:hover { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.08); }
-    @media (max-width: 900px) { .footer__grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 560px) { .footer__grid { grid-template-columns: 1fr; } }
+    .back-to-top:hover { border-color: var(--accent); color: var(--accent); }
+    @media (max-width: 900px) {
+      .footer__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .footer__grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
-<!-- ═══ CURSOR ══════════════════════════════════════ -->
-<div id="scroll-progress"></div>
-
-<!-- ═══ NAV ════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════ -->
 <nav class="nav" id="nav">
   <div class="container nav__inner">
     <a href="#hero" class="nav__logo">LIMITLESS</a>
@@ -532,7 +755,7 @@
     </ul>
     <div class="nav__actions">
       <button class="nav__theme-btn" id="theme-btn" aria-label="Toggle theme">🌙</button>
-      <a href="login.html"  class="btn btn-ghost"   style="padding:8px 18px;font-size:13px">Sign In</a>
+      <a href="login.html" class="btn btn-ghost" style="padding:8px 18px;font-size:13px">Sign In</a>
       <a href="signup.html" class="btn btn-primary" style="padding:9px 20px;font-size:13px">Get Started</a>
     </div>
     <button class="nav__hamburger" id="hamburger" aria-label="Menu">
@@ -541,37 +764,39 @@
   </div>
 </nav>
 
+<!-- Mobile drawer -->
 <div class="nav__mobile-menu" id="mobile-menu">
-  <a href="#features">Features</a>
-  <a href="#exercises">Guides</a>
-  <a href="#bmi">Tools</a>
+  <a href="#features" onclick="closeMobile()">Features</a>
+  <a href="#exercises" onclick="closeMobile()">Guides</a>
+  <a href="#bmi" onclick="closeMobile()">Tools</a>
   <a href="pricing.html">Pro Plans</a>
   <a href="login.html" style="color:var(--accent)">Sign In →</a>
 </div>
 
-<!-- ═══ HERO ════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
 <section class="hero" id="hero">
-  <canvas id="hero-canvas"></canvas>
   <div class="hero__glow"></div>
   <div class="hero__grid-bg"></div>
+  <div class="container hero__inner">
 
-  <div class="container">
     <div class="hero__content">
       <div class="hero__eyebrow reveal">
         <div class="hero__eyebrow-dot"></div>
-        <span class="hero__eyebrow-txt">Dynamic Platform</span>
+        <span class="hero__tag-text">Dynamic Platform</span>
       </div>
       <h1 class="hero__title reveal reveal-delay-1">
         Break<br>
-        <span class="hero__title-gradient">Boundaries.</span><br>
-        Forge an Iron Will.
+        <em>Boundaries.</em><br>
+        Forge an<br>Iron Will.
       </h1>
       <p class="hero__sub reveal reveal-delay-2">
         A high-performance workspace for elite physical transformation.
         Track volume, master rituals, and surpass your peak.
       </p>
       <div class="hero__ctas reveal reveal-delay-3">
-        <a href="signup.html" class="btn btn-primary btn-lg">Get Started →</a>
+        <a href="signup.html" class="btn btn-primary btn-lg">Get Started &rarr;</a>
         <a href="pricing.html" class="btn btn-ghost btn-lg">View Pro Plans</a>
       </div>
       <div class="hero__stats reveal reveal-delay-4">
@@ -589,51 +814,97 @@
         </div>
       </div>
     </div>
-  </div>
 
+    <div class="hero__visual reveal reveal-delay-2">
+      <div class="hero__card-stack">
+        <div class="hero__card hero__card--back"></div>
+        <div class="hero__card hero__card--main">
+          <div class="hero__card-label">Weekly Progress</div>
+          <div class="hero__card-title">Bench Press</div>
+          <div class="hero__card-progress">
+            <div class="hero__card-progress-label">
+              <span>Volume</span><span>82%</span>
+            </div>
+            <div class="hero__card-bar">
+              <div class="hero__card-bar-fill" style="--w:82%"></div>
+            </div>
+          </div>
+          <div class="hero__card-progress">
+            <div class="hero__card-progress-label">
+              <span>Consistency</span><span>91%</span>
+            </div>
+            <div class="hero__card-bar">
+              <div class="hero__card-bar-fill" style="--w:91%;animation-delay:0.2s"></div>
+            </div>
+          </div>
+          <div class="hero__card-stats">
+            <div>
+              <div class="hero__card-stat-val">6 / 7</div>
+              <div class="hero__card-stat-key">Days active</div>
+            </div>
+            <div>
+              <div class="hero__card-stat-val">↑ 12%</div>
+              <div class="hero__card-stat-key">vs last week</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
   <div class="hero__scroll-hint" aria-hidden="true">
     <div class="hero__scroll-line"></div>
     <span>Scroll</span>
   </div>
 </section>
 
-<!-- ═══ FEATURES ════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     FEATURES
+════════════════════════════════════════ -->
 <section class="features" id="features">
   <div class="container">
-    <div class="section-header">
+    <div class="features__header">
       <span class="section-tag reveal">Limitless Ecosystem</span>
       <h2 class="section-title reveal reveal-delay-1">Precision Tools for Elite Results</h2>
       <p class="section-sub reveal reveal-delay-2">A unified suite designed for high-performance physical optimization.</p>
     </div>
     <div class="features__grid">
 
-      <div class="glass-card feature-card reveal">
+      <div class="feature-card reveal">
         <div class="feature-card__icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
         </div>
         <h3 class="feature-card__title">Dynamic Workouts</h3>
         <p class="feature-card__desc">Algorithmically layered protocols spanning Hypertrophy, Powerlifting, and Metabolic Conditioning.</p>
       </div>
 
-      <div class="glass-card feature-card reveal reveal-delay-1">
+      <div class="feature-card reveal reveal-delay-1">
         <div class="feature-card__icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+          </svg>
         </div>
         <h3 class="feature-card__title">AI Ritual Generator</h3>
         <p class="feature-card__desc">Constructs hyper-personalized diet &amp; training maps based on your regional cuisine and biometrics.</p>
       </div>
 
-      <div class="glass-card feature-card reveal reveal-delay-2">
+      <div class="feature-card reveal reveal-delay-2">
         <div class="feature-card__icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
         </div>
         <h3 class="feature-card__title">Advanced Analytics</h3>
         <p class="feature-card__desc">Deep-dive volume tracking and growth heatmaps to visualize your progressive overload journey.</p>
       </div>
 
-      <div class="glass-card feature-card reveal reveal-delay-3">
+      <div class="feature-card reveal reveal-delay-3">
         <div class="feature-card__icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
         </div>
         <h3 class="feature-card__title">Signature Integrity</h3>
         <p class="feature-card__desc">Enterprise-grade security for your personal data and premium Razorpay transaction verification.</p>
@@ -643,7 +914,9 @@
   </div>
 </section>
 
-<!-- ═══ TRAINING PLANS ══════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     TRAINING PLANS
+════════════════════════════════════════ -->
 <section id="workouts">
   <div class="container">
     <span class="section-tag reveal">Training Plans</span>
@@ -651,48 +924,48 @@
     <p class="section-sub reveal reveal-delay-2">Three science-backed programmes. One goal — to make you unstoppable.</p>
     <div class="plans__grid">
 
-      <div class="glass-card plan-card reveal">
+      <div class="plan-card reveal">
         <div class="plan-card__header">
           <span class="plan-card__level plan-card__level--beginner">Beginner</span>
-          <svg class="plan-card__icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          <svg class="plan-card__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
         </div>
         <div class="plan-card__body">
           <h3 class="plan-card__name">Foundation</h3>
           <p class="plan-card__desc">Build the base. Master movement patterns, develop joint stability, and ignite your metabolic engine from the ground up.</p>
           <div class="plan-card__meta">
-            <div class="plan-card__meta-item"><strong>3× / week</strong>Training days</div>
+            <div class="plan-card__meta-item"><strong>3x / week</strong>Training days</div>
             <div class="plan-card__meta-item"><strong>45 min</strong>Per session</div>
             <div class="plan-card__meta-item"><strong>8 weeks</strong>Duration</div>
           </div>
         </div>
       </div>
 
-      <div class="glass-card plan-card reveal reveal-delay-1">
+      <div class="plan-card reveal reveal-delay-1">
         <div class="plan-card__header">
           <span class="plan-card__level plan-card__level--inter">Intermediate</span>
-          <svg class="plan-card__icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <svg class="plan-card__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
         <div class="plan-card__body">
           <h3 class="plan-card__name">Momentum</h3>
-          <p class="plan-card__desc">Increase volume. Apply progressive overload principles, introduce compound lifts, and specialise by training goal.</p>
+          <p class="plan-card__desc">Increase volume. Apply progressive overload principles, introduce compound lifts, and start specializing by training goal.</p>
           <div class="plan-card__meta">
-            <div class="plan-card__meta-item"><strong>4× / week</strong>Training days</div>
+            <div class="plan-card__meta-item"><strong>4x / week</strong>Training days</div>
             <div class="plan-card__meta-item"><strong>60 min</strong>Per session</div>
             <div class="plan-card__meta-item"><strong>12 weeks</strong>Duration</div>
           </div>
         </div>
       </div>
 
-      <div class="glass-card plan-card reveal reveal-delay-2">
+      <div class="plan-card reveal reveal-delay-2">
         <div class="plan-card__header">
           <span class="plan-card__level plan-card__level--advanced">Advanced</span>
-          <svg class="plan-card__icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg class="plan-card__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </div>
         <div class="plan-card__body">
           <h3 class="plan-card__name">Limitless</h3>
           <p class="plan-card__desc">Peak performance. Periodization, deload weeks, and elite-level specificity for athletes who refuse to plateau.</p>
           <div class="plan-card__meta">
-            <div class="plan-card__meta-item"><strong>5× / week</strong>Training days</div>
+            <div class="plan-card__meta-item"><strong>5x / week</strong>Training days</div>
             <div class="plan-card__meta-item"><strong>75 min</strong>Per session</div>
             <div class="plan-card__meta-item"><strong>16 weeks</strong>Duration</div>
           </div>
@@ -703,7 +976,9 @@
   </div>
 </section>
 
-<!-- ═══ NUTRITION ════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     NUTRITION & HEALTH
+════════════════════════════════════════ -->
 <section class="nutrition">
   <div class="container">
     <span class="section-tag reveal">Nutrition &amp; Health</span>
@@ -711,7 +986,7 @@
     <p class="section-sub reveal reveal-delay-2">Expert dietary plans and critical medical guidelines for safe training.</p>
     <div class="nutrition__grid">
 
-      <div class="glass-card nutrition-card reveal">
+      <div class="nutrition-card reveal">
         <span class="nutrition-card__tag nutrition-card__tag--diet">Vegan</span>
         <h3 class="nutrition-card__title">Vegan Plan</h3>
         <div class="nutrition-card__focus">Plant-based proteins (lentils, tofu, chickpeas)</div>
@@ -722,7 +997,7 @@
         </ul>
       </div>
 
-      <div class="glass-card nutrition-card reveal reveal-delay-1">
+      <div class="nutrition-card reveal reveal-delay-1">
         <span class="nutrition-card__tag nutrition-card__tag--diet">Balanced</span>
         <h3 class="nutrition-card__title">Veg / Non-Veg Plan</h3>
         <div class="nutrition-card__focus">Balanced macro intake (chicken, eggs, paneer)</div>
@@ -733,7 +1008,7 @@
         </ul>
       </div>
 
-      <div class="glass-card nutrition-card reveal reveal-delay-2">
+      <div class="nutrition-card reveal reveal-delay-2">
         <span class="nutrition-card__tag nutrition-card__tag--medical">Medical</span>
         <h3 class="nutrition-card__title">Hypertension (BP)</h3>
         <div class="nutrition-card__body">
@@ -745,14 +1020,14 @@
         <div class="nutrition-card__warning">⚠ Consult your doctor before starting any programme.</div>
       </div>
 
-      <div class="glass-card nutrition-card reveal reveal-delay-3">
+      <div class="nutrition-card reveal reveal-delay-3">
         <span class="nutrition-card__tag nutrition-card__tag--medical">Medical</span>
         <h3 class="nutrition-card__title">Heart Conditions</h3>
         <div class="nutrition-card__body">
           <strong>Training:</strong>
-          Light to moderate aerobic activity only. Stop if dizzy or in pain. Avoid HIIT.
+          Extremely light to moderate aerobic activity only. Stop if you feel dizzy or have chest pain. Avoid HIIT.
           <strong style="margin-top:12px">Diet:</strong>
-          Mediterranean diet focus. Omega-3 rich foods. Avoid trans fats and high-sugar drinks.
+          Mediterranean diet focus. Eat Omega-3 rich foods. Strictly avoid trans fats and high-sugar drinks.
         </div>
         <div class="nutrition-card__warning">⚠ ALWAYS consult a cardiologist before starting.</div>
       </div>
@@ -761,44 +1036,53 @@
   </div>
 </section>
 
-<!-- ═══ GYM ETIQUETTE ═══════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     GYM ETIQUETTE
+════════════════════════════════════════ -->
 <section>
   <div class="container">
     <span class="section-tag reveal">Gym Etiquette</span>
     <h2 class="section-title reveal reveal-delay-1">What to Avoid</h2>
     <p class="section-sub reveal reveal-delay-2">Keep yourself and others safe. Discipline is the core of Limitless.</p>
-    <div class="etiquette__grid">
-      <div class="glass-card etiquette-card reveal">
+    <div class="etiquette__grid" style="margin-top:56px">
+
+      <div class="etiquette-card reveal">
         <div class="etiquette-card__x">✕</div>
         <div>
           <h3 class="etiquette-card__title">Ego Lifting</h3>
           <p class="etiquette-card__desc">Lifting heavier than you can handle with strict form leads to severe injuries. Focus on muscle contraction, not momentum.</p>
         </div>
       </div>
-      <div class="glass-card etiquette-card reveal reveal-delay-1">
+
+      <div class="etiquette-card reveal reveal-delay-1">
         <div class="etiquette-card__x">✕</div>
         <div>
           <h3 class="etiquette-card__title">Phone Camping</h3>
           <p class="etiquette-card__desc">Don't sit on machines during peak hours scrolling social media. Rest efficiently and let others work in.</p>
         </div>
       </div>
-      <div class="glass-card etiquette-card reveal reveal-delay-2">
+
+      <div class="etiquette-card reveal reveal-delay-2">
         <div class="etiquette-card__x">✕</div>
         <div>
           <h3 class="etiquette-card__title">Leaving Weights</h3>
           <p class="etiquette-card__desc">Re-rack your weights after use. Leaving plates on the floor is dangerous and disrespectful to fellow members.</p>
         </div>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- ═══ EXERCISE LIBRARY ═════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     EXERCISE LIBRARY
+════════════════════════════════════════ -->
 <section class="exercises" id="exercises">
   <div class="container">
     <span class="section-tag reveal">Exercise Library</span>
     <h2 class="section-title reveal reveal-delay-1">Master Every Movement</h2>
     <p class="section-sub reveal reveal-delay-2">Filter by category and find the perfect exercises for your session.</p>
+
     <div class="exercise-filters reveal">
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="strength">Strength</button>
@@ -806,53 +1090,60 @@
       <button class="filter-btn" data-filter="core">Core</button>
       <button class="filter-btn" data-filter="yoga">Yoga</button>
     </div>
+
     <div class="exercise-grid" id="exercise-grid"></div>
   </div>
 </section>
 
-<!-- ═══ BMI ═══════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     BMI CALCULATOR
+════════════════════════════════════════ -->
 <section id="bmi">
   <div class="container">
     <span class="section-tag reveal">Health Check</span>
     <h2 class="section-title reveal reveal-delay-1">Know Your Numbers</h2>
     <p class="section-sub reveal reveal-delay-2">Calculate your BMI and get personalised fitness advice instantly.</p>
+
     <div class="bmi__inner">
-      <div class="reveal">
-        <div class="bmi-toggle">
-          <button class="active" onclick="switchUnit('metric',this)">Metric</button>
-          <button onclick="switchUnit('imperial',this)">Imperial</button>
+      <div class="bmi-form reveal">
+        <div class="bmi-toggle" id="unit-toggle">
+          <button class="active" data-unit="metric" onclick="switchUnit('metric',this)">Metric</button>
+          <button data-unit="imperial" onclick="switchUnit('imperial',this)">Imperial</button>
         </div>
+
         <div class="bmi-fields">
           <div class="bmi-field">
-            <label>Weight</label>
-            <div class="bmi-field__wrap">
-              <input type="number" id="bmi-weight" placeholder="70" min="1" max="500"/>
+            <label for="bmi-weight">Weight</label>
+            <div class="bmi-field__input-wrap">
+              <input type="number" id="bmi-weight" placeholder="70" min="1" max="500" />
               <span class="bmi-field__unit" id="weight-unit">kg</span>
             </div>
           </div>
           <div class="bmi-field">
-            <label>Height</label>
-            <div class="bmi-field__wrap">
-              <input type="number" id="bmi-height" placeholder="175" min="1" max="300"/>
+            <label for="bmi-height">Height</label>
+            <div class="bmi-field__input-wrap">
+              <input type="number" id="bmi-height" placeholder="175" min="1" max="300" />
               <span class="bmi-field__unit" id="height-unit">cm</span>
             </div>
           </div>
         </div>
+
         <button class="bmi-submit" onclick="calculateBMI()">Calculate BMI</button>
       </div>
 
-      <div class="glass-card bmi-result-panel reveal reveal-delay-1" id="bmi-panel">
+      <div class="bmi-result-panel reveal reveal-delay-1" id="bmi-panel">
         <div id="bmi-default-view">
-          <div class="bmi-gauge">
+          <div class="bmi-gauge" id="bmi-gauge-static">
             <svg viewBox="0 0 220 120" width="220" height="120">
               <path d="M 20 110 A 90 90 0 0 1 200 110" class="bmi-gauge__track"/>
-              <path d="M 20 110 A 90 90 0 0 1 200 110" class="bmi-gauge__fill"/>
+              <path d="M 20 110 A 90 90 0 0 1 200 110" class="bmi-gauge__fill" id="bmi-arc"/>
             </svg>
-            <div class="bmi-gauge__value">--</div>
+            <div class="bmi-gauge__value" id="bmi-value">--</div>
           </div>
           <div class="bmi-gauge__unit-lbl">BMI</div>
-          <p class="bmi-default-msg">Enter your details above to see your<br><em>personalised result</em></p>
+          <p class="bmi-default-msg">Enter your weight and height to see your<br><strong>personalised BMI result</strong></p>
         </div>
+
         <div id="bmi-result-view" style="display:none">
           <div class="bmi-gauge">
             <svg viewBox="0 0 220 120" width="220" height="120">
@@ -863,14 +1154,16 @@
           </div>
           <div class="bmi-gauge__unit-lbl">BMI</div>
           <div class="bmi-status-label" id="bmi-status"></div>
+
           <div class="bmi-scale">
             <div class="bmi-scale-row">
-              <div class="bmi-scale-item"><span>Underweight</span><span style="color:var(--accent)">&lt; 18.5</span></div>
-              <div class="bmi-scale-item"><span>Normal</span><span style="color:var(--success)">18.5–24.9</span></div>
-              <div class="bmi-scale-item"><span>Overweight</span><span style="color:var(--warning)">25–29.9</span></div>
-              <div class="bmi-scale-item"><span>Obese</span><span style="color:var(--danger)">&ge;30</span></div>
+              <div class="bmi-scale-item"><span>Underweight</span><span style="color:var(--info)">&lt; 18.5</span></div>
+              <div class="bmi-scale-item"><span>Normal</span><span style="color:var(--accent)">18.5 – 24.9</span></div>
+              <div class="bmi-scale-item"><span>Overweight</span><span style="color:var(--warning)">25 – 29.9</span></div>
+              <div class="bmi-scale-item"><span>Obese</span><span style="color:var(--danger)">&ge; 30</span></div>
             </div>
           </div>
+
           <div class="bmi-tip" id="bmi-tip"></div>
         </div>
       </div>
@@ -878,61 +1171,94 @@
   </div>
 </section>
 
-<!-- ═══ TESTIMONIALS ═════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     TESTIMONIALS
+════════════════════════════════════════ -->
 <section class="testimonials">
   <div class="container">
     <span class="section-tag reveal">Real Results</span>
     <h2 class="section-title reveal reveal-delay-1">Stories That Inspire</h2>
     <p class="section-sub reveal reveal-delay-2">Don't take our word for it — hear from our growing community.</p>
     <div class="testimonials__grid">
-      <div class="glass-card testimonial-card reveal">
+
+      <div class="testimonial-card reveal">
         <div class="testimonial-card__stars">★★★★★</div>
         <p class="testimonial-card__quote">"The AI Ritual Generator built me a plan using dal and roti that actually fits my macros. Finally something built for us."</p>
         <div class="testimonial-card__author">
           <div class="testimonial-card__avatar">RK</div>
-          <div><div class="testimonial-card__name">Rahul Kumar</div><div class="testimonial-card__meta">Lost 12kg · Lucknow</div></div>
+          <div>
+            <div class="testimonial-card__name">Rahul Kumar</div>
+            <div class="testimonial-card__meta">Lost 12kg · Lucknow</div>
+          </div>
         </div>
       </div>
-      <div class="glass-card testimonial-card reveal reveal-delay-1">
+
+      <div class="testimonial-card reveal reveal-delay-1">
         <div class="testimonial-card__stars">★★★★★</div>
-        <p class="testimonial-card__quote">"Gone from 60kg to 100kg bench in 8 months following the Limitless plan. The progressive overload tracker is insane."</p>
+        <p class="testimonial-card__quote">"The progressive overload tracker is insane. I've gone from 60kg to 100kg bench in 8 months following the Limitless plan."</p>
         <div class="testimonial-card__author">
           <div class="testimonial-card__avatar">AS</div>
-          <div><div class="testimonial-card__name">Anjali Singh</div><div class="testimonial-card__meta">Gained 8kg muscle · Delhi</div></div>
+          <div>
+            <div class="testimonial-card__name">Anjali Singh</div>
+            <div class="testimonial-card__meta">Gained 8kg muscle · Delhi</div>
+          </div>
         </div>
       </div>
-      <div class="glass-card testimonial-card reveal reveal-delay-2">
+
+      <div class="testimonial-card reveal reveal-delay-2">
         <div class="testimonial-card__stars">★★★★★</div>
-        <p class="testimonial-card__quote">"The medical guidelines helped me train safely with my BP condition. No other app gives this level of detail."</p>
+        <p class="testimonial-card__quote">"The medical guidelines section helped me train safely with my BP condition. No other app gives this level of detail."</p>
         <div class="testimonial-card__author">
           <div class="testimonial-card__avatar">PM</div>
-          <div><div class="testimonial-card__name">Pradeep Mishra</div><div class="testimonial-card__meta">Training safely · Mumbai</div></div>
+          <div>
+            <div class="testimonial-card__name">Pradeep Mishra</div>
+            <div class="testimonial-card__meta">Training safely · Mumbai</div>
+          </div>
         </div>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- ═══ CONTACT ══════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     CONTACT
+════════════════════════════════════════ -->
 <section id="contact">
   <div class="container">
     <div class="contact__inner">
+
       <div>
         <span class="section-tag reveal">Get In Touch</span>
         <h2 class="contact__info-title reveal reveal-delay-1">Ready to Start<br>Your Journey?</h2>
         <p class="contact__info-sub reveal reveal-delay-2">Tell us your goal and we'll point you in the right direction.</p>
         <div class="contact__details">
           <div class="contact__detail reveal reveal-delay-1">
-            <div class="contact__detail-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-            <div><div class="contact__detail-label">Email Us</div><div class="contact__detail-value">sarveshchaudhary8027@gmail.com</div></div>
+            <div class="contact__detail-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <div class="contact__detail-label">Email Us</div>
+              <div class="contact__detail-value">sarveshchaudhary8027@gmail.com</div>
+            </div>
           </div>
           <div class="contact__detail reveal reveal-delay-2">
-            <div class="contact__detail-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div>
-            <div><div class="contact__detail-label">Call Us</div><div class="contact__detail-value">+91 7355958027</div></div>
+            <div class="contact__detail-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+            </div>
+            <div>
+              <div class="contact__detail-label">Call Us</div>
+              <div class="contact__detail-value">+91 7355958027</div>
+            </div>
           </div>
           <div class="contact__detail reveal reveal-delay-3">
-            <div class="contact__detail-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-            <div><div class="contact__detail-label">Find Us</div><div class="contact__detail-value">Lucknow, India</div></div>
+            <div class="contact__detail-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div class="contact__detail-label">Find Us</div>
+              <div class="contact__detail-value">Lucknow, India</div>
+            </div>
           </div>
         </div>
       </div>
@@ -941,25 +1267,30 @@
         <div id="form-error" class="form-error"></div>
         <form class="contact-form" id="contact-form" novalidate>
           <div class="form-row">
-            <input type="text"  id="cf-name"    placeholder="Your Name"     required />
-            <input type="email" id="cf-email"   placeholder="Email Address" required />
+            <input type="text"  id="cf-name"    name="name"    placeholder="Your Name"     required />
+            <input type="email" id="cf-email"   name="email"   placeholder="Email Address" required />
           </div>
-          <select id="cf-goal">
+          <select id="cf-goal" name="goal">
             <option value="" disabled selected>Your Fitness Goal</option>
-            <option>Weight Loss</option><option>Muscle Gain</option>
-            <option>Build Endurance</option><option>Improve Flexibility</option>
-            <option>General Fitness</option>
+            <option value="Weight Loss">Weight Loss</option>
+            <option value="Muscle Gain">Muscle Gain</option>
+            <option value="Build Endurance">Build Endurance</option>
+            <option value="Improve Flexibility">Improve Flexibility</option>
+            <option value="General Fitness">General Fitness</option>
           </select>
-          <textarea id="cf-message" placeholder="Tell us about your goal…" maxlength="2000" required></textarea>
+          <textarea id="cf-message" name="message" placeholder="Tell us about your goal..." maxlength="2000" required></textarea>
           <div class="char-count" id="char-count">0 / 2000</div>
           <button type="submit" class="contact-form__submit" id="cf-submit">Send Message</button>
         </form>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- ═══ FOOTER ═══════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
 <footer class="footer">
   <div class="container">
     <div class="footer__grid">
@@ -986,9 +1317,9 @@
       </div>
       <div>
         <div class="footer__col-title">Newsletter</div>
-        <p style="font-size:13px;color:var(--text-lo);margin-bottom:16px;line-height:1.6">Get weekly tips and workout inspiration.</p>
+        <p style="font-size:13px;color:var(--text-lo);margin-bottom:16px;line-height:1.6">Get weekly tips and workout inspiration delivered to your inbox.</p>
         <div class="footer__newsletter-form">
-          <input type="email" class="footer__newsletter-input" placeholder="Enter your email" id="nl-email"/>
+          <input type="email" class="footer__newsletter-input" placeholder="Enter your email" id="nl-email" />
           <button class="footer__newsletter-btn" onclick="subscribeNewsletter()">Subscribe</button>
         </div>
         <p class="footer__newsletter-sub" id="nl-msg">No spam. Unsubscribe anytime.</p>
@@ -1001,39 +1332,56 @@
   </div>
 </footer>
 
-<!-- ═══ SCRIPTS ══════════════════════════════════════ -->
-<script src="js/particles.js"></script>
-<script src="js/cursor.js"></script>
+<!-- ════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════ -->
 <script src="js/animations.js" defer></script>
 <script src="auth-client.js"></script>
 <script>
-/* ── Exercise library ──────────────────────── */
+/* ── Nav scroll + hamburger ─────────────────────── */
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+});
+document.getElementById('hamburger').addEventListener('click', function () {
+  this.classList.toggle('open');
+  document.getElementById('mobile-menu').classList.toggle('open');
+});
+function closeMobile() {
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('mobile-menu').classList.remove('open');
+}
+document.querySelectorAll('.nav__mobile-menu a').forEach(a =>
+  a.addEventListener('click', closeMobile)
+);
+
+
+/* ── Exercise library ───────────────────────────── */
 const EXERCISES = [
-  {name:'Barbell Squat',    cat:'strength',muscle:'Quadriceps, Glutes'},
-  {name:'Deadlift',         cat:'strength',muscle:'Hamstrings, Lower Back'},
-  {name:'Bench Press',      cat:'strength',muscle:'Chest, Triceps'},
-  {name:'Pull-Up',          cat:'strength',muscle:'Lats, Biceps'},
-  {name:'Overhead Press',   cat:'strength',muscle:'Shoulders, Triceps'},
-  {name:'Romanian Deadlift',cat:'strength',muscle:'Hamstrings, Glutes'},
-  {name:'Running 5K',       cat:'cardio',  muscle:'Full Body Cardio'},
-  {name:'Cycling',          cat:'cardio',  muscle:'Legs, Cardiovascular'},
-  {name:'Jump Rope',        cat:'cardio',  muscle:'Calves, Coordination'},
-  {name:'Box Jumps',        cat:'cardio',  muscle:'Legs, Explosive Power'},
-  {name:'Burpees',          cat:'cardio',  muscle:'Full Body'},
-  {name:'Plank',            cat:'core',    muscle:'Abs, Obliques'},
-  {name:'Hanging Leg Raise',cat:'core',    muscle:'Lower Abs, Hip Flexors'},
-  {name:'Russian Twist',    cat:'core',    muscle:'Obliques, Core'},
-  {name:'Ab Wheel Rollout', cat:'core',    muscle:'Full Core'},
-  {name:'Dead Bug',         cat:'core',    muscle:'Deep Core Stability'},
-  {name:'Sun Salutation',   cat:'yoga',    muscle:'Full Body Flexibility'},
-  {name:'Warrior II',       cat:'yoga',    muscle:'Hips, Legs, Shoulders'},
-  {name:'Downward Dog',     cat:'yoga',    muscle:'Hamstrings, Shoulders'},
-  {name:'Pigeon Pose',      cat:'yoga',    muscle:'Hip Flexors, Glutes'},
+  {name:'Barbell Squat',    cat:'strength', muscle:'Quadriceps, Glutes'},
+  {name:'Deadlift',         cat:'strength', muscle:'Hamstrings, Lower Back'},
+  {name:'Bench Press',      cat:'strength', muscle:'Chest, Triceps'},
+  {name:'Pull-Up',          cat:'strength', muscle:'Lats, Biceps'},
+  {name:'Overhead Press',   cat:'strength', muscle:'Shoulders, Triceps'},
+  {name:'Romanian Deadlift',cat:'strength', muscle:'Hamstrings, Glutes'},
+  {name:'Running 5K',       cat:'cardio',   muscle:'Full Body Cardio'},
+  {name:'Cycling',          cat:'cardio',   muscle:'Legs, Cardiovascular'},
+  {name:'Jump Rope',        cat:'cardio',   muscle:'Calves, Coordination'},
+  {name:'Box Jumps',        cat:'cardio',   muscle:'Legs, Explosive Power'},
+  {name:'Burpees',          cat:'cardio',   muscle:'Full Body'},
+  {name:'Plank',            cat:'core',     muscle:'Abs, Obliques'},
+  {name:'Hanging Leg Raise',cat:'core',     muscle:'Lower Abs, Hip Flexors'},
+  {name:'Russian Twist',    cat:'core',     muscle:'Obliques, Core'},
+  {name:'Ab Wheel Rollout', cat:'core',     muscle:'Full Core'},
+  {name:'Dead Bug',         cat:'core',     muscle:'Deep Core Stability'},
+  {name:'Sun Salutation',   cat:'yoga',     muscle:'Full Body Flexibility'},
+  {name:'Warrior II',       cat:'yoga',     muscle:'Hips, Legs, Shoulders'},
+  {name:'Downward Dog',     cat:'yoga',     muscle:'Hamstrings, Shoulders'},
+  {name:'Pigeon Pose',      cat:'yoga',     muscle:'Hip Flexors, Glutes'},
 ];
-function renderExercises(f) {
-  const list = f === 'all' ? EXERCISES : EXERCISES.filter(e => e.cat === f);
+function renderExercises(filter) {
+  const list = filter === 'all' ? EXERCISES : EXERCISES.filter(e => e.cat === filter);
   document.getElementById('exercise-grid').innerHTML = list.map(e =>
-    `<div class="glass-card exercise-card">
+    `<div class="exercise-card">
        <div class="exercise-card__cat exercise-card__cat--${e.cat}">${e.cat}</div>
        <div class="exercise-card__name">${e.name}</div>
        <div class="exercise-card__muscle">${e.muscle}</div>
@@ -1049,24 +1397,28 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-/* ── BMI ──────────────────────────────────── */
+/* ── BMI Calculator ─────────────────────────────── */
 let currentUnit = 'metric';
-function switchUnit(u, btn) {
-  currentUnit = u;
+function switchUnit(unit, btn) {
+  currentUnit = unit;
   document.querySelectorAll('.bmi-toggle button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('weight-unit').textContent = u === 'metric' ? 'kg'  : 'lbs';
-  document.getElementById('height-unit').textContent = u === 'metric' ? 'cm'  : 'in';
-  document.getElementById('bmi-weight').placeholder  = u === 'metric' ? '70'  : '154';
-  document.getElementById('bmi-height').placeholder  = u === 'metric' ? '175' : '69';
+  document.getElementById('weight-unit').textContent = unit === 'metric' ? 'kg' : 'lbs';
+  document.getElementById('height-unit').textContent = unit === 'metric' ? 'cm' : 'in';
+  document.getElementById('bmi-weight').placeholder = unit === 'metric' ? '70' : '154';
+  document.getElementById('bmi-height').placeholder = unit === 'metric' ? '175' : '69';
 }
 function calculateBMI() {
   const w = parseFloat(document.getElementById('bmi-weight').value);
   const h = parseFloat(document.getElementById('bmi-height').value);
   if (!w || !h || w <= 0 || h <= 0) return;
-  const bmi = Math.round((currentUnit === 'metric'
-    ? w / ((h / 100) ** 2)
-    : (703 * w) / (h * h)) * 10) / 10;
+  let bmi;
+  if (currentUnit === 'metric') {
+    bmi = w / ((h / 100) ** 2);
+  } else {
+    bmi = (703 * w) / (h * h);
+  }
+  bmi = Math.round(bmi * 10) / 10;
   showBMIResult(bmi);
 }
 function showBMIResult(bmi) {
@@ -1074,41 +1426,48 @@ function showBMIResult(bmi) {
   document.getElementById('bmi-result-view').style.display  = 'block';
   document.getElementById('bmi-panel').classList.add('has-result');
   document.getElementById('bmi-num').textContent = bmi.toFixed(1);
+
   const arc = document.getElementById('bmi-arc-result');
-  const st  = document.getElementById('bmi-status');
-  const tip = document.getElementById('bmi-tip');
+  const status = document.getElementById('bmi-status');
+  const tip    = document.getElementById('bmi-tip');
+
   const pct = Math.min(Math.max((bmi - 10) / 30, 0), 1);
-  arc.style.strokeDashoffset = 314 - pct * 314;
-  const lvl = bmi < 18.5
-    ? {c:'var(--accent)',  l:'Underweight', t:'Consider a calorie surplus with nutrient-dense whole foods. A strength programme helps build healthy mass.'}
-    : bmi < 25
-    ? {c:'var(--success)', l:'Normal Weight', t:'Excellent. Maintain with consistent training and a balanced diet. Combine BMI with body-fat % for the full picture.'}
-    : bmi < 30
-    ? {c:'var(--warning)', l:'Overweight', t:'A modest calorie deficit with resistance training is the most effective approach. Avoid extreme restriction.'}
-    : {c:'var(--danger)',  l:'Obese', t:'Focus on sustainable lifestyle changes. Consult a healthcare provider for a personalised plan before starting intensive exercise.'};
-  arc.style.stroke = lvl.c;
-  st.textContent   = lvl.l;
-  st.style.background = lvl.c + '1A';
-  st.style.color      = lvl.c;
-  st.style.border     = `1px solid ${lvl.c}40`;
-  tip.textContent     = lvl.t;
+  const totalDash = 314;
+  arc.style.strokeDashoffset = totalDash - (pct * totalDash);
+
+  const levels = {
+    underweight: { range: [0, 18.5],  color: '#378ADD', label: 'Underweight', tip: 'Consider a calorie surplus with nutrient-dense foods. A strength programme can help build healthy mass.' },
+    normal:      { range: [18.5, 25], color: '#E8FF47', label: 'Normal Weight', tip: 'Great work. Maintain with consistent training and a balanced diet. BMI is a screening tool — combine with body-fat % for the full picture.' },
+    overweight:  { range: [25, 30],   color: '#EF9F27', label: 'Overweight', tip: 'A modest calorie deficit with strength training is the most effective approach. Avoid extreme restriction.' },
+    obese:       { range: [30, 999],  color: '#E24B4A', label: 'Obese', tip: 'Focus on sustainable lifestyle changes. Consult a healthcare provider for a personalised plan before starting intensive exercise.' },
+  };
+  const cat = bmi < 18.5 ? levels.underweight : bmi < 25 ? levels.normal : bmi < 30 ? levels.overweight : levels.obese;
+  arc.style.stroke = cat.color;
+  status.textContent = cat.label;
+  status.style.background = cat.color + '22';
+  status.style.color = cat.color;
+  status.style.border = `1px solid ${cat.color}44`;
+  tip.textContent = cat.tip;
 }
 
-/* ── Contact ──────────────────────────────── */
+/* ── Contact form ───────────────────────────────── */
 document.getElementById('cf-message').addEventListener('input', function () {
-  const c = document.getElementById('char-count');
-  c.textContent = this.value.length + ' / 2000';
-  c.style.color = this.value.length > 1800 ? 'var(--danger)' : 'var(--text-lo)';
+  const count = document.getElementById('char-count');
+  count.textContent = this.value.length + ' / 2000';
+  count.style.color = this.value.length > 1800 ? 'var(--danger)' : 'var(--text-lo)';
 });
+
 document.getElementById('contact-form').addEventListener('submit', async function (e) {
   e.preventDefault();
   const btn = document.getElementById('cf-submit');
-  const err = document.getElementById('form-error');
-  err.style.display = 'none';
-  btn.disabled = true; btn.textContent = 'Sending…';
+  const errEl = document.getElementById('form-error');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
   try {
     const res = await fetch('http://localhost:5000/api/contact', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name:    document.getElementById('cf-name').value,
         email:   document.getElementById('cf-email').value,
@@ -1117,36 +1476,32 @@ document.getElementById('contact-form').addEventListener('submit', async functio
       }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message || 'Failed to send.');
     this.insertAdjacentHTML('afterend',
       `<div class="form-success-state">
          <div class="form-success-check">✓</div>
-         <h3 style="font-family:var(--font-display);font-size:28px;margin-bottom:8px">Message Sent!</h3>
+         <h3 style="font-family:var(--font-display);font-size:26px;margin-bottom:8px">Message Sent!</h3>
          <p style="font-size:14px;color:var(--text-lo)">${data.message}</p>
-       </div>`);
+       </div>`
+    );
     this.style.display = 'none';
-  } catch (ex) {
-    err.textContent = ex.message; err.style.display = 'block';
-    btn.disabled = false; btn.textContent = 'Send Message';
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Send Message';
   }
 });
 
-/* ── Newsletter ───────────────────────────── */
+/* ── Newsletter stub ────────────────────────────── */
 function subscribeNewsletter() {
   const email = document.getElementById('nl-email').value;
   const msg   = document.getElementById('nl-msg');
-  if (!email || !email.includes('@')) {
-    msg.textContent = 'Enter a valid email.'; msg.style.color = 'var(--danger)'; return;
-  }
+  if (!email || !email.includes('@')) { msg.textContent = 'Enter a valid email.'; msg.style.color = 'var(--danger)'; return; }
   msg.textContent = '✓ You\'re subscribed!';
   msg.style.color = 'var(--success)';
   document.getElementById('nl-email').value = '';
 }
-
-/* ── Theme toggle (stub) ──────────────────── */
-document.getElementById('theme-btn').addEventListener('click', function () {
-  this.textContent = this.textContent === '🌙' ? '☀️' : '🌙';
-});
 </script>
 </body>
 </html>
