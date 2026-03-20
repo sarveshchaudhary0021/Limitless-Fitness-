@@ -1,51 +1,60 @@
 :root {
-  --bg-base:        #0A0A0B;
-  --bg-surface:     #111114;
-  --bg-card:        #1A1A1F;
-  --bg-card-hover:  #20202A;
-  --accent:         #E8FF47;
-  --accent-dim:     rgba(232,255,71,0.10);
-  --accent-hover:   #F0FF6A;
-  --text-hi:        #FFFFFF;
-  --text-mid:       #C8C8D8;
-  --text-lo:        #8A8A9A;
-  --border:         #2A2A30;
-  --border-hover:   #3A3A48;
-  --danger:         #E24B4A;
-  --success:        #4AE28A;
-  --warning:        #EF9F27;
-  --info:           #378ADD;
+  /* ── New professional palette — replaces yellow ── */
+  --accent:         #38BDF8;   /* electric sky blue   */
+  --accent-2:       #818CF8;   /* indigo              */
+  --accent-3:       #C084FC;   /* violet              */
+  --accent-glow:    rgba(56, 189, 248, 0.18);
+  --accent-dim:     rgba(56, 189, 248, 0.08);
+  --accent-hover:   #7DD3FC;
+  --accent-2-glow:  rgba(129, 140, 248, 0.18);
 
+  /* ── Backgrounds — deeper, richer blacks ── */
+  --bg-base:        #030308;
+  --bg-surface:     #07070F;
+  --bg-card:        #0E0E1A;
+  --bg-card-hover:  #131325;
+
+  /* ── Glass ── */
+  --glass-bg:       rgba(14, 14, 26, 0.55);
+  --glass-border:   rgba(255, 255, 255, 0.07);
+  --glass-shine:    rgba(255, 255, 255, 0.03);
+
+  /* ── Text ── */
+  --text-hi:        #F1F5F9;
+  --text-mid:       #94A3B8;
+  --text-lo:        #475569;
+
+  /* ── Borders ── */
+  --border:         rgba(255, 255, 255, 0.06);
+  --border-hover:   rgba(255, 255, 255, 0.12);
+
+  /* ── Semantic ── */
+  --success:        #4ADE80;
+  --warning:        #FB923C;
+  --danger:         #F87171;
+  --info:           #38BDF8;
+
+  /* ── Spacing ── */
   --radius-xs:  4px;
   --radius-sm:  8px;
-  --radius-md:  12px;
+  --radius-md:  14px;
   --radius-lg:  20px;
   --radius-xl:  28px;
+  --radius-2xl: 40px;
 
-  --ease:       cubic-bezier(0.4, 0, 0.2, 1);
-  --transition: 200ms var(--ease);
-  --transition-slow: 400ms var(--ease);
+  /* ── Motion — Apple-grade easing ── */
+  --ease:           cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:       cubic-bezier(0.0,  0.0,  0.2,  1.0);
+  --transition:     220ms var(--ease);
+  --transition-slow:450ms var(--ease);
+  --transition-spring: 500ms var(--ease-spring);
 
+  /* ── Typography ── */
   --font-display: 'Bebas Neue', cursive;
   --font-body:    'Plus Jakarta Sans', sans-serif;
 
-  --max-width: 1200px;
-  --section-pad: 96px;
-}
-
-[data-theme="light"] {
-  --bg-base:        #FAFAFA;
-  --bg-surface:     #F0F0F3;
-  --bg-card:        #FFFFFF;
-  --bg-card-hover:  #F7F7F9;
-  --text-hi:        #0A0A0B;
-  --text-mid:       #3A3A48;
-  --text-lo:        #6A6A7A;
-  --border:         #E5E5EB;
-  --border-hover:   #D1D1D8;
-  
-  /* Accent colors can remain the same or adjust slightly for contrast */
-  --accent:         #D6ED2C; /* Slightly darker yellow for light mode contrast */
-  --accent-dim:     rgba(214,237,44,0.15);
-  --accent-hover:   #C4DA1B;
+  /* ── Layout ── */
+  --max-width:   1200px;
+  --section-pad: 104px;
 }

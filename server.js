@@ -450,37 +450,67 @@ app.get('/api/dashboard/analytics', authenticateToken, async (req, res) => {
       [req.user.id]
     );
     
-    const pythonProcess = spawn('python', ['analytics.py']);
+    // Pure JS Aggregation (Replacing python script dependency)
+    const heatmapMap = {};
+    const pieMap = {};
     
-    let result = '';
-    let errorOutput = '';
-    
-    pythonProcess.stdout.on('data', (data) => {
-      result += data.toString();
+    logs.forEach(log => {
+      // Heatmap volume score per day
+      if (!heatmapMap[log.date]) heatmapMap[log.date] = 0;
+      heatmapMap[log.date] += (log.sets || 1) * 10; // score multiplier
+      
+      // Categorize exercises for Pie Chart
+      const ex = log.exercise.toLowerCase();
+      let category = 'Other';
+      if (ex.includes('bench') || ex.includes('chest') || ex.includes('pec') || ex.includes('fly')) category = 'Chest';
+      else if (ex.includes('row') || ex.includes('pull') || ex.includes('lat') || ex.includes('back')) category = 'Back';
+      else if (ex.includes('squat') || ex.includes('leg') || ex.includes('calf') || ex.includes('press') && ex.includes('leg')) category = 'Legs';
+      else if (ex.includes('curl') || ex.includes('extension') || ex.includes('tri') || ex.includes('bi')) category = 'Arms';
+      else if (ex.includes('press') || ex.includes('shoulder') || ex.includes('delt')) category = 'Shoulders';
+      else if (ex.includes('core') || ex.includes('crunch') || ex.includes('plank')) category = 'Core';
+      else if (ex.includes('run') || ex.includes('treadmill') || ex.includes('cardio')) category = 'Cardio';
+      
+      if (!pieMap[category]) pieMap[category] = 0;
+      pieMap[category] += (log.sets || 1);
     });
     
-    pythonProcess.stderr.on('data', (data) => {
-      errorOutput += data.toString();
-    });
+    const heatmap = Object.keys(heatmapMap).map(date => ({ date, count: heatmapMap[date] }));
+    const pieChart = {
+      labels: Object.keys(pieMap),
+      data: Object.values(pieMap)
+    };
     
-    pythonProcess.on('close', (code) => {
-      if (code !== 0) {
-        console.error('Python Error:', errorOutput);
-        return res.status(500).json({ error: 'Python Analytics failed' });
-      }
-      try {
-        const parsedData = JSON.parse(result);
-        res.json(parsedData);
-      } catch (e) {
-        res.status(500).json({ error: 'Failed to parse python output' });
-      }
-    });
-    
-    pythonProcess.stdin.write(JSON.stringify(logs));
-    pythonProcess.stdin.end();
-    
+    res.json({ success: true, heatmap, pieChart });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch analytics.' });
+  }
+});
+
+app.post('/api/generate-plan', authenticateToken, async (req, res) => {
+  try {
+    const { weight, goal, dietPref } = req.body;
+    let w = parseFloat(weight) || 70;
+    
+    let calTarget = 2200;
+    if (goal === 'cut') calTarget = Math.max(1500, w * 22);
+    else if (goal === 'bulk') calTarget = w * 30 + 500;
+    else calTarget = w * 24;
+    
+    const diet = `${Math.round(calTarget)} kcal/day. Focus on high protein (${Math.round(w * 2.2)}g), moderate carbs, and healthy fats. Structure meals around your ${dietPref || 'balanced'} preference.`;
+    
+    const routine = [
+      "Day 1: Heavy Push (Chest, Shoulders, Triceps)",
+      "Day 2: Heavy Pull (Back, Biceps, Rear Delts)",
+      "Day 3: Legs (Quads, Hamstrings, Calves)",
+      "Day 4: Rest / Active Recovery",
+      "Day 5: Upper Body Hypertrophy",
+      "Day 6: Lower Body Hypertrophy",
+      "Day 7: Rest"
+    ];
+    
+    res.json({ success: true, diet, routine });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to generate plan.' });
   }
 });
 

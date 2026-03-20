@@ -3,59 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Limitless Fitness</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/tokens.css">
-  <link rel="stylesheet" href="styles/global.css">
-  <link rel="stylesheet" href="style.css">
+  <title>Dashboard — Limitless Fitness</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/global.css" />
+  
   <script src="theme-init.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    body { background-color: var(--bg); color: var(--text-1); font-family: 'Inter', sans-serif; transition: background 0.3s, color 0.3s; }
-    .dash-nav { padding: 1rem 2rem; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100; }
-    .dash-container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-    .form-control { width: 100%; padding: 0.8rem 1.2rem; background: var(--bg-2); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-md); box-sizing: border-box; margin-bottom: 1.2rem; transition: all 0.3s; outline: none; font-size: 0.95rem; }
-    .form-control:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); background: var(--bg); }
-    .log-btn { width: 100%; padding: 1rem; font-size: 1rem; }
-    h2, h3 { letter-spacing: -0.5px; }
-    @media (max-width: 768px) { .dash-container { grid-template-columns: 1fr; } }
+    body { background-color: var(--bg-body); color: var(--text-hi); font-family: var(--font-body); transition: background var(--transition), color var(--transition); }
+    
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 14px 0; background: rgba(10,10,11,0.82); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); transition: background var(--transition), border-color var(--transition); }
+    [data-theme="light"] .nav { background: rgba(255,255,255,0.82); }
+    
+    .nav__inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav__logo { font-family: var(--font-display); font-size: 22px; letter-spacing: 4px; color: var(--accent); text-decoration: none; display:flex; align-items:center; }
+    
+    .dash-container { max-width: 1200px; margin: 100px auto 40px; padding: 0 24px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    
+    .glass-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-sm); transition: transform var(--transition-slow), border-color var(--transition); }
+    .glass-card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
+    
+    .badge-pro { background: var(--accent); color: white; font-family: var(--font-display); font-size: 14px; padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; margin-left: 12px; vertical-align: middle; }
+    
+    .form-control { width: 100%; padding: 12px 16px; background: transparent; border: 1px solid var(--border); color: var(--text-hi); border-radius: var(--radius-sm); margin-bottom: 16px; font-family: var(--font-body); font-size: 15px; transition: border-color var(--transition); outline: none; }
+    .form-control:focus { border-color: var(--accent); }
+    .form-control option { background: var(--bg-surface); color: var(--text-hi); }
+    
+    .btn-full { width: 100%; display: block; text-align: center; }
+    
+    h3 { font-family: var(--font-display); font-size: 28px; letter-spacing: 1px; color: var(--text-hi); margin-bottom: 8px; }
+    .subtitle { color: var(--text-mid); font-size: 14px; margin-bottom: 24px; }
+    
+    @media (max-width: 768px) { 
+      .dash-container { grid-template-columns: 1fr; } 
+    }
   </style>
 </head>
 <body>
-  <nav class="dash-nav">
-    <div class="nav-container" style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-      <a href="index.html" style="text-decoration:none;">
-        <h2 style="margin: 0;"><i class="fa-solid fa-infinity" style="color:var(--primary-color);"></i> Limitless <span style="font-weight:400; color:var(--text-2);">Dashboard</span> <span id="user-name" style="margin-left:8px; font-size:1rem; color:var(--primary-color);"></span> <span id="proBadge" style="display:none; background:var(--primary-color); color:white; font-size:0.7rem; padding:2px 8px; border-radius:10px; vertical-align:middle; margin-left:10px;">PRO</span></h2>
-      </a>
-      <div class="nav-actions">
-        <a href="generator.html" class="btn btn-glass" style="padding: 0.5rem 1rem;"><i class="fas fa-brain"></i> Generator</a>
-        <button class="theme-toggle-btn" aria-label="Toggle theme">
-          <span class="theme-icon">🌙</span>
-        </button>
-        <button onclick="logout()" class="btn btn-outline" style="padding: 0.5rem 1rem; border-color: #f43f5e; color:#f43f5e;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+
+  <nav class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="index.html" class="nav__logo">LIMITLESS<span style="color:var(--text-mid); font-weight:400; margin-left:8px; font-size:16px; padding-top:2px;">WORKSPACE</span></a>
+      
+      <div style="display:flex; align-items:center;">
+        <span id="user-name" style="color:var(--text-hi); font-weight:600; font-size:14px; margin-right:4px;"></span>
+        <span id="proBadge" class="badge-pro" style="display:none; margin-right:16px;">PRO</span>
+        <button id="theme-btn" class="btn btn--ghost" aria-label="Toggle theme" style="padding:8px 12px; font-size:16px; margin-right:8px;">🌙</button>
+        <button onclick="logout()" class="btn btn--outline" style="padding: 8px 16px; font-size:13px; border-color: #f43f5e; color:#f43f5e;">Logout</button>
       </div>
     </div>
   </nav>
 
   <div class="dash-container">
+    
     <!-- Today's Routine -->
     <div class="glass-card" id="todayRoutineCard">
-      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-calendar-day"></i> Today's Routine</h3>
+      <h3>Today's Routine</h3>
       <div id="routineContent" style="margin-top: 1rem;">
-        <p style="color:var(--text-2);">Loading your plan...</p>
+        <p style="color:var(--text-mid);">Loading your plan...</p>
       </div>
     </div>
 
     <!-- Log Workout -->
     <div class="glass-card">
-      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-plus-circle"></i> Log Workout</h3>
-      <p style="color:var(--text-2); font-size:0.9rem; margin-bottom: 1.5rem;">Track your progressive overload instantly.</p>
+      <h3>Log Workout</h3>
+      <p class="subtitle">Track your progressive overload instantly.</p>
       <form id="logForm">
         <select id="exercise" class="form-control" required>
-          <option value="">Select Exercise...</option>
+          <option value="" disabled selected>Select Exercise...</option>
           <option value="Bench Press">Bench Press</option>
           <option value="Squat">Squat</option>
           <option value="Deadlift">Deadlift</option>
@@ -67,168 +88,185 @@
           <option value="Bicep Curl">Bicep Curl</option>
           <option value="Tricep Extension">Tricep Extension</option>
         </select>
-        <div style="display:flex; gap:0.5rem;">
+        <div style="display:flex; gap:12px;">
           <input type="number" id="sets" class="form-control" placeholder="Sets" min="1" required>
           <input type="number" id="reps" class="form-control" placeholder="Reps" min="1" required>
         </div>
         <input type="number" id="weight" class="form-control" placeholder="Weight (kg)" min="0" step="0.5" required>
-        <button type="submit" class="btn btn-primary btn-full btn-glow">Save Workout</button>
+        <button type="submit" class="btn btn--primary btn-full">Save Workout</button>
       </form>
     </div>
 
     <!-- Quick Planner -->
     <div class="glass-card" style="grid-column: 1 / -1;">
-      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-bolt"></i> Quick Planner</h3>
-      <p style="color:var(--text-2); font-size:0.9rem; margin-bottom: 1rem;">Instantly generate a customized workout and diet plan.</p>
-      <form id="plannerForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-        <input type="number" id="planWeight" class="form-control" placeholder="Weight (kg)" required>
-        <select id="planGoal" class="form-control" required>
-          <option value="muscle-gain">Muscle Gain</option>
-          <option value="fat-loss">Fat Loss</option>
-          <option value="maintenance">Maintenance</option>
+      <h3>Quick Planner</h3>
+      <p class="subtitle">Instantly generate a customized workout and diet plan using our AI logic.</p>
+      <form id="plannerForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <input type="number" id="planWeight" class="form-control" style="margin-bottom:0;" placeholder="Weight (kg)" required>
+        <select id="planGoal" class="form-control" style="margin-bottom:0;" required>
+          <option value="" disabled selected>Select Goal...</option>
+          <option value="cut">Fat Loss (Cut)</option>
+          <option value="bulk">Muscle Gain (Bulk)</option>
+          <option value="maintain">Maintenance</option>
         </select>
-        <select id="planDiet" class="form-control" required>
-          <option value="non-veg">Non-Veg</option>
-          <option value="veg">Vegetarian</option>
-          <option value="vegan">Vegan</option>
+        <select id="planDiet" class="form-control" style="margin-bottom:0;" required>
+          <option value="" disabled selected>Diet Preference...</option>
+          <option value="balanced">Balanced</option>
+          <option value="high-protein">High Protein Med Carbs</option>
+          <option value="keto">Keto / Low Carb</option>
+          <option value="vegan">Vegan High Protein</option>
         </select>
-        <button type="submit" class="btn btn-outline" style="grid-column: 1 / -1;">Generate Plan</button>
+        <button type="submit" class="btn btn--outline" style="grid-column: 1 / -1; padding-top:12px; padding-bottom:12px; margin-top:8px;">Generate Plan</button>
       </form>
-      <div id="plannerResult" style="margin-top: 1.5rem; display: none; padding: 1rem; background: var(--bg-2); border-radius: 8px; border: 1px solid var(--border);"></div>
+      <div id="plannerResult" style="display: none; padding: 24px; background: rgba(0,0,0,0.1); border-radius: var(--radius-md); border: 1px solid var(--border);"></div>
     </div>
 
-    <!-- Advanced Analytics (Python Powered) -->
+    <!-- Advanced Analytics -->
     <div class="glass-card" style="grid-column: 1 / -1; display:flex; flex-direction:column;">
-      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-chart-pie"></i> Advanced Analytics</h3>
-      <p style="color:var(--text-2); font-size:0.85rem; margin-bottom: 1rem;">📊 Powered by Python Data Engine</p>
+      <h3>Advanced Analytics</h3>
+      <p class="subtitle">Volume progression and muscle distribution visualizer.</p>
       
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-        <div>
-          <h4 style="margin-bottom: 0.5rem; color: var(--text-1);">30-Day Volume Heatmap</h4>
-          <div style="width: 100%; height: 250px; position:relative;">
-            <canvas id="progressChart"></canvas>
-          </div>
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+        <div style="width: 100%; height: 300px; position:relative;">
+          <canvas id="progressChart"></canvas>
         </div>
-        <div>
-          <h4 style="margin-bottom: 0.5rem; color: var(--text-1);">Muscle Distribution</h4>
-          <div style="width: 100%; height: 250px; position:relative;">
-            <canvas id="pieChart"></canvas>
-          </div>
+        <div style="width: 100%; height: 300px; position:relative;">
+          <canvas id="pieChart"></canvas>
         </div>
       </div>
     </div>
+
   </div>
 
   <script>
-    const token = localStorage.getItem('limitless_token');
-    if (!token) window.location.href = 'login.html';
+    // Theme logic
+    const html = document.documentElement;
+    const themeBtn = document.getElementById('theme-btn');
+    
+    function updateThemeBtn(theme) {
+      themeBtn.textContent = (theme === 'light') ? '☀️' : '🌙';
+    }
+    
+    themeBtn.addEventListener('click', () => {
+      let current = html.getAttribute('data-theme') || 'dark';
+      let next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('limitless_theme', next);
+      updateThemeBtn(next);
+      // Re-render charts on theme switch
+      if(window.lastChartData) renderCharts(window.lastChartData.heatmap, window.lastChartData.pieChart);
+    });
+    updateThemeBtn(localStorage.getItem('limitless_theme') || 'dark');
 
-    async function checkStatus() {
+    async function verifyAuth() {
       try {
-        const res = await fetch('/api/user/status', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (!res.ok) throw new Error('Not authenticated');
         const data = await res.json();
-        if (data.success && data.user.subscription_plan !== 'free') {
+        
+        if (data.user && data.user.subscription_plan && data.user.subscription_plan !== 'free') {
           document.getElementById('proBadge').style.display = 'inline-block';
-          document.getElementById('proBadge').textContent = data.user.subscription_plan.toUpperCase();
         }
-      } catch (err) { console.error(err); }
+        document.getElementById('user-name').textContent = data.user.name;
+        return data.user;
+      } catch (err) {
+        window.location.href = 'login.html';
+      }
     }
 
-    // Load Today's Routine
     async function loadTodayRoutine() {
       try {
-        const res = await fetch('/api/dashboard/today', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
+        const res = await fetch('/api/dashboard/today', { credentials: 'include' });
         const data = await res.json();
         if (data.success) {
           const r = data.routine;
-          const html = `
-            <div style="padding: 1.2rem; background: var(--bg-2); border-radius: 12px; border: 1px solid var(--border);">
-              <div style="color: var(--primary-color); text-transform:uppercase; font-size: 0.8rem; letter-spacing:1px; margin-bottom: 0.5rem; font-weight:600;"><i class="fas fa-sun"></i> ${data.dayName}</div>
-              <h4 style="margin: 0 0 0.5rem 0; font-size: 1.4rem;">${r.title}</h4>
-              <p style="margin: 0 0 1rem 0; color: var(--text-2); display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-crosshairs fa-sm"></i> Focus: ${r.target}</p>
-              ${r.sets > 0 ? `<div style="display:inline-block; padding: 6px 14px; background: rgba(59,130,246,0.1); color: var(--primary-color); border-radius: 20px; font-weight: 500; font-size: 0.9rem;"><i class="fas fa-dumbbell"></i> ${r.sets} Sets × ${r.reps} Reps per exercise</div>` : '<div style="display:inline-block; padding: 6px 14px; background: rgba(16,185,129,0.1); color: #10b981; border-radius: 20px; font-weight: 500; font-size: 0.9rem;"><i class="fas fa-bed"></i> Recovery Day</div>'}
+          document.getElementById('routineContent').innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h4 style="margin:0; font-size:18px; color:var(--text-hi);">${data.dayName}</h4>
+            </div>
+            <h5 style="margin:0 0 8px 0; font-size:22px; color:var(--accent);">${r.title}</h5>
+            <p style="margin:0 0 16px 0; color:var(--text-mid); font-size:15px;">Target: ${r.target}</p>
+            <div style="background:rgba(0,0,0,0.1); padding:16px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+              <span style="font-weight:600; color:var(--text-hi);">Suggested Volume:</span>
+              <br> <span style="color:var(--text-mid);">${r.sets} Sets × ${r.reps} Reps per exercise.</span>
             </div>
           `;
-          document.getElementById('routineContent').innerHTML = html;
         }
-      } catch (err) { console.error('Failed to load today routine'); }
+      } catch (err) {}
     }
 
     let progressChart, pieChartInst;
 
     async function loadAnalytics() {
       try {
-        const res = await fetch('/api/dashboard/analytics', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
+        const res = await fetch('/api/dashboard/analytics', { credentials: 'include' });
         const data = await res.json();
         if (data.success) {
+          window.lastChartData = data;
           renderCharts(data.heatmap, data.pieChart);
         } else {
           loadFallbackHistory();
         }
-      } catch (err) { 
-        console.error(err);
+      } catch (err) {
         loadFallbackHistory();
       }
     }
 
     async function loadFallbackHistory() {
       try {
-        const res = await fetch('/api/workouts/history', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
+        const res = await fetch('/api/workouts/history', { credentials: 'include' });
         const data = await res.json();
         if (data.success) {
           const dates = [...new Set(data.logs.map(log => log.date))];
-          const heatmap = dates.map(date => ({
-            date: date,
-            volume: data.logs.filter(l => l.date === date).reduce((s, l) => s + (l.sets * l.reps * l.weight), 0)
-          }));
-          renderCharts(heatmap, { "No Python Data": 1 });
+          const volumeArray = dates.map(date => {
+            return data.logs.filter(l => l.date === date).reduce((sum, curr) => sum + (curr.sets * curr.reps * curr.weight), 0);
+          });
+          const heatmap = dates.map((d, i) => ({ date: d, count: volumeArray[i] }));
+          window.lastChartData = { heatmap, pieChart: { labels: ['No Detailed Split Matrix'], data: [1] } };
+          renderCharts(window.lastChartData.heatmap, window.lastChartData.pieChart);
         }
       } catch (err) { console.error(err); }
     }
 
     function renderCharts(heatmapData, pieData) {
       const style = getComputedStyle(document.documentElement);
-      const primaryColor = style.getPropertyValue('--primary-color').trim();
-      const textColor = style.getPropertyValue('--text-2').trim();
-      const gridColor = style.getPropertyValue('--border').trim();
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      
+      const primaryColor = style.getPropertyValue('--accent').trim() || '#3b82f6';
+      const textColor = style.getPropertyValue('--text-mid').trim() || '#8892b0';
+      const gridColor = style.getPropertyValue('--border').trim() || 'rgba(255,255,255,0.1)';
 
       const ctxBar = document.getElementById('progressChart').getContext('2d');
       if (progressChart) progressChart.destroy();
 
-      const gradient = ctxBar.createLinearGradient(0, 0, 0, 250);
+      const gradient = ctxBar.createLinearGradient(0, 0, 0, 300);
       gradient.addColorStop(0, primaryColor);
-      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
+      gradient.addColorStop(1, 'transparent');
 
       progressChart = new Chart(ctxBar, {
-        type: 'bar',
+        type: 'line',
         data: {
           labels: heatmapData.length ? heatmapData.map(d => d.date) : ['No Data'],
           datasets: [{
-            label: 'Volume (kg)',
-            data: heatmapData.length ? heatmapData.map(d => d.volume) : [0],
+            label: 'Volume Score',
+            data: heatmapData.length ? heatmapData.map(d => d.count || d.volume) : [0],
             backgroundColor: gradient,
-            hoverBackgroundColor: primaryColor,
-            borderRadius: 6,
-            barPercentage: 0.6,
+            borderColor: primaryColor,
+            borderWidth: 2,
+            pointBackgroundColor: primaryColor,
+            pointBorderColor: isLight ? '#fff' : '#0a0a0b',
+            pointRadius: 4,
+            fill: true,
+            tension: 0.4
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { 
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false } },
           scales: {
-            x: { ticks: { color: textColor, font: {family:'Inter'} }, grid: { display: false } },
-            y: { beginAtZero: true, ticks: { color: textColor, font: {family:'Inter'} }, grid: { color: gridColor, borderDash: [5, 5] }, border: {display:false} }
+            x: { ticks: { color: textColor, font: {family:'Plus Jakarta Sans'} }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: textColor, font: {family:'Plus Jakarta Sans'} }, grid: { color: gridColor, borderDash: [5, 5] }, border: {display:false} }
           }
         }
       });
@@ -236,20 +274,18 @@
       const ctxPie = document.getElementById('pieChart').getContext('2d');
       if (pieChartInst) pieChartInst.destroy();
 
-      const pieLabels = Object.keys(pieData);
-      const pieValues = Object.values(pieData);
-      
-      const pieColors = ['#3b82f6', '#00c896', '#ff6b35', '#e63946', '#8b5cf6', '#f59e0b'];
+      const pieColors = [primaryColor, '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1'];
 
       pieChartInst = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-          labels: pieLabels.length ? pieLabels : ['No Data'],
+          labels: pieData.labels ? pieData.labels : ['No Data'],
           datasets: [{
-            data: pieValues.length ? pieValues : [1],
+            data: pieData.data ? pieData.data : [1],
             backgroundColor: pieColors,
-            borderWidth: 0,
-            hoverOffset: 4
+            borderColor: style.getPropertyValue('--bg-surface').trim() || (isLight ? '#fff' : '#141416'),
+            borderWidth: 2,
+            hoverOffset: 6
           }]
         },
         options: {
@@ -257,11 +293,11 @@
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              position: 'right',
-              labels: { color: textColor, font: { family: 'Inter', size: 12 }, padding: 15, boxWidth: 12 }
+              position: 'bottom',
+              labels: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 12 }, padding: 15, boxWidth: 12 }
             }
           },
-          cutout: '70%',
+          cutout: '75%',
           animation: { animateScale: true, animateRotate: true }
         }
       });
@@ -279,82 +315,77 @@
       try {
         const res = await fetch('/api/workouts/log', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         if (res.ok) {
-          e.target.reset();
-          loadAnalytics();
-        } else {
-          alert('Failed to log');
+          const btn = e.target.querySelector('button');
+          btn.textContent = 'Logged ✔';
+          btn.style.background = '#10b981';
+          btn.style.borderColor = '#10b981';
+          btn.style.color = '#fff';
+          setTimeout(() => {
+            btn.textContent = 'Save Workout';
+            btn.style.background = '';
+            btn.style.borderColor = '';
+            btn.style.color = '';
+            e.target.reset();
+            loadAnalytics(); // Reload charts to reflect new data
+          }, 2000);
         }
-      } catch (err) { alert('Error logging'); }
+      } catch (err) { alert('Error logging workout'); }
     });
 
     document.getElementById('plannerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const payload = {
-        age: 25, 
         weight: document.getElementById('planWeight').value,
         goal: document.getElementById('planGoal').value,
-        dietParams: { preference: document.getElementById('planDiet').value, region: 'western' }
+        dietPref: document.getElementById('planDiet').value
       };
 
       try {
         const res = await fetch('/api/generate-plan', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
         if (data.success) {
-          const p = data.plan;
-          const html = `
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
-              <div>
-                <h4 style="color:var(--primary-color); margin-top:0; font-size:1.1rem;"><i class="fas fa-utensils"></i> Diet (${p.targetCalories} kcal)</h4>
-                <ul style="padding-left:1.2rem; margin:0; color:var(--text-1); font-size:0.95rem; line-height:1.6;">
-                  ${p.dailyDiet.map(item => `<li style="margin-bottom:0.5rem;">${item}</li>`).join('')}
-                </ul>
-              </div>
-              <div>
-                <h4 style="color:var(--primary-color); margin-top:0; font-size:1.1rem;"><i class="fas fa-dumbbell"></i> Weekly Routine</h4>
-                <ul style="padding-left:1.2rem; margin:0; color:var(--text-1); font-size:0.95rem; line-height:1.6;">
-                  ${p.weeklyRoutine.slice(0,5).map(item => `<li style="margin-bottom:0.5rem;">${item}</li>`).join('')}
-                </ul>
-              </div>
+          const resultDiv = document.getElementById('plannerResult');
+          resultDiv.style.display = 'block';
+          resultDiv.innerHTML = `
+            <h4 style="color:var(--accent); font-size:20px; font-family:var(--font-display); margin:0 0 12px 0;">Your Customized Program</h4>
+            <div style="margin-bottom:16px;">
+              <strong style="color:var(--text-hi);">Diet Framework:</strong><br>
+              <span style="color:var(--text-mid);">${data.diet}</span>
+            </div>
+            <div>
+              <strong style="color:var(--text-hi);">Training Split:</strong><br>
+              <ul style="color:var(--text-mid); padding-left:20px; margin-top:8px;">
+                ${data.routine.map(r => '<li style="margin-bottom:4px;">'+r+'</li>').join('')}
+              </ul>
             </div>
           `;
-          const resDiv = document.getElementById('plannerResult');
-          resDiv.innerHTML = html;
-          resDiv.style.opacity = 0;
-          resDiv.style.display = 'block';
-          setTimeout(() => {
-            resDiv.style.transition = 'opacity 0.4s ease';
-            resDiv.style.opacity = 1;
-          }, 10);
         }
       } catch (err) { alert('Error generating plan'); }
     });
 
-    function logout() {
-      localStorage.removeItem('limitless_token');
-      localStorage.removeItem('limitless_user');
-      window.location.href = 'index.html';
+    async function logout() {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      } catch (e) {}
+      localStorage.removeItem('limitless_theme');
+      window.location.href = 'login.html';
     }
 
-    checkStatus();
-    loadTodayRoutine();
-    loadAnalytics();
-
     (async () => {
-      if (typeof authGuard === 'function') {
-        const user = await authGuard();
-        if (user) document.getElementById('user-name').textContent = user.name;
-      }
+      await verifyAuth();
+      loadTodayRoutine();
+      loadAnalytics();
     })();
   </script>
-  <script src="cursor.js"></script>
-  <script src="script.js"></script>
 </body>
 </html>
