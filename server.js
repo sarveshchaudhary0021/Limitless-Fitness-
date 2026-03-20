@@ -251,50 +251,7 @@ app.post('/api/bmi', (req, res) => {
 
 // ─── SMART GENERATOR ROUTES ──────────────────────────────────────────────────
 
-app.post('/api/generate-plan', async (req, res) => {
-  try {
-    const { age, weight, goal, dietParams } = req.body;
-    
-    // Algorithmic Calorie Calculation
-    let calories = weight * (goal === 'muscle-gain' ? 35 : goal === 'fat-loss' ? 22 : 28);
-    let diet = [];
-    
-    // Demographic / Region based Diet assignment
-    if (dietParams.region === 'indian' || dietParams.region === 'jain') {
-      if (dietParams.preference === 'veg' || dietParams.region === 'jain') {
-        diet = ['Breakfast: Poha with Peanuts & Protein Shake', 'Lunch: Dal Makhani, Mixed Sabzi & 3 Rotis', 'Dinner: Paneer Bhurji & Brown Rice', 'Snack: Roasted Makhana & Almonds'];
-      } else if (dietParams.preference === 'vegan') {
-        diet = ['Breakfast: Oats Chilla & Tofu Scramble', 'Lunch: Chana Masala & Quinoa', 'Dinner: Soya Chunk Curry & Roti', 'Snack: Mixed Seeds & Black Coffee'];
-      } else {
-        diet = ['Breakfast: 4 Whole Eggs Bhurji & Toast', 'Lunch: Chicken Curry (200g) & Rice', 'Dinner: Grilled Fish & Veggies', 'Snack: Whey Protein & Banana'];
-      }
-    } else {
-      // Western / Halal
-      if (dietParams.preference === 'veg') {
-        diet = ['Breakfast: Greek Yogurt, Honey & Berries', 'Lunch: Quinoa, Black Bean & Avocado Salad', 'Dinner: Cottage Cheese Stir Fry', 'Snack: Whey Isolate & Almonds'];
-      } else if (dietParams.preference === 'vegan') {
-        diet = ['Breakfast: Acai Smoothie Bowl with Hemp Seeds', 'Lunch: Lentil Soup & Sweet Potato', 'Dinner: Beyond Meat Burger (No Bun)', 'Snack: Peanut Butter Rice Cakes'];
-      } else {
-        diet = ['Breakfast: Scrambled Eggs & Turkey Bacon', 'Lunch: Grilled Chicken Salad (250g)', 'Dinner: Lean Steak & Asparagus', 'Snack: Protein Bar & Apple'];
-      }
-    }
 
-    // Routine Based on Goal
-    let routine = goal === 'muscle-gain' 
-      ? ['Day 1: Push (Chest, Shoulders, Triceps)', 'Day 2: Pull (Back, Biceps, Rear Delts)', 'Day 3: Rest', 'Day 4: Legs & Core Focus', 'Day 5: Upper Body Hypertrophy']
-      : ['Day 1: Full Body HIIT & Core', 'Day 2: LISS Cardio & Mobility', 'Day 3: Heavy Compound Lifts', 'Day 4: Rest', 'Day 5: Sprints & Conditioning'];
-
-    const plan = {
-      targetCalories: Math.round(calories),
-      dailyDiet: diet,
-      weeklyRoutine: routine
-    };
-
-    res.json({ success: true, plan });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to generate smart plan.' });
-  }
-});
 
 // ─── AUTHENTICATION ROUTES ───────────────────────────────────────────────────
 
@@ -488,7 +445,7 @@ app.get('/api/dashboard/analytics', authenticateToken, async (req, res) => {
 
 app.post('/api/generate-plan', authenticateToken, async (req, res) => {
   try {
-    const { weight, goal, dietPref } = req.body;
+    const { weight, goal, dietPref, religion, geography } = req.body;
     let w = parseFloat(weight) || 70;
     
     let calTarget = 2200;
@@ -496,8 +453,75 @@ app.post('/api/generate-plan', authenticateToken, async (req, res) => {
     else if (goal === 'bulk') calTarget = w * 30 + 500;
     else calTarget = w * 24;
     
-    const diet = `${Math.round(calTarget)} kcal/day. Focus on high protein (${Math.round(w * 2.2)}g), moderate carbs, and healthy fats. Structure meals around your ${dietPref || 'balanced'} preference.`;
+    // Customize phrasing based on religion and geography constraints
+    let limits = [];
+    if (religion === 'jain') limits.push('strictly avoiding onions, garlic, and root vegetables');
+    else if (religion === 'hindu') limits.push('focusing on Sattvic / vegetarian-friendly sources (no beef)');
+    else if (religion === 'halal') limits.push('ensuring all meat is strictly Halal certified (no pork)');
+    else if (religion === 'sikh') limits.push('incorporating Jhatka or pure vegetarian guidelines');
+    else if (religion === 'buddha') limits.push('following mindful, primarily plant-based consumption');
     
+    let spiceMsg = "balanced seasonings";
+    if (geography === 'indian') spiceMsg = "rich South Asian spices (turmeric, cumin, garam masala)";
+    else if (geography === 'western') spiceMsg = "light Continental herbs (rosemary, thyme, olive oil)";
+    else if (geography === 'asian') spiceMsg = "East Asian flavor profiles (soy, ginger, sesame)";
+    else if (geography === 'middle-eastern') spiceMsg = "Middle Eastern aromatics (za'atar, sumac, tahini)";
+
+    const limitStr = limits.length > 0 ? `, ${limits.join(' and ')}` : '';
+
+    const diet = `${Math.round(calTarget)} kcal/day. Focus on high protein (${Math.round(w * 2.2)}g), moderate carbs, and healthy fats. Structure meals around a ${dietPref || 'balanced'} template using ${spiceMsg}${limitStr}.`;
+    
+    // Construct the Daily Meal Plan
+    let mealOptions = [];
+    if (geography === 'indian') {
+      if (dietPref === 'vegan' || religion === 'jain' || religion === 'buddha') {
+        mealOptions = [
+          'Breakfast: Oats Chilla & Tofu Scramble',
+          'Lunch: Dal Makhani (No Onion/Garlic for Jain), Mixed Sabzi & 3 Rotis',
+          'Dinner: Soya Chunk Curry & Brown Rice',
+          'Snack: Roasted Makhana & Almonds'
+        ];
+      } else if (religion === 'hindu' || dietPref === 'balanced' || dietPref === 'keto') {
+        mealOptions = [
+          'Breakfast: Poha with Peanuts & Whey Protein Shake',
+          'Lunch: Paneer Butter Masala, Rice & 2 Rotis',
+          'Dinner: Grilled Paneer Tikka & Seasonal Salad',
+          'Snack: Mixed Nuts & Greek Yogurt'
+        ];
+      } else {
+        mealOptions = [
+          'Breakfast: 4 Whole Eggs Bhurji & Multigrain Toast',
+          'Lunch: Chicken Tikka Masala (200g meat) & Basmati Rice',
+          'Dinner: Grilled Fish & Stir-fried Veggies',
+          'Snack: Whey Protein & Banana'
+        ];
+      }
+    } else {
+      // Western / Middle Eastern / Asian / Default
+      if (dietPref === 'vegan' || religion === 'jain' || religion === 'buddha') {
+        mealOptions = [
+          'Breakfast: Acai Smoothie Bowl with Hemp Seeds & Chia',
+          'Lunch: Lentil Soup & Baked Sweet Potato',
+          'Dinner: Beyond Meat Patty & Grilled Asparagus',
+          'Snack: Peanut Butter Rice Cakes'
+        ];
+      } else if (religion === 'hindu' || dietPref === 'balanced') {
+        mealOptions = [
+          'Breakfast: Greek Yogurt, Honey & Berries',
+          'Lunch: Quinoa, Black Bean & Avocado Salad',
+          'Dinner: Cottage Cheese Stir Fry',
+          'Snack: Whey Isolate & Almonds'
+        ];
+      } else {
+        mealOptions = [
+          'Breakfast: Scrambled Eggs & Lean Turkey Bacon',
+          'Lunch: Grilled Chicken Salad (250g breast)',
+          'Dinner: Lean Steak & Broccoli (Substitute with Halal Chicken if desired)',
+          'Snack: Protein Bar & Apple'
+        ];
+      }
+    }
+
     const routine = [
       "Day 1: Heavy Push (Chest, Shoulders, Triceps)",
       "Day 2: Heavy Pull (Back, Biceps, Rear Delts)",
@@ -508,7 +532,7 @@ app.post('/api/generate-plan', authenticateToken, async (req, res) => {
       "Day 7: Rest"
     ];
     
-    res.json({ success: true, diet, routine });
+    res.json({ success: true, diet, routine, dailyMeals: mealOptions });
   } catch (err) {
     res.status(500).json({ error: 'Failed to generate plan.' });
   }
