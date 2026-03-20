@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const { spawn } = require('child_process');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'limitless_super_secret_key_123';
 
@@ -372,6 +373,72 @@ app.get('/api/workouts/history', authenticateToken, async (req, res) => {
     res.json({ success: true, logs });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch history.' });
+  }
+});
+
+app.get('/api/dashboard/today', authenticateToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT subscription_plan FROM users WHERE id = ?', [req.user.id]);
+    const plan = rows[0]?.subscription_plan || 'free';
+    
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const today = new Date().getDay();
+    const dayName = days[today];
+    
+    const routines = {
+      0: { title: "Rest & Recovery", target: "Mobility & Stretching", sets: 0, reps: 0 },
+      1: { title: "Day 1 - Push Day", target: "Chest, Shoulders & Triceps", sets: 4, reps: 10 },
+      2: { title: "Day 2 - Pull Day", target: "Back & Biceps", sets: 4, reps: 10 },
+      3: { title: "Day 3 - Leg Day", target: "Quads, Hamstrings & Calves", sets: 4, reps: 12 },
+      4: { title: "Day 4 - Upper Body", target: "Shoulders, Chest & Core", sets: 3, reps: 15 },
+      5: { title: "Day 5 - Full Body", target: "Compound Movements", sets: 3, reps: 8 },
+      6: { title: "Active Rest", target: "Light Cardio", sets: 0, reps: 0 }
+    };
+    
+    res.json({ success: true, dayName, routine: routines[today], plan });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch daily routine.' });
+  }
+});
+
+app.get('/api/dashboard/analytics', authenticateToken, async (req, res) => {
+  try {
+    const [logs] = await pool.query(
+      'SELECT exercise, sets, reps, weight, DATE_FORMAT(logged_at, "%Y-%m-%d") as date FROM workout_logs WHERE user_id = ? ORDER BY logged_at ASC',
+      [req.user.id]
+    );
+    
+    const pythonProcess = spawn('python', ['analytics.py']);
+    
+    let result = '';
+    let errorOutput = '';
+    
+    pythonProcess.stdout.on('data', (data) => {
+      result += data.toString();
+    });
+    
+    pythonProcess.stderr.on('data', (data) => {
+      errorOutput += data.toString();
+    });
+    
+    pythonProcess.on('close', (code) => {
+      if (code !== 0) {
+        console.error('Python Error:', errorOutput);
+        return res.status(500).json({ error: 'Python Analytics failed' });
+      }
+      try {
+        const parsedData = JSON.parse(result);
+        res.json(parsedData);
+      } catch (e) {
+        res.status(500).json({ error: 'Failed to parse python output' });
+      }
+    });
+    
+    pythonProcess.stdin.write(JSON.stringify(logs));
+    pythonProcess.stdin.end();
+    
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch analytics.' });
   }
 });
 

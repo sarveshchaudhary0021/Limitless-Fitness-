@@ -11,7 +11,7 @@
   <style>
     body { background-color: var(--bg); color: var(--text-1); font-family: 'Inter', sans-serif; transition: background 0.3s, color 0.3s; }
     .dash-nav { padding: 1rem 2rem; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100; }
-    .dash-container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
+    .dash-container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
     .form-control { width: 100%; padding: 0.8rem 1.2rem; background: var(--bg-2); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-md); box-sizing: border-box; margin-bottom: 1.2rem; transition: all 0.3s; outline: none; font-size: 0.95rem; }
     .form-control:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); background: var(--bg); }
     .log-btn { width: 100%; padding: 1rem; font-size: 1rem; }
@@ -36,10 +36,18 @@
   </nav>
 
   <div class="dash-container">
+    <!-- Today's Routine -->
+    <div class="glass-card" id="todayRoutineCard">
+      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-calendar-day"></i> Today's Routine</h3>
+      <div id="routineContent" style="margin-top: 1rem;">
+        <p style="color:var(--text-2);">Loading your plan...</p>
+      </div>
+    </div>
+
+    <!-- Log Workout -->
     <div class="glass-card">
       <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-plus-circle"></i> Log Workout</h3>
       <p style="color:var(--text-2); font-size:0.9rem; margin-bottom: 1.5rem;">Track your progressive overload instantly.</p>
-      
       <form id="logForm">
         <select id="exercise" class="form-control" required>
           <option value="">Select Exercise...</option>
@@ -48,6 +56,11 @@
           <option value="Deadlift">Deadlift</option>
           <option value="Pull-Up">Pull-Up</option>
           <option value="Overhead Press">Overhead Press</option>
+          <option value="Push-Up">Push-Up</option>
+          <option value="Plank">Plank</option>
+          <option value="Lunge">Lunge</option>
+          <option value="Bicep Curl">Bicep Curl</option>
+          <option value="Tricep Extension">Tricep Extension</option>
         </select>
         <div style="display:flex; gap:0.5rem;">
           <input type="number" id="sets" class="form-control" placeholder="Sets" min="1" required>
@@ -58,10 +71,45 @@
       </form>
     </div>
 
-    <div class="glass-card">
-      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-chart-line"></i> Analytics & Volume</h3>
-      <div style="width: 100%; height: 320px; position:relative;">
-        <canvas id="progressChart"></canvas>
+    <!-- Quick Planner -->
+    <div class="glass-card" style="grid-column: 1 / -1;">
+      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-bolt"></i> Quick Planner</h3>
+      <p style="color:var(--text-2); font-size:0.9rem; margin-bottom: 1rem;">Instantly generate a customized workout and diet plan.</p>
+      <form id="plannerForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <input type="number" id="planWeight" class="form-control" placeholder="Weight (kg)" required>
+        <select id="planGoal" class="form-control" required>
+          <option value="muscle-gain">Muscle Gain</option>
+          <option value="fat-loss">Fat Loss</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
+        <select id="planDiet" class="form-control" required>
+          <option value="non-veg">Non-Veg</option>
+          <option value="veg">Vegetarian</option>
+          <option value="vegan">Vegan</option>
+        </select>
+        <button type="submit" class="btn btn-outline" style="grid-column: 1 / -1;">Generate Plan</button>
+      </form>
+      <div id="plannerResult" style="margin-top: 1.5rem; display: none; padding: 1rem; background: var(--bg-2); border-radius: 8px; border: 1px solid var(--border);"></div>
+    </div>
+
+    <!-- Advanced Analytics (Python Powered) -->
+    <div class="glass-card" style="grid-column: 1 / -1; display:flex; flex-direction:column;">
+      <h3 style="margin-top:0; color:var(--primary-color);"><i class="fas fa-chart-pie"></i> Advanced Analytics</h3>
+      <p style="color:var(--text-2); font-size:0.85rem; margin-bottom: 1rem;">📊 Powered by Python Data Engine</p>
+      
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        <div>
+          <h4 style="margin-bottom: 0.5rem; color: var(--text-1);">30-Day Volume Heatmap</h4>
+          <div style="width: 100%; height: 250px; position:relative;">
+            <canvas id="progressChart"></canvas>
+          </div>
+        </div>
+        <div>
+          <h4 style="margin-bottom: 0.5rem; color: var(--text-1);">Muscle Distribution</h4>
+          <div style="width: 100%; height: 250px; position:relative;">
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -83,89 +131,133 @@
       } catch (err) { console.error(err); }
     }
 
-    let progressChart;
+    // Load Today's Routine
+    async function loadTodayRoutine() {
+      try {
+        const res = await fetch('/api/dashboard/today', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        if (data.success) {
+          const r = data.routine;
+          const html = `
+            <div style="padding: 1.2rem; background: var(--bg-2); border-radius: 12px; border: 1px solid var(--border);">
+              <div style="color: var(--primary-color); text-transform:uppercase; font-size: 0.8rem; letter-spacing:1px; margin-bottom: 0.5rem; font-weight:600;"><i class="fas fa-sun"></i> ${data.dayName}</div>
+              <h4 style="margin: 0 0 0.5rem 0; font-size: 1.4rem;">${r.title}</h4>
+              <p style="margin: 0 0 1rem 0; color: var(--text-2); display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-crosshairs fa-sm"></i> Focus: ${r.target}</p>
+              ${r.sets > 0 ? `<div style="display:inline-block; padding: 6px 14px; background: rgba(59,130,246,0.1); color: var(--primary-color); border-radius: 20px; font-weight: 500; font-size: 0.9rem;"><i class="fas fa-dumbbell"></i> ${r.sets} Sets × ${r.reps} Reps per exercise</div>` : '<div style="display:inline-block; padding: 6px 14px; background: rgba(16,185,129,0.1); color: #10b981; border-radius: 20px; font-weight: 500; font-size: 0.9rem;"><i class="fas fa-bed"></i> Recovery Day</div>'}
+            </div>
+          `;
+          document.getElementById('routineContent').innerHTML = html;
+        }
+      } catch (err) { console.error('Failed to load today routine'); }
+    }
 
-    // Fetch and render chart
-    async function loadHistory() {
+    let progressChart, pieChartInst;
+
+    async function loadAnalytics() {
+      try {
+        const res = await fetch('/api/dashboard/analytics', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        if (data.success) {
+          renderCharts(data.heatmap, data.pieChart);
+        } else {
+          loadFallbackHistory();
+        }
+      } catch (err) { 
+        console.error(err);
+        loadFallbackHistory();
+      }
+    }
+
+    async function loadFallbackHistory() {
       try {
         const res = await fetch('/api/workouts/history', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
         const data = await res.json();
-        
         if (data.success) {
           const dates = [...new Set(data.logs.map(log => log.date))];
-          
-          // Group cumulative volume per day
-          const volumeData = dates.map(date => {
-            const dayLogs = data.logs.filter(l => l.date === date);
-            return dayLogs.reduce((sum, log) => sum + (log.sets * log.reps * log.weight), 0);
-          });
-
-          renderChart(dates, volumeData);
+          const heatmap = dates.map(date => ({
+            date: date,
+            volume: data.logs.filter(l => l.date === date).reduce((s, l) => s + (l.sets * l.reps * l.weight), 0)
+          }));
+          renderCharts(heatmap, { "No Python Data": 1 });
         }
       } catch (err) { console.error(err); }
     }
 
-    function renderChart(dates, volumes) {
-      const ctx = document.getElementById('progressChart').getContext('2d');
-      if (progressChart) progressChart.destroy();
-
+    function renderCharts(heatmapData, pieData) {
       const style = getComputedStyle(document.documentElement);
       const primaryColor = style.getPropertyValue('--primary-color').trim();
       const textColor = style.getPropertyValue('--text-2').trim();
       const gridColor = style.getPropertyValue('--border').trim();
 
-      const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+      const ctxBar = document.getElementById('progressChart').getContext('2d');
+      if (progressChart) progressChart.destroy();
+
+      const gradient = ctxBar.createLinearGradient(0, 0, 0, 250);
       gradient.addColorStop(0, primaryColor);
       gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
 
-      progressChart = new Chart(ctx, {
+      progressChart = new Chart(ctxBar, {
         type: 'bar',
         data: {
-          labels: dates.length ? dates : ['No Data'],
+          labels: heatmapData.length ? heatmapData.map(d => d.date) : ['No Data'],
           datasets: [{
-            label: 'Total Lifted Volume (kg)',
-            data: volumes.length ? volumes : [0],
+            label: 'Volume (kg)',
+            data: heatmapData.length ? heatmapData.map(d => d.volume) : [0],
             backgroundColor: gradient,
-            hoverBackgroundColor: '#00c896',
+            hoverBackgroundColor: primaryColor,
             borderRadius: 6,
-            barPercentage: 0.5,
-            borderSkipped: false
+            barPercentage: 0.6,
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: { 
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: style.getPropertyValue('--btn-bg').trim(),
-              titleColor: primaryColor,
-              bodyColor: style.getPropertyValue('--btn-text').trim(),
-              padding: 12,
-              cornerRadius: 8,
-              displayColors: false,
-              titleFont: { family: 'Inter', size: 14 }
-            }
+            legend: { display: false }
           },
           scales: {
-            x: { 
-              ticks: { color: textColor, font: { family: 'Inter' } }, 
-              grid: { display: false },
-              border: { display: false }
-            },
-            y: { 
-              beginAtZero: true,
-              ticks: { color: textColor, font: { family: 'Inter' }, padding: 10 }, 
-              grid: { color: gridColor, drawBorder: false },
-              border: { display: false }
+            x: { ticks: { color: textColor, font: {family:'Inter'} }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: textColor, font: {family:'Inter'} }, grid: { color: gridColor, borderDash: [5, 5] }, border: {display:false} }
+          }
+        }
+      });
+
+      const ctxPie = document.getElementById('pieChart').getContext('2d');
+      if (pieChartInst) pieChartInst.destroy();
+
+      const pieLabels = Object.keys(pieData);
+      const pieValues = Object.values(pieData);
+      
+      const pieColors = ['#3b82f6', '#00c896', '#ff6b35', '#e63946', '#8b5cf6', '#f59e0b'];
+
+      pieChartInst = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+          labels: pieLabels.length ? pieLabels : ['No Data'],
+          datasets: [{
+            data: pieValues.length ? pieValues : [1],
+            backgroundColor: pieColors,
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: textColor, font: { family: 'Inter', size: 12 }, padding: 15, boxWidth: 12 }
             }
           },
-          animation: {
-            duration: 1200,
-            easing: 'easeOutQuart'
-          }
+          cutout: '70%',
+          animation: { animateScale: true, animateRotate: true }
         }
       });
     }
@@ -187,11 +279,57 @@
         });
         if (res.ok) {
           e.target.reset();
-          loadHistory(); // reload chart dynamically
+          loadAnalytics();
         } else {
           alert('Failed to log');
         }
       } catch (err) { alert('Error logging'); }
+    });
+
+    document.getElementById('plannerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        age: 25, 
+        weight: document.getElementById('planWeight').value,
+        goal: document.getElementById('planGoal').value,
+        dietParams: { preference: document.getElementById('planDiet').value, region: 'western' }
+      };
+
+      try {
+        const res = await fetch('/api/generate-plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          const p = data.plan;
+          const html = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+              <div>
+                <h4 style="color:var(--primary-color); margin-top:0; font-size:1.1rem;"><i class="fas fa-utensils"></i> Diet (${p.targetCalories} kcal)</h4>
+                <ul style="padding-left:1.2rem; margin:0; color:var(--text-1); font-size:0.95rem; line-height:1.6;">
+                  ${p.dailyDiet.map(item => `<li style="margin-bottom:0.5rem;">${item}</li>`).join('')}
+                </ul>
+              </div>
+              <div>
+                <h4 style="color:var(--primary-color); margin-top:0; font-size:1.1rem;"><i class="fas fa-dumbbell"></i> Weekly Routine</h4>
+                <ul style="padding-left:1.2rem; margin:0; color:var(--text-1); font-size:0.95rem; line-height:1.6;">
+                  ${p.weeklyRoutine.slice(0,5).map(item => `<li style="margin-bottom:0.5rem;">${item}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          `;
+          const resDiv = document.getElementById('plannerResult');
+          resDiv.innerHTML = html;
+          resDiv.style.opacity = 0;
+          resDiv.style.display = 'block';
+          setTimeout(() => {
+            resDiv.style.transition = 'opacity 0.4s ease';
+            resDiv.style.opacity = 1;
+          }, 10);
+        }
+      } catch (err) { alert('Error generating plan'); }
     });
 
     function logout() {
@@ -200,9 +338,9 @@
       window.location.href = 'index.html';
     }
 
-    // Init
     checkStatus();
-    loadHistory();
+    loadTodayRoutine();
+    loadAnalytics();
   </script>
   <script src="cursor.js"></script>
   <script src="script.js"></script>
