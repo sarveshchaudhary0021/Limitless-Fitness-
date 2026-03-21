@@ -13,6 +13,9 @@
   <link rel="stylesheet" href="styles/tokens.css" />
   <link rel="stylesheet" href="styles/global.css" />
 
+  <!-- Razorpay Cryptographic Architecture Wrapper -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
   <style>
     /* ══════════════════════════════════════════
        PAGE BASE
@@ -996,31 +999,95 @@ function toggleBilling() {
 }
 
 /* ══════════════════════════════════════════
-   PLAN SELECTION → RAZORPAY / AUTH
+   PLAN SELECTION → RAZORPAY FRONTEND MODAL
 ══════════════════════════════════════════ */
 async function selectPlan(planId) {
   const btn = document.getElementById('btn-' + planId);
+  const originalText = btn.textContent;
   btn.classList.add('loading');
-  btn.textContent = 'Loading…';
+  btn.textContent = 'Allocating Order…';
 
   try {
-    /* Check if user is logged in */
-    const me = await fetch('http://localhost:5000/api/auth/me', {
-      credentials: 'include',
-    });
+    // Determine correct billing cycle scope internally
+    const cycle = isYearly ? 'yearly' : 'monthly';
 
-    if (!me.ok) {
-      /* Not logged in — send to signup with plan pre-selected */
-      window.location.href = `signup.html?plan=${planId}`;
+    // 1. Fetch Dynamic Public Key strictly from Environment Variables
+    const keyReq = await fetch('/api/razorpay/key');
+    const { key: RAZORPAY_KEY_ID } = await keyReq.json();
+
+    // 2. Instruct Server to securely allocate Cryptographic Order
+    const orderRes = await fetch('/api/razorpay/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ planId, cycle }) // Data Security: Passing ID to server for trusted arbitration
+    });
+    const orderData = await orderRes.json();
+    if (!orderRes.ok) throw new Error("Failed to allocate mathematically secure Order.");
+
+    btn.textContent = 'Awaiting Payment…';
+
+    // 3. Mount Razorpay Modal Interface
+    const options = {
+      key: RAZORPAY_KEY_ID,
+      amount: orderData.amount,
+      currency: "INR",
+      name: "Limitless Fitness",
+      description: `Unlock ${planId.toUpperCase()} Tier`,
+      order_id: orderData.id,
+      handler: async function (response) {
+        btn.textContent = 'Verifying Checksum…';
+
+        // 4. Force Cryptographic Signature Validation on the Server-side
+        const verifyRes = await fetch('/api/razorpay/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(response)
+        });
+        const verifyResult = await verifyRes.json();
+        
+        if (verifyResult.success) {
+          alert('Welcome to Limitless Pro! Transaction Verified Mathematically!');
+          window.location.href = 'index.html';
+        } else {
+          alert("Cryptographic signature failure! Transaction blocked.");
+          btn.classList.remove('loading');
+          btn.textContent = originalText;
+        }
+      },
+      prefill: {
+        name: "Elite Athlete",
+        email: "athlete@limitless.com"
+      },
+      theme: { color: "#E8FF47" },
+      modal: {
+          ondismiss: function() {
+              btn.classList.remove('loading');
+              btn.textContent = originalText;
+          }
+      }
+    };
+    
+    // Safety Fallback check
+    if (!window.Razorpay) {
+      alert("Server Gateway momentarily overloaded. Reload page.");
+      btn.classList.remove('loading');
+      btn.textContent = originalText;
       return;
     }
-
-    /* Logged in — kick off Razorpay subscription */
-    window.location.href = `http://localhost:5000/api/payments/create-subscription?plan=${planId}`;
-
-  } catch {
-    /* Network error — fallback to signup */
-    window.location.href = `signup.html?plan=${planId}`;
+    
+    const rzp1 = new window.Razorpay(options);
+    rzp1.on('payment.failed', function (response){
+        alert("Payment Gateway Failed: " + response.error.description);
+        btn.classList.remove('loading');
+        btn.textContent = originalText;
+    });
+    rzp1.open();
+    
+  } catch (error) {
+    console.error(error);
+    alert('Billing initialization blocked securely. Please try again.');
+    btn.classList.remove('loading');
+    btn.textContent = originalText;
   }
 }
 
@@ -1063,5 +1130,6 @@ function toggleFaq(btn) {
   }
 })();
 </script>
+<script src="js/ai-coach.js"></script>
 </body>
 </html>

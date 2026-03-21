@@ -22,6 +22,9 @@ const razorpay = new Razorpay({
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Expose the standalone Public Chatbot Sandbox UI directly to the router
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 // ─── DATABASE SETUP ───────────────────────────────────────────────────────────
 
 const pool = mysql.createPool({
@@ -262,7 +265,7 @@ app.post('/api/auth/register', async (req, res) => {
     if (!name || !email || !password || password.length < 6) {
       return res.status(400).json({ error: 'Valid name, email, and 6+ char password required.' });
     }
-    
+
     const hash = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
       'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
@@ -270,7 +273,7 @@ app.post('/api/auth/register', async (req, res) => {
     );
 
     const token = jwt.sign({ id: result.insertId, email }, JWT_SECRET, { expiresIn: '7d' });
-    
+
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -290,15 +293,15 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email.trim().toLowerCase()]);
-    
+
     if (rows.length === 0) return res.status(401).json({ error: 'Invalid credentials.' });
     const user = rows[0];
-    
+
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) return res.status(401).json({ error: 'Invalid credentials.' });
 
     const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
-    
+
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -325,7 +328,7 @@ app.get('/api/auth/me', async (req, res) => {
 
   jwt.verify(token, JWT_SECRET, async (err, decoded) => {
     if (err) return res.status(401).json({ error: 'Invalid or expired token' });
-    
+
     try {
       const [rows] = await pool.query('SELECT id, name, email, subscription_plan FROM users WHERE id = ?', [decoded.id]);
       if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
@@ -379,11 +382,11 @@ app.get('/api/dashboard/today', authenticateToken, async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT subscription_plan FROM users WHERE id = ?', [req.user.id]);
     const plan = rows[0]?.subscription_plan || 'free';
-    
+
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const today = new Date().getDay();
     const dayName = days[today];
-    
+
     const routines = {
       0: { title: "Rest & Recovery", target: "Mobility & Stretching", sets: 0, reps: 0 },
       1: { title: "Day 1 - Push Day", target: "Chest, Shoulders & Triceps", sets: 4, reps: 10 },
@@ -393,7 +396,7 @@ app.get('/api/dashboard/today', authenticateToken, async (req, res) => {
       5: { title: "Day 5 - Full Body", target: "Compound Movements", sets: 3, reps: 8 },
       6: { title: "Active Rest", target: "Light Cardio", sets: 0, reps: 0 }
     };
-    
+
     res.json({ success: true, dayName, routine: routines[today], plan });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch daily routine.' });
@@ -406,16 +409,16 @@ app.get('/api/dashboard/analytics', authenticateToken, async (req, res) => {
       'SELECT exercise, sets, reps, weight, DATE_FORMAT(logged_at, "%Y-%m-%d") as date FROM workout_logs WHERE user_id = ? ORDER BY logged_at ASC',
       [req.user.id]
     );
-    
+
     // Pure JS Aggregation (Replacing python script dependency)
     const heatmapMap = {};
     const pieMap = {};
-    
+
     logs.forEach(log => {
       // Heatmap volume score per day
       if (!heatmapMap[log.date]) heatmapMap[log.date] = 0;
       heatmapMap[log.date] += (log.sets || 1) * 10; // score multiplier
-      
+
       // Categorize exercises for Pie Chart
       const ex = log.exercise.toLowerCase();
       let category = 'Other';
@@ -426,17 +429,17 @@ app.get('/api/dashboard/analytics', authenticateToken, async (req, res) => {
       else if (ex.includes('press') || ex.includes('shoulder') || ex.includes('delt')) category = 'Shoulders';
       else if (ex.includes('core') || ex.includes('crunch') || ex.includes('plank')) category = 'Core';
       else if (ex.includes('run') || ex.includes('treadmill') || ex.includes('cardio')) category = 'Cardio';
-      
+
       if (!pieMap[category]) pieMap[category] = 0;
       pieMap[category] += (log.sets || 1);
     });
-    
+
     const heatmap = Object.keys(heatmapMap).map(date => ({ date, count: heatmapMap[date] }));
     const pieChart = {
       labels: Object.keys(pieMap),
       data: Object.values(pieMap)
     };
-    
+
     res.json({ success: true, heatmap, pieChart });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch analytics.' });
@@ -447,12 +450,12 @@ app.post('/api/generate-plan', authenticateToken, async (req, res) => {
   try {
     const { weight, goal, dietPref, religion, geography } = req.body;
     let w = parseFloat(weight) || 70;
-    
+
     let calTarget = 2200;
     if (goal === 'cut') calTarget = Math.max(1500, w * 22);
     else if (goal === 'bulk') calTarget = w * 30 + 500;
     else calTarget = w * 24;
-    
+
     // Customize phrasing based on religion and geography constraints
     let limits = [];
     if (religion === 'jain') limits.push('strictly avoiding onions, garlic, and root vegetables');
@@ -460,7 +463,7 @@ app.post('/api/generate-plan', authenticateToken, async (req, res) => {
     else if (religion === 'halal') limits.push('ensuring all meat is strictly Halal certified (no pork)');
     else if (religion === 'sikh') limits.push('incorporating Jhatka or pure vegetarian guidelines');
     else if (religion === 'buddha') limits.push('following mindful, primarily plant-based consumption');
-    
+
     let spiceMsg = "balanced seasonings";
     if (geography === 'indian') spiceMsg = "rich South Asian spices (turmeric, cumin, garam masala)";
     else if (geography === 'western') spiceMsg = "light Continental herbs (rosemary, thyme, olive oil)";
@@ -470,7 +473,7 @@ app.post('/api/generate-plan', authenticateToken, async (req, res) => {
     const limitStr = limits.length > 0 ? `, ${limits.join(' and ')}` : '';
 
     const diet = `${Math.round(calTarget)} kcal/day. Focus on high protein (${Math.round(w * 2.2)}g), moderate carbs, and healthy fats. Structure meals around a ${dietPref || 'balanced'} template using ${spiceMsg}${limitStr}.`;
-    
+
     // Construct the Daily Meal Plan
     let mealOptions = [];
     if (geography === 'indian') {
@@ -531,7 +534,7 @@ app.post('/api/generate-plan', authenticateToken, async (req, res) => {
       "Day 6: Lower Body Hypertrophy",
       "Day 7: Rest"
     ];
-    
+
     res.json({ success: true, diet, routine, dailyMeals: mealOptions });
   } catch (err) {
     res.status(500).json({ error: 'Failed to generate plan.' });
@@ -543,13 +546,13 @@ app.post('/api/generate-plan', authenticateToken, async (req, res) => {
 app.post('/api/payment/create-order', authenticateToken, async (req, res) => {
   try {
     const { amount, plan } = req.body;
-    
+
     if (!amount || isNaN(amount)) {
       return res.status(400).json({ error: 'Valid amount is required.' });
     }
 
     if (process.env.RAZORPAY_KEY_ID === 'dummy_key') {
-       console.warn('⚠️ Warning: Razorpay Key ID is set to dummy_key. Payments will not work.');
+      console.warn('⚠️ Warning: Razorpay Key ID is set to dummy_key. Payments will not work.');
     }
 
     const options = {
@@ -569,7 +572,7 @@ app.post('/api/payment/create-order', authenticateToken, async (req, res) => {
 app.post('/api/payment/verify', authenticateToken, async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, plan_name, amount } = req.body;
-    
+
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({ error: 'Missing payment verification details.' });
     }
@@ -578,8 +581,8 @@ app.post('/api/payment/verify', authenticateToken, async (req, res) => {
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto.createHmac('sha256', secret)
-                                    .update(body.toString())
-                                    .digest('hex');
+      .update(body.toString())
+      .digest('hex');
 
     if (expectedSignature === razorpay_signature) {
       await pool.query(
@@ -695,6 +698,317 @@ app.delete('/api/clients/:id', async (req, res) => {
   } catch (err) {
     console.error('❌ DB delete error:', err.message);
     res.status(500).json({ error: 'Failed to delete client.' });
+  }
+});
+
+// ─────────────────────────────────────────────────
+// API CONFIGS
+// ─────────────────────────────────────────────────
+
+const GROQ = {
+  url:   'https://api.groq.com/openai/v1/chat/completions',
+  key:   process.env.GROQ_API_KEY,
+  model: 'llama-3.3-70b-versatile', // Specifically mapped to the available Versatile model
+};
+
+const CLAUDE = {
+  url:     'https://api.anthropic.com/v1/messages',
+  key:     process.env.CLAUDE_API_KEY,
+  version: '2023-06-01',
+  model:   'claude-sonnet-4-20250514',
+};
+
+// ─────────────────────────────────────────────────
+// FITNESS SYSTEM PROMPTS — ALL INDIAN LANGUAGES
+// ─────────────────────────────────────────────────
+
+const PROMPTS = {
+  'hi-IN': `आप "Limitless Fitness" के AI पर्सनल ट्रेनर हैं।
+आप इन विषयों में मदद करते हैं: वर्कआउट प्लान, डाइट, न्यूट्रिशन, वजन कम करना, मसल बनाना, योगा, HIIT, कार्डियो, एक्सरसाइज की सही तकनीक, रिकवरी और मोटिवेशन।
+हमेशा हिंदी में, सरल और स्पष्ट भाषा में जवाब दें। जवाब छोटे और उपयोगी रखें।
+गंभीर बीमारी के लिए डॉक्टर से मिलने की सलाह दें।`,
+
+  'bn-IN': `আপনি "Limitless Fitness"-এর AI পার্সোনাল ট্রেইনার।
+আপনি সাহায্য করেন: ওয়ার্কআউট প্ল্যান, ডায়েট, পুষ্টি, ওজন কমানো, পেশী গঠন, যোগব্যায়াম, HIIT, কার্ডিও, ব্যায়ামের সঠিক কৌশল, রিকভারি এবং মোটিভেশন।
+সবসময় বাংলায় সহজ ও স্পষ্ট ভাষায় উত্তর দিন। উত্তর সংক্ষিপ্ত ও কার্যকর রাখুন।`,
+
+  'te-IN': `మీరు "Limitless Fitness" యొక్క AI పర్సనల్ ట్రెయినర్.
+మీరు సహాయం చేస్తారు: వర్కౌట్ ప్లాన్లు, డైట్, న్యూట్రిషన్, బరువు తగ్గించుకోవడం, కండరాల పెంపు, యోగా, HIIT, కార్డియో, సరైన వ్యాయామ పద్ధతులు, రికవరీ మరియు మోటివేషన్.
+ఎల్లప్పుడూ తెలుగులో సులభమైన మరియు స్పష్టమైన భాషలో సమాధానం ఇవ్వండి.`,
+
+  'ta-IN': `நீங்கள் "Limitless Fitness"-இன் AI தனிப்பட்ட பயிற்சியாளர்.
+நீங்கள் உதவுவீர்கள்: உடற்பயிற்சி திட்டங்கள், உணவு முறை, ஊட்டச்சத்து, எடை குறைப்பு, தசை வளர்ச்சி, யோகா, HIIT, கார்டியோ, சரியான உடற்பயிற்சி நுட்பங்கள், மீட்பு மற்றும் உந்துதல்.
+எப்போதும் தமிழில் எளிமையான மற்றும் தெளிவான மொழியில் பதில் சொல்லுங்கள்.`,
+
+  'mr-IN': `तुम्ही "Limitless Fitness" चे AI पर्सनल ट्रेनर आहात.
+तुम्ही मदत करता: वर्कआउट प्लान, डाएट, न्यूट्रिशन, वजन कमी करणे, स्नायू बांधणे, योगा, HIIT, कार्डियो, योग्य व्यायाम तंत्र, रिकव्हरी आणि मोटिव्हेशन.
+नेहमी मराठीत सोप्या आणि स्पष्ट भाषेत उत्तर द्या.`,
+
+  'gu-IN': `તમે "Limitless Fitness"ના AI પર્સનલ ટ્રેનર છો.
+તમે મદદ કરો છો: વર્કઆઉટ પ્લાન, ડાયેટ, ન્યુટ્રિશન, વજન ઘટાડવું, સ્નાયુ બનાવવા, યોગ, HIIT, કાર્ડિયો, યોગ્ય વ્યાયામ તકનીક, રિકવરી અને મોટિવેશન.
+હંમેશા ગુજરાતીમાં સરળ અને સ્પષ્ટ ભાષામાં જવાબ આપો.`,
+
+  'kn-IN': `ನೀವು "Limitless Fitness"ನ AI ವೈಯಕ್ತಿಕ ತರಬೇತಿಗಾರರು.
+ನೀವು ಸಹಾಯ ಮಾಡುತ್ತೀರಿ: ವರ್ಕೌಟ್ ಯೋಜನೆಗಳು, ಆಹಾರ ಪದ್ಧತಿ, ಪೋಷಣೆ, ತೂಕ ಇಳಿಸುವುದು, ಸ್ನಾಯು ನಿರ್ಮಾಣ, ಯೋಗ, HIIT, ಕಾರ್ಡಿಯೊ, ಸರಿಯಾದ ವ್ಯಾಯಾಮ ತಂತ್ರ, ಚೇತರಿಕೆ ಮತ್ತು ಪ್ರೇರಣೆ.
+ಯಾವಾಗಲೂ ಕನ್ನಡದಲ್ಲಿ ಸರಳ ಮತ್ತು ಸ್ಪಷ್ಟ ಭಾಷೆಯಲ್ಲಿ ಉತ್ತರಿಸಿ.`,
+
+  'ml-IN': `നിങ്ങൾ "Limitless Fitness"-ന്റെ AI വ്യക്തിഗത പരിശീലകനാണ്.
+നിങ്ങൾ സഹായിക്കുന്നു: വർക്കൗട്ട് പ്ലാൻ, ഡയറ്റ്, പോഷകാഹാരം, ഭാരം കുറയ്ക്കൽ, പേശി നിർമ്മാണം, യോഗ, HIIT, കാർഡിയോ, ശരിയായ വ്യായാമ രീതികൾ, വീണ്ടെടുക്കൽ, പ്രേരണ.
+എല്ലായ്പ്പോഴും മലയാളത്തിൽ ലളിതമായും വ്യക്തമായും മറുപടി നൽകുക.`,
+
+  'pa-IN': `ਤੁਸੀਂ "Limitless Fitness" ਦੇ AI ਨਿੱਜੀ ਟ੍ਰੇਨਰ ਹੋ।
+ਤੁਸੀਂ ਮਦਦ ਕਰਦੇ ਹੋ: ਵਰਕਆਊਟ ਪਲਾਨ, ਡਾਇਟ, ਪੋਸ਼ਣ, ਭਾਰ ਘਟਾਉਣਾ, ਮਾਸਪੇਸ਼ੀ ਬਣਾਉਣਾ, ਯੋਗਾ, HIIT, ਕਾਰਡੀਓ, ਸਹੀ ਕਸਰਤ ਤਕਨੀਕ, ਰਿਕਵਰੀ ਅਤੇ ਪ੍ਰੇਰਣਾ।
+ਹਮੇਸ਼ਾ ਪੰਜਾਬੀ ਵਿੱਚ ਸਰਲ ਅਤੇ ਸਪੱਸ਼ਟ ਭਾਸ਼ਾ ਵਿੱਚ ਜਵਾਬ ਦਿਓ।`,
+
+  'or-IN': `ଆପଣ "Limitless Fitness"ର AI ବ୍ୟକ୍ତିଗତ ପ୍ରଶିକ୍ଷକ।
+ଆପଣ ସାହାଯ୍ୟ କରନ୍ତି: ୱାର୍କଆଉଟ୍ ଯୋଜନା, ଡାଏଟ, ପୋଷଣ, ଓଜନ ହ୍ରାସ, ମାଂସପେଶୀ ନିର୍ମାଣ, ଯୋଗ, HIIT, କାର୍ଡିଓ, ସଠିକ ବ୍ୟାୟାମ ଟେକ୍ନିକ୍, ରିକଭରି ଏବଂ ମୋଟିଭେସନ୍।
+ସର୍ବଦା ଓଡ଼ିଆରେ ସରଳ ଓ ସ୍ପଷ୍ଟ ଭାଷାରେ ଉତ୍ତର ଦିଅନ୍ତୁ।`,
+
+  'ur-IN': `آپ "Limitless Fitness" کے AI پرسنل ٹرینر ہیں۔
+آپ مدد کرتے ہیں: ورک آؤٹ پلان، ڈائیٹ، نیوٹریشن، وزن کم کرنا، پٹھے بنانا، یوگا، HIIT، کارڈیو، صحیح ورزش کی تکنیک، ریکوری اور حوصلہ افزائی۔
+ہمیشہ اردو میں سادہ اور واضح زبان میں جواب دیں۔`,
+
+  'as-IN': `আপুনি "Limitless Fitness"ৰ AI ব্যক্তিগত প্ৰশিক্ষক।
+আপুনি সহায় কৰে: ৱৰ্কআউট পৰিকল্পনা, ডায়েট, পুষ্টি, ওজন হ্ৰাস, পেশী নিৰ্মাণ, যোগ, HIIT, কাৰ্ডিঅ', সঠিক ব্যায়ামৰ কৌশল, পুনৰুদ্ধাৰ আৰু প্ৰেৰণা।
+সদায় অসমীয়াত সহজ আৰু স্পষ্ট ভাষাত উত্তৰ দিয়ক।`,
+
+  'en-IN': `You are the AI personal trainer for "Limitless Fitness".
+You help with: workout plans, diet, nutrition, weight loss, muscle building, yoga, HIIT, cardio, correct exercise technique, recovery and motivation.
+Always reply in simple, clear Indian English. Keep answers short and actionable.
+For serious health issues, always advise consulting a doctor.`,
+};
+
+// ─────────────────────────────────────────────────
+// STREAM FROM GROQ  (OpenAI-compatible SSE)
+// ─────────────────────────────────────────────────
+
+async function streamGroq(messages, res) {
+  const response = await fetch(GROQ.url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ.key}`,
+    },
+    body: JSON.stringify({
+      model: GROQ.model,
+      messages,
+      stream: true,
+      temperature: 0.7,
+      max_tokens: 1024,
+    }),
+  });
+
+  if (!response.ok) throw new Error(`Groq error: ${response.status}`);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '));
+    for (const line of lines) {
+      const raw = line.slice(6);
+      if (raw === '[DONE]') { res.write('data: [DONE]\\n\\n'); return; }
+      try {
+        const token = JSON.parse(raw).choices?.[0]?.delta?.content;
+        if (token) res.write(`data: ${JSON.stringify({ token })}\\n\\n`);
+      } catch {}
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────
+// STREAM FROM CLAUDE  (Anthropic SSE)
+// ─────────────────────────────────────────────────
+
+async function streamClaude(messages, systemPrompt, res) {
+  const response = await fetch(CLAUDE.url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': CLAUDE.key,
+      'anthropic-version': CLAUDE.version,
+    },
+    body: JSON.stringify({
+      model: CLAUDE.model,
+      max_tokens: 1024,
+      system: systemPrompt,
+      stream: true,
+      messages: messages.filter(m => m.role !== 'system'), // Claude uses system param separately
+    }),
+  });
+
+  if (!response.ok) throw new Error(`Claude error: ${response.status}`);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '));
+    for (const line of lines) {
+      const raw = line.slice(6);
+      try {
+        const parsed = JSON.parse(raw);
+        // Claude event types
+        if (parsed.type === 'content_block_delta') {
+          const token = parsed.delta?.text;
+          if (token) res.write(`data: ${JSON.stringify({ token })}\\n\\n`);
+        }
+        if (parsed.type === 'message_stop') {
+          res.write('data: [DONE]\\n\\n');
+          return;
+        }
+      } catch {}
+    }
+  }
+}
+
+// ─── CHATBOT ROUTE (OPENCLAW)  ───────────────────────────────────────────────
+
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: 'Message is required.' });
+
+    // Spawn the bespoke Python AI Agent connected to Groq
+    const pythonAgent = spawn('python', ['fuaak_agent.py', message]);
+    let stdoutData = '';
+    let stderrData = '';
+
+    pythonAgent.stdout.on('data', data => { stdoutData += data.toString(); });
+    pythonAgent.stderr.on('data', data => { stderrData += data.toString(); });
+
+    pythonAgent.on('close', (code) => {
+      try {
+        if (code !== 0 && !stdoutData.trim()) {
+            return res.status(500).json({ error: stderrData.trim() || 'Internal agent error' });
+        }
+        res.json({ success: true, reply: stdoutData.trim() });
+      } catch (err) {
+        console.error("AI Bridge Parsing Error:", err);
+        res.status(500).json({ error: 'Failed to process AI response.' });
+      }
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to connect to the Chatbot service.' });
+  }
+});
+
+// ─────────────────────────────────────────────────
+// SSE STREAMING CHAT ENDPOINT
+// ─────────────────────────────────────────────────
+
+app.post('/api/chat/stream', async (req, res) => {
+  const { message, language = 'hi-IN', chatHistory = [] } = req.body;
+
+  const systemPrompt = PROMPTS[language] || PROMPTS['en-IN'];
+
+  // Build messages array
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    ...chatHistory.slice(-8),
+    { role: 'user', content: message },
+  ];
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  try {
+    if (process.env.PRIMARY_AI === 'claude') {
+      await streamClaude(messages, systemPrompt, res);
+    } else {
+      await streamGroq(messages, res);
+    }
+  } catch (primaryError) {
+    console.error('Primary AI failed:', primaryError.message);
+    // Auto-fallback to the other AI
+    try {
+      console.log('Falling back to secondary AI...');
+      if (process.env.PRIMARY_AI === 'claude') {
+        await streamGroq(messages, res);
+      } else {
+        await streamClaude(messages, systemPrompt, res);
+      }
+    } catch (fallbackError) {
+      console.error('Fallback also failed:', fallbackError.message);
+      res.write(`data: ${JSON.stringify({ token: 'Sorry, AI service is temporarily unavailable. Please try again.' })}\\n\\n`);
+      res.write('data: [DONE]\\n\\n');
+    }
+  }
+
+  res.end();
+});
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    primaryAI: process.env.PRIMARY_AI || 'groq',
+    groqKey: !!process.env.GROQ_API_KEY,
+    claudeKey: !!process.env.CLAUDE_API_KEY,
+  });
+});
+
+// ─── RAZORPAY COMMERCE ROUTES ────────────────────────────────────────────────
+
+// Strict Immutable Pricing Logic (Data Security: Never trust client amounts)
+const SECURE_PRICING = {
+  monthly: { initiate: 999, momentum: 4999, limitless: 8999 },
+  yearly:  { initiate: 9588, momentum: 8499, limitless: 8999 }
+};
+
+app.get('/api/razorpay/key', (req, res) => {
+  res.json({ key: process.env.RAZORPAY_KEY_ID || 'dummy_key' });
+});
+
+app.post('/api/razorpay/create-order', async (req, res) => {
+  try {
+    const { planId, cycle, currency = 'INR', receipt = 'receipt_' + Date.now() } = req.body;
+    
+    // Mathematically enforce Server-Side Pricing mapping.
+    const strictAmount = SECURE_PRICING[cycle]?.[planId];
+    if (!strictAmount) return res.status(400).json({ error: "Invalid plan or billing cycle detected. Access Denied." });
+
+    const options = {
+      amount: strictAmount * 100, // Securely converted to Paisa natively on server
+      currency,
+      receipt
+    };
+
+    const order = await razorpay.orders.create(options);
+    if (!order) return res.status(500).json({ error: "Server failed to allocate gateway order ID." });
+    
+    res.json(order);
+  } catch (error) {
+    console.error("Razorpay Sub-process Error:", error);
+    res.status(500).json({ error: "Failed to initialize external Razorpay transaction frame." });
+  }
+});
+
+app.post('/api/razorpay/verify-payment', async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    const sign = razorpay_order_id + "|" + razorpay_payment_id;
+    const expectedSign = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || 'dummy_secret')
+      .update(sign.toString())
+      .digest("hex");
+
+    if (razorpay_signature === expectedSign) {
+      // Payment safely verified mathematically.
+      return res.status(200).json({ success: true, message: "Receipt Validated via SHA256 HMAC." });
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid key signature injection detected!" });
+    }
+  } catch (error) {
+    console.error("Razorpay Validation Sync Error:", error);
+    res.status(500).json({ success: false, message: "Runtime validation server crash." });
   }
 });
 

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Limitless Fitness — AI Coach</title>
+  <link rel="stylesheet" href="style.css"/>
+  <!-- Google Noto fonts for all Indian scripts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&family=Noto+Sans+Bengali&family=Noto+Sans+Telugu&family=Noto+Sans+Tamil&family=Noto+Sans+Kannada&family=Noto+Sans+Malayalam&family=Noto+Sans+Gujarati&family=Noto+Sans+Gurmukhi&family=Noto+Sans+Oriya&family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div id="fitbot-app">
+
+  <!-- Header -->
+  <div id="header">
+    <div id="header-logo">L</div>
+    <div id="header-info">
+      <div id="header-title">Limitless Fitness</div>
+      <div id="header-sub">AI Personal Trainer • FitBot</div>
+    </div>
+  </div>
+
+  <!-- Language Bar -->
+  <div id="lang-bar">
+    <label>भाषा / Language:</label>
+    <select id="lang-select"></select>
+    <button id="autospeak-btn" onclick="toggleAutoSpeak()" title="Auto-speak ON">🔊</button>
+  </div>
+
+  <!-- Messages -->
+  <div id="messages"></div>
+
+  <!-- Input Bar -->
+  <div id="input-bar">
+    <input id="text-input" type="text" placeholder="हिंदी में पूछें या माइक दबाएँ..."/>
+    <button id="mic-btn" onclick="toggleMic()" title="Voice input">🎤</button>
+    <button id="send-btn" onclick="sendMessage()" title="Send">➤</button>
+  </div>
+
+</div>
+
+<script type="module" src="chatbot.js"></script>
+</body>
+</html>
