@@ -43,6 +43,27 @@
     @media (max-width: 768px) { 
       .dash-container { grid-template-columns: 1fr; } 
     }
+
+    /* ── Workspace Card Styles ── */
+    .routine-card h2, .log-card h2 {
+      font-family: var(--font-display); font-size: 22px; letter-spacing: 2px;
+      color: var(--text-hi); margin-bottom: 12px;
+    }
+    .volume-box {
+      background: rgba(0,0,0,0.2); padding: 14px 18px;
+      border-radius: var(--radius-sm); border: 1px solid var(--border);
+      margin: 14px 0; font-size: 14px; color: var(--text-mid);
+    }
+    .volume-box strong { color: var(--text-hi); display: block; margin-bottom: 4px; }
+    #routine-type { color: var(--accent); font-weight: 900; font-size: 22px; line-height: 1.2; margin-bottom: 6px; }
+    #routine-day  { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--text-mid); text-transform: uppercase; margin-bottom: 4px; }
+    #routine-target { font-size: 14px; color: var(--text-mid); margin-bottom: 0; }
+    #today-log-count {
+      margin-top: 14px; font-size: 13px; color: #888;
+      padding: 8px 14px; background: rgba(0,0,0,0.25);
+      border-radius: 8px; border: 1px solid var(--border);
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
@@ -63,31 +84,32 @@
   <div class="dash-container">
     
     <!-- Today's Routine (driven by workspace.js) -->
-    <div class="glass-card" id="todayRoutineCard">
-      <h3 id="routine-type">Loading...</h3>
-      <p class="subtitle" id="routine-target"></p>
-      <div style="background:rgba(0,0,0,0.15); padding:14px 18px; border-radius:var(--radius-sm); border:1px solid var(--border); margin-bottom:14px;">
-        <span style="font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--text-mid); text-transform:uppercase;" id="routine-day"></span>
-        <div style="font-size:14px; color:var(--text-mid); margin-top:6px;" id="routine-volume"></div>
+    <div class="glass-card routine-card" id="todayRoutineCard">
+      <h2>TODAY'S ROUTINE</h2>
+      <div id="routine-day"></div>
+      <div id="routine-type">Loading...</div>
+      <div id="routine-target"></div>
+      <div class="volume-box">
+        <strong>Suggested Volume:</strong>
+        <div id="routine-volume">Loading...</div>
       </div>
-      <p style="font-size:12px; color:var(--accent); font-weight:600;" id="today-log-count">Loading...</p>
+      <div id="today-log-count">No exercises logged yet today</div>
     </div>
 
     <!-- Log Workout (wired to workspace.js) -->
-    <div class="glass-card">
-      <h3>Log Workout</h3>
+    <div class="glass-card log-card">
+      <h2>LOG WORKOUT</h2>
       <p class="subtitle">Track your progressive overload instantly.</p>
       <select id="exercise-select" class="form-control" required>
         <option value="">Select Exercise...</option>
       </select>
       <div style="display:flex; gap:12px;">
-        <input type="number" id="sets-input" class="form-control" placeholder="Sets" min="1" required>
-        <input type="number" id="reps-input" class="form-control" placeholder="Reps" min="1" required>
+        <input type="number" id="sets-input"   class="form-control" placeholder="Sets"   min="1" max="20">
+        <input type="number" id="reps-input"   class="form-control" placeholder="Reps"   min="1" max="100">
       </div>
-      <input type="number" id="weight-input" class="form-control" placeholder="Weight (kg)" min="0" step="0.5" required>
-      <button id="save-workout-btn" class="btn btn-primary btn-full">Save Workout ↗</button>
-      <!-- Today's logged exercises render here -->
-      <div id="today-logs-list" style="margin-top:18px;"></div>
+      <input type="number" id="weight-input" class="form-control" placeholder="Weight (kg)" min="0" step="0.5">
+      <button id="save-workout-btn" class="btn btn-primary btn-full">Save Workout</button>
+      <div id="today-logs-list" style="margin-top:16px"></div>
     </div>
 
     <!-- Quick Planner -->
