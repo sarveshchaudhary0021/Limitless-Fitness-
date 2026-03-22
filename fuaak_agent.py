@@ -8,6 +8,10 @@ GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 MODEL = "llama-3.3-70b-versatile"
 
+if not GROQ_API_KEY:
+    print("Error: GROQ_API_KEY environment variable is not set.")
+    sys.exit(1)
+
 def get_workout_stats():
     # Leveraging the native project analytics resource!
     logs = [

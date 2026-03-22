@@ -18,8 +18,6 @@ def process_workout_logs(logs_dict):
     """
     try:
         logs_json = json.dumps(logs_dict)
-        # We explicitly isolated this call so OpenClaw runs this wrapper rather than
-        # arbitrary shell commands.
         process = subprocess.Popen(
             ['python', 'analytics.py'], 
             stdin=subprocess.PIPE, 
@@ -27,10 +25,17 @@ def process_workout_logs(logs_dict):
             stderr=subprocess.PIPE,
             text=True
         )
-        stdout, stderr = process.communicate(input=logs_json)
-        if stderr:
-            return {"success": False, "error": stderr}
-        return json.loads(stdout)
+        try:
+            stdout, stderr = process.communicate(input=logs_json, timeout=10)  # 10s hard limit
+        except subprocess.TimeoutExpired:
+            process.kill()
+            return {"success": False, "error": "Analytics process timed out after 10 seconds."}
+        if process.returncode != 0 or stderr:
+            return {"success": False, "error": stderr or "Analytics script exited with error."}
+        try:
+            return json.loads(stdout)
+        except json.JSONDecodeError:
+            return {"success": False, "error": f"Non-JSON output from analytics: {stdout[:200]}"}
     except Exception as e:
         return {"success": False, "error": str(e)}
 

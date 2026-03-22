@@ -809,10 +809,10 @@ async function streamGroq(messages, res) {
     const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '));
     for (const line of lines) {
       const raw = line.slice(6);
-      if (raw === '[DONE]') { res.write('data: [DONE]\\n\\n'); return; }
+      if (raw === '[DONE]') { res.write('data: [DONE]\n\n'); return; }
       try {
         const token = JSON.parse(raw).choices?.[0]?.delta?.content;
-        if (token) res.write(`data: ${JSON.stringify({ token })}\\n\\n`);
+        if (token) res.write(`data: ${JSON.stringify({ token })}\n\n`);
       } catch {}
     }
   }
@@ -852,13 +852,12 @@ async function streamClaude(messages, systemPrompt, res) {
       const raw = line.slice(6);
       try {
         const parsed = JSON.parse(raw);
-        // Claude event types
         if (parsed.type === 'content_block_delta') {
           const token = parsed.delta?.text;
-          if (token) res.write(`data: ${JSON.stringify({ token })}\\n\\n`);
+          if (token) res.write(`data: ${JSON.stringify({ token })}\n\n`);
         }
         if (parsed.type === 'message_stop') {
-          res.write('data: [DONE]\\n\\n');
+          res.write('data: [DONE]\n\n');
           return;
         }
       } catch {}
@@ -936,8 +935,8 @@ app.post('/api/chat/stream', async (req, res) => {
       }
     } catch (fallbackError) {
       console.error('Fallback also failed:', fallbackError.message);
-      res.write(`data: ${JSON.stringify({ token: 'Sorry, AI service is temporarily unavailable. Please try again.' })}\\n\\n`);
-      res.write('data: [DONE]\\n\\n');
+      res.write(`data: ${JSON.stringify({ token: 'Sorry, AI service is temporarily unavailable. Please try again.' })}\n\n`);
+      res.write('data: [DONE]\n\n');
     }
   }
 
@@ -994,21 +993,25 @@ app.post('/api/razorpay/verify-payment', async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
+    // Security null-guard: reject missing fields immediately
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ success: false, message: "Missing payment verification fields. Request rejected." });
+    }
+
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSign = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || 'dummy_secret')
-      .update(sign.toString())
+      .update(sign)
       .digest("hex");
 
     if (razorpay_signature === expectedSign) {
-      // Payment safely verified mathematically.
       return res.status(200).json({ success: true, message: "Receipt Validated via SHA256 HMAC." });
     } else {
-      return res.status(400).json({ success: false, message: "Invalid key signature injection detected!" });
+      return res.status(400).json({ success: false, message: "Invalid signature. Transaction blocked." });
     }
   } catch (error) {
-    console.error("Razorpay Validation Sync Error:", error);
-    res.status(500).json({ success: false, message: "Runtime validation server crash." });
+    console.error("Razorpay Validation Error:", error);
+    res.status(500).json({ success: false, message: "Runtime validation server error." });
   }
 });
 
