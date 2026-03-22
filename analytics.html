@@ -3,21 +3,18 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Advanced Analytics — Limitless Fitness</title>
+  <title>Advanced Analytics — Limitless Workspace</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg:       #0a0a0f;
-      --surface:  #12121e;
-      --card:     #1a1a2e;
-      --border:   #2a2a4a;
-      --accent:   #6c63ff;
-      --accent2:  #a855f7;
-      --green:    #22c55e;
-      --red:      #ef4444;
-      --gold:     #f59e0b;
-      --text:     #e8e8ff;
-      --muted:    #888aaa;
+      --bg:      #0a0a0a;
+      --surface: #111111;
+      --card:    #161616;
+      --border:  #222222;
+      --accent:  #cbf04b;
+      --text:    #ffffff;
+      --muted:   #666666;
+      --dim:     #333333;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,663 +26,705 @@
       min-height: 100vh;
     }
 
-    /* ── NAV ─────────────────────────────────────── */
+    /* ── NAV ────────────────────────────────────── */
     nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 40px;
-      background: rgba(10,10,15,0.95);
+      padding: 16px 32px;
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
     }
-    .nav-logo {
-      font-size: 20px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 2px;
+    .nav-logo { font-size: 18px; font-weight: 900; letter-spacing: 3px; }
+    .nav-logo span { color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-right a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .nav-right a:hover { color: var(--text); }
+    .btn-outline {
+      border: 1px solid var(--accent); color: var(--accent);
+      padding: 7px 16px; border-radius: 6px; font-size: 13px;
+      font-weight: 600; cursor: pointer; background: none; transition: all 0.2s;
     }
-    nav a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.2s;
-    }
-    nav a:hover { color: var(--text); }
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-cta {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: white !important;
-      padding: 8px 18px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 13px;
-    }
+    .btn-outline:hover { background: var(--accent); color: #000; }
 
-    /* ── PAGE HEADER ─────────────────────────────── */
-    .page-header {
-      text-align: center;
-      padding: 60px 20px 40px;
-      border-bottom: 1px solid var(--border);
+    /* ── HEADER ──────────────────────────────────── */
+    .page-header { padding: 48px 32px 32px; border-bottom: 1px solid var(--border); }
+    .header-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; flex-wrap: wrap; gap: 16px;
     }
-    .page-header .tag {
-      display: inline-block;
-      background: rgba(108,99,255,0.15);
-      color: var(--accent);
-      border: 1px solid rgba(108,99,255,0.3);
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 16px;
+    .page-header h1 { font-size: 32px; font-weight: 900; letter-spacing: 1px; }
+    .page-header h1 span { color: var(--accent); }
+    .page-header p { color: var(--muted); margin-top: 6px; font-size: 14px; }
+    .header-actions { display: flex; gap: 10px; }
+
+    /* ── NO DATA BANNER ──────────────────────────── */
+    #no-data-banner {
+      display: none; margin: 32px; padding: 28px;
+      background: var(--card); border: 1px dashed var(--dim);
+      border-radius: 14px; text-align: center;
     }
-    .page-header h1 {
-      font-size: clamp(28px, 5vw, 48px);
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 14px;
-    }
-    .page-header h1 em {
-      font-style: normal;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .page-header p {
-      color: var(--muted);
-      font-size: 16px;
-      max-width: 520px;
-      margin: 0 auto;
+    #no-data-banner h3 { font-size: 18px; margin-bottom: 8px; }
+    #no-data-banner p  { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+    .go-btn {
+      display: inline-block; background: var(--accent); color: #000;
+      font-weight: 800; padding: 10px 24px; border-radius: 8px;
+      text-decoration: none; font-size: 14px;
     }
 
     /* ── STAT STRIP ──────────────────────────────── */
-    .stat-strip {
-      display: flex;
-      justify-content: center;
-      gap: 0;
-      border-bottom: 1px solid var(--border);
-      overflow-x: auto;
-    }
+    .stat-strip { display: flex; overflow-x: auto; border-bottom: 1px solid var(--border); }
     .stat-item {
-      flex: 1;
-      min-width: 140px;
-      text-align: center;
-      padding: 20px;
-      border-right: 1px solid var(--border);
+      flex: 1; min-width: 130px; padding: 20px 24px;
+      border-right: 1px solid var(--border); text-align: center;
     }
     .stat-item:last-child { border-right: none; }
-    .stat-value {
-      font-size: 26px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    .stat-value { font-size: 28px; font-weight: 900; color: var(--accent); }
     .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-sub   { font-size: 11px; color: #555; margin-top: 2px; }
 
-    /* ── MAIN GRID ───────────────────────────────── */
-    .analytics-grid {
+    /* ── GRID ────────────────────────────────────── */
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-      gap: 24px;
-      padding: 32px;
-      max-width: 1400px;
-      margin: 0 auto;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 20px; padding: 24px 28px;
+      max-width: 1440px; margin: 0 auto;
     }
 
     /* ── CHART CARD ──────────────────────────────── */
     .chart-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      transition: border-color 0.3s;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px; transition: border-color 0.3s;
     }
-    .chart-card:hover { border-color: rgba(108,99,255,0.4); }
-    .chart-card.wide { grid-column: 1 / -1; }
+    .chart-card:hover { border-color: #333; }
+    .chart-card.wide  { grid-column: 1 / -1; }
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-    .card-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-    .card-sub { font-size: 12px; color: var(--muted); }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .card-title { font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: 0.5px; }
+    .card-sub   { font-size: 12px; color: var(--muted); margin-top: 3px; }
 
-    .badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 20px;
-      white-space: nowrap;
-    }
-    .badge.up   { background: rgba(34,197,94,0.15);  color: var(--green); }
-    .badge.down { background: rgba(239,68,68,0.15);  color: var(--red); }
-    .badge.info { background: rgba(108,99,255,0.15); color: var(--accent); }
-
-    .chart-wrap { position: relative; }
+    .pill { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .pill.green { background: rgba(203,240,75,0.12); color: var(--accent); border: 1px solid rgba(203,240,75,0.2); }
+    .pill.gray  { background: #1e1e1e; color: #888; border: 1px solid #2a2a2a; }
+    .pill.red   { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
 
     /* ── HEATMAP ─────────────────────────────────── */
-    .heatmap-container { overflow-x: auto; }
-    .heatmap-row { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
-    .heatmap-label {
-      font-size: 11px;
-      color: var(--muted);
-      width: 32px;
-      text-align: right;
-      flex-shrink: 0;
+    .heatmap-wrap { overflow-x: auto; }
+    .heatmap-row  { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+    .hm-label     { width: 36px; font-size: 11px; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .hm-cell {
+      width: 22px; height: 22px; border-radius: 4px;
+      cursor: pointer; transition: transform 0.1s; flex-shrink: 0;
     }
-    .heatmap-cell {
-      width: 20px;
-      height: 20px;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: transform 0.1s;
+    .hm-cell:hover { transform: scale(1.3); z-index: 2; position: relative; }
+    .hm-week-row  { display: flex; gap: 4px; padding-left: 40px; margin-bottom: 6px; }
+    .hm-wk-label  { width: 22px; text-align: center; font-size: 10px; color: #444; }
+    .hm-legend    { display: flex; align-items: center; gap: 5px; margin-top: 12px; font-size: 11px; color: var(--muted); }
+    .hm-leg-cell  { width: 14px; height: 14px; border-radius: 3px; }
+
+    /* ── EXERCISE TABLE ──────────────────────────── */
+    .ex-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .ex-table th {
+      text-align: left; padding: 8px 12px; color: var(--muted);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
     }
-    .heatmap-cell:hover { transform: scale(1.35); z-index: 2; position: relative; }
-    .heatmap-week-labels {
-      display: flex;
-      gap: 4px;
-      padding-left: 36px;
-      margin-bottom: 6px;
-    }
-    .heatmap-week-label {
-      width: 20px;
-      text-align: center;
-      font-size: 10px;
-      color: var(--muted);
-    }
-    .heatmap-legend {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 14px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .legend-cell { width: 14px; height: 14px; border-radius: 2px; }
+    .ex-table td { padding: 10px 12px; border-bottom: 1px solid #1a1a1a; }
+    .ex-table tr:last-child td { border-bottom: none; }
+    .ex-table tr:hover td { background: #1a1a1a; }
+    .vol-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .vol-bar { height: 6px; border-radius: 3px; background: var(--accent); flex-shrink: 0; transition: width 0.5s ease; }
 
     /* ── PERIOD TABS ─────────────────────────────── */
-    .period-tabs { display: flex; gap: 6px; }
+    .tabs { display: flex; gap: 6px; }
     .tab {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: #1a1a1a; border: 1px solid var(--border);
+      color: var(--muted); padding: 5px 12px; border-radius: 6px;
+      font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
     }
-    .tab.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: white;
-    }
+    .tab.active { background: var(--accent); border-color: var(--accent); color: #000; }
 
-    /* ── FOOTER ──────────────────────────────────── */
     footer {
-      text-align: center;
-      padding: 28px;
+      text-align: center; padding: 24px;
       border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 40px;
+      color: var(--muted); font-size: 12px; margin-top: 32px;
     }
     footer a { color: var(--accent); text-decoration: none; }
 
-    /* ── RESPONSIVE ──────────────────────────────── */
     @media (max-width: 768px) {
-      nav { padding: 14px 20px; }
-      .nav-links { gap: 16px; }
-      .analytics-grid { grid-template-columns: 1fr; padding: 16px; }
+      .grid { grid-template-columns: 1fr; padding: 12px; }
       .chart-card.wide { grid-column: 1; }
+      nav { padding: 12px 16px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── NAV ──────────────────────────────────────── -->
+<!-- NAV -->
 <nav>
-  <a href="index.html" class="nav-logo">LIMITLESS</a>
-  <div class="nav-links">
-    <a href="index.html#features">Features</a>
-    <a href="index.html#exercises">Guides</a>
-    <a href="index.html#bmi">Tools</a>
-    <a href="pricing.html">Pro</a>
-    <a href="login.html" class="nav-cta">Sign In</a>
+  <div class="nav-logo"><span>LIMITLESS</span> WORKSPACE</div>
+  <div class="nav-right">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="index.html">Home</a>
+    <button class="btn-outline" onclick="clearAllData()">Reset Data</button>
   </div>
 </nav>
 
-<!-- ── PAGE HEADER ───────────────────────────────── -->
-<div class="page-header">
-  <div class="tag">Advanced Analytics</div>
-  <h1>Your Growth, <em>Visualized</em></h1>
-  <p>Deep-dive into your volume, consistency, and progressive overload journey with live charts.</p>
+<!-- NO DATA BANNER -->
+<div id="no-data-banner">
+  <h3>No Workout Data Yet</h3>
+  <p>Start logging your workouts in the Dashboard and your analytics will appear here automatically.</p>
+  <a href="dashboard.html" class="go-btn">Go to Dashboard →</a>
 </div>
 
-<!-- ── STAT STRIP ─────────────────────────────────── -->
-<div class="stat-strip">
-  <div class="stat-item">
-    <div class="stat-value" id="stat-streak">12</div>
-    <div class="stat-label">Day Streak</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value" id="stat-volume">8,420</div>
-    <div class="stat-label">Weekly Volume (kg)</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value" id="stat-pr">+18%</div>
-    <div class="stat-label">Strength Gain</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value" id="stat-consistency">87%</div>
-    <div class="stat-label">Consistency Score</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value" id="stat-calories">2,340</div>
-    <div class="stat-label">Avg Daily Calories</div>
+<!-- PAGE HEADER -->
+<div class="page-header" id="analytics-header" style="display:none">
+  <div class="header-top">
+    <div>
+      <h1>ADVANCED <span>ANALYTICS</span></h1>
+      <p id="analytics-subtitle">Loading your workout data...</p>
+    </div>
+    <div class="header-actions">
+      <div class="tabs">
+        <button class="tab"        onclick="filterPeriod(this, 7)">7D</button>
+        <button class="tab active" onclick="filterPeriod(this, 30)">30D</button>
+        <button class="tab"        onclick="filterPeriod(this, 90)">90D</button>
+        <button class="tab"        onclick="filterPeriod(this, 9999)">All</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ── CHARTS GRID ────────────────────────────────── -->
-<div class="analytics-grid">
+<!-- STAT STRIP -->
+<div class="stat-strip" id="stat-strip" style="display:none">
+  <div class="stat-item">
+    <div class="stat-value" id="s-sessions">—</div>
+    <div class="stat-label">Total Sessions</div>
+    <div class="stat-sub" id="s-sessions-sub"></div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="s-volume">—</div>
+    <div class="stat-label">Total Volume</div>
+    <div class="stat-sub">kg lifted</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="s-streak">—</div>
+    <div class="stat-label">Current Streak</div>
+    <div class="stat-sub">consecutive days</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="s-pr">—</div>
+    <div class="stat-label">Best 1RM</div>
+    <div class="stat-sub" id="s-pr-sub"></div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="s-muscle">—</div>
+    <div class="stat-label">Top Muscle</div>
+    <div class="stat-sub" id="s-muscle-sub"></div>
+  </div>
+</div>
 
-  <!-- 1. Progress Lineplot (wide) -->
+<!-- CHARTS GRID -->
+<div class="grid" id="charts-grid" style="display:none">
+
+  <!-- 1. Volume Over Time -->
   <div class="chart-card wide">
-    <div class="card-header">
+    <div class="card-head">
       <div>
-        <div class="card-title">Progress Over Time</div>
-        <div class="card-sub">Weight · Strength · Stamina — 12 week journey</div>
+        <div class="card-title">VOLUME OVER TIME</div>
+        <div class="card-sub">Total kg moved per session — progressive overload tracker</div>
       </div>
-      <div class="period-tabs">
-        <button class="tab" onclick="switchPeriod(this,'4w')">4W</button>
-        <button class="tab" onclick="switchPeriod(this,'8w')">8W</button>
-        <button class="tab active" onclick="switchPeriod(this,'12w')">12W</button>
-      </div>
+      <span class="pill green" id="volume-trend-badge">Loading...</span>
     </div>
-    <div class="chart-wrap">
-      <canvas id="progressChart" height="90"></canvas>
-    </div>
+    <canvas id="volumeChart" height="80"></canvas>
   </div>
 
-  <!-- 2. Workout Consistency Heatmap -->
+  <!-- 2. Consistency Heatmap -->
   <div class="chart-card">
-    <div class="card-header">
+    <div class="card-head">
       <div>
-        <div class="card-title">Workout Consistency</div>
-        <div class="card-sub">12-week calendar heatmap</div>
+        <div class="card-title">WORKOUT CONSISTENCY</div>
+        <div class="card-sub">Activity heatmap — last 12 weeks</div>
       </div>
-      <span class="badge up">87% Consistent</span>
+      <span class="pill green" id="consistency-badge">—</span>
     </div>
-    <div class="heatmap-container">
-      <div class="heatmap-week-labels" id="heatmap-week-labels"></div>
-      <div id="heatmap"></div>
+    <div class="heatmap-wrap">
+      <div class="hm-week-row" id="hm-week-row"></div>
+      <div id="heatmap-grid"></div>
     </div>
-    <div class="heatmap-legend">
-      <span>Less</span>
-      <div class="legend-cell" style="background:#1a1a2e;border:1px solid #2a2a4a"></div>
-      <div class="legend-cell" style="background:#1a3a1a"></div>
-      <div class="legend-cell" style="background:#166534"></div>
-      <div class="legend-cell" style="background:#16a34a"></div>
-      <div class="legend-cell" style="background:#22c55e"></div>
-      <span>More</span>
+    <div class="hm-legend">
+      <span>Rest</span>
+      <div class="hm-leg-cell" style="background:#1a1a1a;border:1px solid #2a2a2a"></div>
+      <div class="hm-leg-cell" style="background:#1f3a0a"></div>
+      <div class="hm-leg-cell" style="background:#2d6e0a"></div>
+      <div class="hm-leg-cell" style="background:#5ca818"></div>
+      <div class="hm-leg-cell" style="background:#cbf04b"></div>
+      <span>Heavy</span>
     </div>
   </div>
 
   <!-- 3. Muscle Group Barplot -->
   <div class="chart-card">
-    <div class="card-header">
+    <div class="card-head">
       <div>
-        <div class="card-title">Muscle Group Strength Gains</div>
-        <div class="card-sub">% improvement since Day 1</div>
+        <div class="card-title">VOLUME BY MUSCLE GROUP</div>
+        <div class="card-sub">Total kg per muscle — from your actual logs</div>
       </div>
-      <span class="badge info">12 Weeks</span>
+      <span class="pill gray">Your data</span>
     </div>
-    <div class="chart-wrap">
-      <canvas id="muscleChart" height="200"></canvas>
-    </div>
+    <canvas id="muscleChart" height="220"></canvas>
   </div>
 
-  <!-- 4. Sleep vs Performance Scatterplot -->
+  <!-- 4. Exercise Frequency Table -->
   <div class="chart-card">
-    <div class="card-header">
+    <div class="card-head">
       <div>
-        <div class="card-title">Sleep vs Performance Score</div>
-        <div class="card-sub">Correlation — more sleep = better output</div>
+        <div class="card-title">TOP EXERCISES</div>
+        <div class="card-sub">Most logged exercises + total volume</div>
       </div>
-      <span class="badge up">r = 0.78</span>
+      <span class="pill green">Ranked</span>
     </div>
-    <div class="chart-wrap">
-      <canvas id="correlationChart" height="200"></canvas>
-    </div>
+    <table class="ex-table" id="exercise-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Exercise</th><th>Sessions</th><th>Total Volume</th><th>Volume Bar</th>
+        </tr>
+      </thead>
+      <tbody id="exercise-tbody"></tbody>
+    </table>
   </div>
 
-  <!-- 5. Monthly Distribution -->
+  <!-- 5. Volume by Day of Week -->
   <div class="chart-card">
-    <div class="card-header">
+    <div class="card-head">
       <div>
-        <div class="card-title">Monthly Performance Distribution</div>
-        <div class="card-sub">Consistency improves each month</div>
+        <div class="card-title">VOLUME BY DAY OF WEEK</div>
+        <div class="card-sub">Which days you train hardest</div>
       </div>
-      <span class="badge up">Trending Up</span>
+      <span class="pill gray">Weekly pattern</span>
     </div>
-    <div class="chart-wrap">
-      <canvas id="distributionChart" height="200"></canvas>
-    </div>
+    <canvas id="dayChart" height="220"></canvas>
   </div>
 
-  <!-- 6. Workout Type Doughnut -->
+  <!-- 6. Routine Type Doughnut -->
   <div class="chart-card">
-    <div class="card-header">
+    <div class="card-head">
       <div>
-        <div class="card-title">Workout Type Breakdown</div>
-        <div class="card-sub">Volume split across training styles</div>
+        <div class="card-title">ROUTINE TYPE BREAKDOWN</div>
+        <div class="card-sub">Sessions split by training type</div>
       </div>
-      <span class="badge info">This Month</span>
+      <span class="pill gray">All time</span>
     </div>
-    <div class="chart-wrap">
-      <canvas id="typeChart" height="200"></canvas>
-    </div>
+    <canvas id="typeChart" height="220"></canvas>
   </div>
 
 </div>
 
-<!-- ── FOOTER ──────────────────────────────────────── -->
-<footer>
-  © 2026 Limitless Fitness · Built for champions ·
-  <a href="index.html">Back to Home</a>
+<footer id="analytics-footer" style="display:none">
+  © 2026 Limitless Fitness · Data stored locally on your device ·
+  <a href="dashboard.html">← Back to Dashboard</a>
 </footer>
 
 <script>
-// ─── CHART DEFAULTS ───────────────────────────────────────────────────────────
-Chart.defaults.color           = '#888aaa';
-Chart.defaults.borderColor     = '#2a2a4a';
-Chart.defaults.font.family     = "'Segoe UI', system-ui, sans-serif";
-Chart.defaults.font.size       = 12;
-Chart.defaults.plugins.legend.labels.boxWidth = 12;
-Chart.defaults.plugins.legend.labels.padding  = 16;
+// ═══════════════════════════════════════════════════
+//  READ FROM THE SAME localStorage KEY workspace.js writes to
+// ═══════════════════════════════════════════════════
 
-const ACCENT  = '#6c63ff';
-const ACCENT2 = '#a855f7';
-const GREEN   = '#22c55e';
-const RED     = '#ef4444';
-const GOLD    = '#f59e0b';
-const BLUE    = '#3b82f6';
-const TEAL    = '#14b8a6';
+const DB_KEY = 'limitless_workouts';
 
-// ─── 1. PROGRESS LINEPLOT ─────────────────────────────────────────────────────
-const progressData = {
-  '12w': {
-    labels:   ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12'],
-    weight:   [82,81.5,80.8,80.2,79.5,79.0,78.3,77.8,77.2,76.8,76.1,75.5],
-    strength: [50,52,55,54,58,61,63,65,68,70,73,76],
-    stamina:  [30,33,35,38,40,43,45,48,50,53,56,60],
-  },
-  '8w': {
-    labels:   ['W1','W2','W3','W4','W5','W6','W7','W8'],
-    weight:   [82,81.5,80.8,80.2,79.5,79.0,78.3,77.8],
-    strength: [50,52,55,54,58,61,63,65],
-    stamina:  [30,33,35,38,40,43,45,48],
-  },
-  '4w': {
-    labels:   ['W1','W2','W3','W4'],
-    weight:   [82,81.5,80.8,80.2],
-    strength: [50,52,55,54],
-    stamina:  [30,33,35,38],
-  },
-};
-
-const progressChart = new Chart(document.getElementById('progressChart'), {
-  type: 'line',
-  data: {
-    labels: progressData['12w'].labels,
-    datasets: [
-      {
-        label: 'Weight (kg)',
-        data: progressData['12w'].weight,
-        borderColor: RED,
-        backgroundColor: 'rgba(239,68,68,0.08)',
-        fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6,
-        yAxisID: 'y',
-      },
-      {
-        label: 'Strength (kg lifted)',
-        data: progressData['12w'].strength,
-        borderColor: BLUE,
-        backgroundColor: 'rgba(59,130,246,0.08)',
-        fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6,
-        yAxisID: 'y1',
-      },
-      {
-        label: 'Stamina (min)',
-        data: progressData['12w'].stamina,
-        borderColor: GREEN,
-        backgroundColor: 'rgba(34,197,94,0.08)',
-        fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6,
-        yAxisID: 'y1',
-      },
-    ],
-  },
-  options: {
-    responsive: true,
-    interaction: { mode: 'index', intersect: false },
-    plugins: { legend: { position: 'top' } },
-    scales: {
-      y:  { position: 'left',  title: { display: true, text: 'Weight (kg)' },        grid: { color: '#1e1e3a' } },
-      y1: { position: 'right', title: { display: true, text: 'Score / Minutes' },    grid: { drawOnChartArea: false } },
-      x:  { grid: { color: '#1e1e3a' } },
-    },
-  },
-});
-
-function switchPeriod(btn, period) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  const d = progressData[period];
-  progressChart.data.labels           = d.labels;
-  progressChart.data.datasets[0].data = d.weight;
-  progressChart.data.datasets[1].data = d.strength;
-  progressChart.data.datasets[2].data = d.stamina;
-  progressChart.update('active');
+function getAllWorkouts() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
+  catch { return []; }
 }
 
-// ─── 2. HEATMAP ───────────────────────────────────────────────────────────────
-(function buildHeatmap() {
-  const days   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const weeks  = 12;
-  const colors = ['#1a1a2e','#1a3a1a','#166534','#16a34a','#22c55e'];
-  const labels = ['Rest','Light','Medium','Good','Intense'];
+function clearAllData() {
+  if (confirm('Reset all your workout data? This cannot be undone.')) {
+    localStorage.removeItem(DB_KEY);
+    location.reload();
+  }
+}
 
-  const data = Array.from({ length: 7 }, (_, d) =>
-    Array.from({ length: weeks }, () =>
-      d >= 5 && Math.random() < 0.5 ? 0 : Math.floor(Math.random() * 5)
-    )
-  );
+// ─────────────────────────────────────────────────
+//  CHART DEFAULTS
+// ─────────────────────────────────────────────────
 
-  const wlCtn = document.getElementById('heatmap-week-labels');
-  for (let w = 0; w < weeks; w++) {
-    const lbl = document.createElement('div');
-    lbl.className = 'heatmap-week-label';
-    lbl.textContent = `W${w + 1}`;
-    wlCtn.appendChild(lbl);
+Chart.defaults.color       = '#666';
+Chart.defaults.borderColor = '#222';
+Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+Chart.defaults.font.size   = 12;
+
+const ACCENT = '#cbf04b';
+
+const MUSCLE_COLORS = {
+  'Chest':'#ef4444','Back':'#3b82f6','Biceps':'#06b6d4',
+  'Triceps':'#8b5cf6','Shoulders':'#f59e0b','Quads':'#22c55e',
+  'Hamstrings':'#16a34a','Glutes':'#ec4899','Calves':'#14b8a6',
+  'Core':'#f97316','Cardio':'#cbf04b','Other':'#555',
+};
+
+// ─────────────────────────────────────────────────
+//  GLOBAL STATE
+// ─────────────────────────────────────────────────
+
+let ALL_DATA  = [];
+let FILTERED  = [];
+let ACTIVE_DAYS = 30;
+let charts    = {};
+
+// ─────────────────────────────────────────────────
+//  FILTER BY PERIOD
+// ─────────────────────────────────────────────────
+
+function filterPeriod(btn, days) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ACTIVE_DAYS = days;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  FILTERED = ALL_DATA.filter(e => new Date(e.date) >= cutoff);
+  renderAll();
+}
+
+// ─────────────────────────────────────────────────
+//  STATS
+// ─────────────────────────────────────────────────
+
+function computeStats(data) {
+  const totalVolume = data.reduce((s, e) => s + (e.volume || 0), 0);
+  const uniqueDates = [...new Set(data.map(e => e.date))];
+  const bestOneRM   = data.reduce((best, e) =>
+    (e.oneRepMax || 0) > (best.val || 0) ? { val: e.oneRepMax, ex: e.exercise } : best, {});
+
+  const muscleVol = {};
+  data.forEach(e => {
+    const m = e.muscle || 'Other';
+    muscleVol[m] = (muscleVol[m] || 0) + (e.volume || 0);
+  });
+  const topMuscle = Object.entries(muscleVol).sort((a,b) => b[1]-a[1])[0];
+
+  // Streak
+  const sortedDates = [...new Set(data.map(e => e.date))].sort().reverse();
+  let streak = 0;
+  let check  = new Date(); check.setHours(0,0,0,0);
+  for (const d of sortedDates) {
+    const dDate = new Date(d); dDate.setHours(0,0,0,0);
+    const diff  = Math.round((check - dDate) / 86400000);
+    if (diff <= 1) { streak++; check = dDate; } else break;
   }
 
-  const container = document.getElementById('heatmap');
-  days.forEach((day, di) => {
+  return { totalVolume, sessions: uniqueDates.length, bestOneRM, topMuscle, streak };
+}
+
+function updateStats(data) {
+  const s = computeStats(data);
+  document.getElementById('s-sessions').textContent     = s.sessions;
+  document.getElementById('s-sessions-sub').textContent = `${data.length} total sets`;
+  document.getElementById('s-volume').textContent       =
+    s.totalVolume >= 1000 ? (s.totalVolume/1000).toFixed(1)+'t' : Math.round(s.totalVolume)+'kg';
+  document.getElementById('s-streak').textContent   = s.streak;
+  document.getElementById('s-pr').textContent       = s.bestOneRM?.val ? s.bestOneRM.val+'kg' : '—';
+  document.getElementById('s-pr-sub').textContent   = s.bestOneRM?.ex || '';
+  document.getElementById('s-muscle').textContent   = s.topMuscle?.[0] || '—';
+  document.getElementById('s-muscle-sub').textContent =
+    s.topMuscle ? Math.round(s.topMuscle[1])+'kg volume' : '';
+}
+
+// ─────────────────────────────────────────────────
+//  1. VOLUME LINEPLOT
+// ─────────────────────────────────────────────────
+
+function buildVolumeChart(data) {
+  const byDate = {};
+  data.forEach(e => { byDate[e.date] = (byDate[e.date] || 0) + (e.volume || 0); });
+  const dates   = Object.keys(byDate).sort();
+  const volumes = dates.map(d => Math.round(byDate[d]));
+
+  const badge = document.getElementById('volume-trend-badge');
+  if (volumes.length >= 2) {
+    const first = volumes.slice(0, Math.ceil(volumes.length/2)).reduce((a,b)=>a+b,0);
+    const last  = volumes.slice(Math.floor(volumes.length/2)).reduce((a,b)=>a+b,0);
+    const pct   = first > 0 ? Math.round(((last-first)/first)*100) : 0;
+    badge.textContent = pct >= 0 ? `↑ ${pct}% volume` : `↓ ${Math.abs(pct)}% volume`;
+    badge.className   = `pill ${pct >= 0 ? 'green' : 'red'}`;
+  }
+
+  if (charts.volume) charts.volume.destroy();
+  charts.volume = new Chart(document.getElementById('volumeChart'), {
+    type: 'line',
+    data: {
+      labels: dates.map(d => new Date(d).toLocaleDateString('en-IN', {day:'numeric',month:'short'})),
+      datasets: [{
+        label: 'Session Volume (kg)',
+        data: volumes,
+        borderColor: ACCENT,
+        backgroundColor: 'rgba(203,240,75,0.07)',
+        fill: true, tension: 0.4,
+        pointRadius: 5, pointBackgroundColor: ACCENT, pointHoverRadius: 7,
+        borderWidth: 2.5,
+      }],
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor:'#1a1a1a', titleColor:'#fff', bodyColor: ACCENT,
+          borderColor:'#333', borderWidth:1,
+          callbacks: { label: ctx => ` ${ctx.parsed.y} kg volume` }
+        }
+      },
+      scales: {
+        y: { title:{display:true,text:'Volume (kg)',color:'#555'}, grid:{color:'#1a1a1a'}, ticks:{color:'#555'} },
+        x: { grid:{color:'#1a1a1a'}, ticks:{color:'#555',maxTicksLimit:12} },
+      },
+    },
+  });
+}
+
+// ─────────────────────────────────────────────────
+//  2. HEATMAP
+// ─────────────────────────────────────────────────
+
+function buildHeatmap(data) {
+  const WEEKS = 12;
+  const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const volByDate = {};
+  data.forEach(e => { volByDate[e.date] = (volByDate[e.date]||0) + (e.volume||0); });
+  const maxVol = Math.max(...Object.values(volByDate), 1);
+  const today  = new Date(); today.setHours(0,0,0,0);
+  const heatColors = ['transparent','#1f3a0a','#2d6e0a','#5ca818','#cbf04b'];
+
+  const wkRow = document.getElementById('hm-week-row');
+  wkRow.innerHTML = '';
+  for (let w = WEEKS-1; w >= 0; w--) {
+    const el = document.createElement('div');
+    el.className = 'hm-wk-label';
+    const wkStart = new Date(today);
+    wkStart.setDate(wkStart.getDate() - w*7 - today.getDay() + 1);
+    el.textContent = wkStart.toLocaleDateString('en-IN',{month:'short',day:'numeric'});
+    wkRow.appendChild(el);
+  }
+
+  const grid = document.getElementById('heatmap-grid');
+  grid.innerHTML = '';
+  let activeDays = 0;
+  const totalDays = WEEKS * 7;
+
+  DAYS.forEach((dayLabel, di) => {
     const row = document.createElement('div');
     row.className = 'heatmap-row';
     const lbl = document.createElement('div');
-    lbl.className = 'heatmap-label';
-    lbl.textContent = day;
+    lbl.className = 'hm-label'; lbl.textContent = dayLabel;
     row.appendChild(lbl);
-    for (let w = 0; w < weeks; w++) {
+
+    for (let w = WEEKS-1; w >= 0; w--) {
       const cell = document.createElement('div');
-      cell.className = 'heatmap-cell';
-      const val = data[di][w];
-      cell.style.background = colors[val];
-      cell.title = `${day} W${w + 1}: ${labels[val]}`;
+      cell.className = 'hm-cell';
+      const daysBack = w*7 + ((today.getDay()+6)%7 - di + 7) % 7;
+      const cellDate = new Date(today);
+      cellDate.setDate(today.getDate() - daysBack);
+      const dateKey = cellDate.toISOString().split('T')[0];
+      const vol = volByDate[dateKey] || 0;
+      let intensity = 0;
+      if (vol > 0) { activeDays++; intensity = Math.min(4, Math.ceil((vol/maxVol)*4)); }
+      cell.style.background = vol > 0 ? heatColors[intensity] : '#1a1a1a';
+      cell.style.border     = vol > 0 ? 'none' : '1px solid #222';
+      cell.title = vol > 0 ? `${dateKey}: ${Math.round(vol)}kg volume` : `${dateKey}: Rest day`;
       row.appendChild(cell);
     }
-    container.appendChild(row);
+    grid.appendChild(row);
   });
-})();
 
-// ─── 3. MUSCLE GROUP BARPLOT ──────────────────────────────────────────────────
-new Chart(document.getElementById('muscleChart'), {
-  type: 'bar',
-  data: {
-    labels: ['Chest','Back','Shoulders','Arms','Legs','Core'],
-    datasets: [
-      {
-        label: 'Week 1 (kg)',
-        data: [50,60,30,25,80,20],
-        backgroundColor: 'rgba(108,99,255,0.3)',
-        borderColor: ACCENT, borderWidth: 1.5, borderRadius: 6,
-      },
-      {
-        label: 'Week 12 (kg)',
-        data: [70,82,44,36,110,35],
-        backgroundColor: 'rgba(168,85,247,0.5)',
-        borderColor: ACCENT2, borderWidth: 1.5, borderRadius: 6,
-      },
-    ],
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { position: 'top' } },
-    scales: {
-      y: { title: { display: true, text: 'kg Lifted' }, grid: { color: '#1e1e3a' } },
-      x: { grid: { color: '#1e1e3a' } },
+  const pct = Math.round((activeDays/totalDays)*100);
+  const badge = document.getElementById('consistency-badge');
+  badge.textContent = `${pct}% Consistent`;
+  badge.className   = `pill ${pct >= 70 ? 'green' : pct >= 40 ? 'gray' : 'red'}`;
+}
+
+// ─────────────────────────────────────────────────
+//  3. MUSCLE GROUP BARPLOT
+// ─────────────────────────────────────────────────
+
+function buildMuscleChart(data) {
+  const muscleVol = {};
+  data.forEach(e => {
+    const m = e.muscle || 'Other';
+    muscleVol[m] = (muscleVol[m]||0) + (e.volume||0);
+  });
+  const sorted = Object.entries(muscleVol).sort((a,b) => b[1]-a[1]);
+  const labels = sorted.map(([m]) => m);
+  const values = sorted.map(([,v]) => Math.round(v));
+  const colors = labels.map(m => MUSCLE_COLORS[m] || '#555');
+
+  if (charts.muscle) charts.muscle.destroy();
+  charts.muscle = new Chart(document.getElementById('muscleChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Volume (kg)', data: values,
+        backgroundColor: colors.map(c => c+'99'),
+        borderColor: colors, borderWidth: 2, borderRadius: 6,
+      }],
     },
-  },
-});
-
-// ─── 4. SLEEP vs PERFORMANCE SCATTERPLOT ──────────────────────────────────────
-const sleepData = Array.from({ length: 40 }, () => {
-  const sleep = 4 + Math.random() * 5;
-  const perf  = +(sleep * 8 + Math.random() * 15 - 5).toFixed(1);
-  return { x: +sleep.toFixed(1), y: perf };
-});
-
-new Chart(document.getElementById('correlationChart'), {
-  type: 'scatter',
-  data: {
-    datasets: [
-      {
-        label: 'Daily Reading',
-        data: sleepData,
-        backgroundColor: 'rgba(108,99,255,0.55)',
-        pointRadius: 5, pointHoverRadius: 7,
+    options: {
+      indexAxis: 'y', responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title:{display:true,text:'Total Volume (kg)',color:'#555'}, grid:{color:'#1a1a1a'}, ticks:{color:'#555'} },
+        y: { grid:{display:false}, ticks:{color:'#aaa',font:{weight:'700'}} },
       },
-      {
-        label: 'Trend Line',
-        data: [{ x:4, y:32 }, { x:9, y:72 }],
-        type: 'line',
-        borderColor: GOLD, borderWidth: 2,
-        borderDash: [6,4], pointRadius: 0, fill: false,
-      },
-    ],
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { position: 'top' } },
-    scales: {
-      x: { title: { display: true, text: 'Sleep (hours)' },     grid: { color: '#1e1e3a' } },
-      y: { title: { display: true, text: 'Performance Score' }, grid: { color: '#1e1e3a' } },
     },
-  },
-});
+  });
+}
 
-// ─── 5. MONTHLY DISTRIBUTION ──────────────────────────────────────────────────
-new Chart(document.getElementById('distributionChart'), {
-  type: 'bar',
-  data: {
-    labels: ['Month 1','Month 2','Month 3','Month 4'],
-    datasets: [
-      {
-        label: 'Avg Score',
-        data: [52,61,68,76],
-        backgroundColor: [
-          'rgba(59,130,246,0.5)',
-          'rgba(20,184,166,0.5)',
-          'rgba(168,85,247,0.5)',
-          'rgba(34,197,94,0.5)',
-        ],
-        borderColor: [BLUE,TEAL,ACCENT2,GREEN],
-        borderWidth: 2, borderRadius: 8,
-      },
-      {
-        label: 'Best Day',
-        data: [72,82,88,96],
-        type: 'line',
-        borderColor: GOLD, backgroundColor: 'transparent',
-        borderWidth: 2, pointRadius: 5, tension: 0.3,
-      },
-      {
-        label: 'Worst Day',
-        data: [32,42,50,60],
-        type: 'line',
-        borderColor: RED, backgroundColor: 'transparent',
-        borderWidth: 2, pointRadius: 5, tension: 0.3,
-        borderDash: [5,4],
-      },
-    ],
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { position: 'top' } },
-    scales: {
-      y: { title: { display: true, text: 'Performance Score' }, grid: { color: '#1e1e3a' } },
-      x: { grid: { color: '#1e1e3a' } },
+// ─────────────────────────────────────────────────
+//  4. EXERCISE TABLE
+// ─────────────────────────────────────────────────
+
+function buildExerciseTable(data) {
+  const exStats = {};
+  data.forEach(e => {
+    if (!exStats[e.exercise]) exStats[e.exercise] = { sessions:0, volume:0, muscle:e.muscle };
+    exStats[e.exercise].sessions++;
+    exStats[e.exercise].volume += (e.volume||0);
+  });
+  const sorted  = Object.entries(exStats).sort((a,b)=>b[1].volume-a[1].volume).slice(0,8);
+  const maxVol  = sorted[0]?.[1]?.volume || 1;
+  const tbody   = document.getElementById('exercise-tbody');
+  tbody.innerHTML = '';
+  sorted.forEach(([name, s], i) => {
+    const pct   = Math.round((s.volume/maxVol)*100);
+    const color = MUSCLE_COLORS[s.muscle] || '#cbf04b';
+    const tr    = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:#555;font-weight:700">${i+1}</td>
+      <td>
+        <div style="font-weight:700;color:#fff">${name}</div>
+        <div style="font-size:11px;color:#555">${s.muscle||'General'}</div>
+      </td>
+      <td style="color:#aaa">${s.sessions}</td>
+      <td style="color:${color};font-weight:700">${Math.round(s.volume)}kg</td>
+      <td style="min-width:80px">
+        <div class="vol-bar-wrap">
+          <div class="vol-bar" style="width:${pct}%;background:${color};max-width:80px"></div>
+          <span style="font-size:11px;color:#555">${pct}%</span>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ─────────────────────────────────────────────────
+//  5. VOLUME BY DAY OF WEEK
+// ─────────────────────────────────────────────────
+
+function buildDayChart(data) {
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const byDay = [0,0,0,0,0,0,0];
+  data.forEach(e => { byDay[new Date(e.date).getDay()] += (e.volume||0); });
+  const maxDay = Math.max(...byDay, 1);
+  const colors = byDay.map(v =>
+    v===0 ? '#1a1a1a' : v/maxDay > 0.75 ? '#cbf04b' : v/maxDay > 0.4 ? '#5ca818' : '#2d6e0a'
+  );
+  if (charts.day) charts.day.destroy();
+  charts.day = new Chart(document.getElementById('dayChart'), {
+    type: 'bar',
+    data: {
+      labels: DAYS,
+      datasets: [{ label:'Volume (kg)', data:byDay.map(v=>Math.round(v)), backgroundColor:colors, borderRadius:8, borderSkipped:false }],
     },
-  },
-});
+    options: {
+      responsive: true,
+      plugins: { legend:{display:false} },
+      scales: {
+        y: { title:{display:true,text:'Total Volume (kg)',color:'#555'}, grid:{color:'#1a1a1a'}, ticks:{color:'#555'} },
+        x: { grid:{display:false}, ticks:{color:'#aaa',font:{weight:'700'}} },
+      },
+    },
+  });
+}
 
-// ─── 6. WORKOUT TYPE DOUGHNUT ─────────────────────────────────────────────────
-new Chart(document.getElementById('typeChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Hypertrophy','Powerlifting','Cardio','HIIT','Yoga','Recovery'],
-    datasets: [{
-      data: [35,25,15,12,8,5],
-      backgroundColor: [
-        'rgba(108,99,255,0.8)',
-        'rgba(168,85,247,0.8)',
-        'rgba(59,130,246,0.8)',
-        'rgba(20,184,166,0.8)',
-        'rgba(34,197,94,0.8)',
-        'rgba(245,158,11,0.8)',
-      ],
-      borderColor: '#12121e',
-      borderWidth: 3,
-      hoverOffset: 8,
-    }],
-  },
-  options: {
-    responsive: true,
-    cutout: '68%',
-    plugins: { legend: { position: 'right' } },
-  },
+// ─────────────────────────────────────────────────
+//  6. ROUTINE TYPE DOUGHNUT
+// ─────────────────────────────────────────────────
+
+function buildTypeChart(data) {
+  const byType = {};
+  data.forEach(e => { byType[e.routineType] = (byType[e.routineType]||0) + 1; });
+  const entries = Object.entries(byType).sort((a,b)=>b[1]-a[1]);
+  const labels  = entries.map(([t]) => t.split(' ').slice(0,2).join(' '));
+  const values  = entries.map(([,v]) => v);
+  const palette = ['#cbf04b','#5ca818','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#14b8a6'];
+
+  if (charts.type) charts.type.destroy();
+  charts.type = new Chart(document.getElementById('typeChart'), {
+    type: 'doughnut',
+    data: {
+      labels, datasets: [{
+        data: values,
+        backgroundColor: palette.slice(0, values.length),
+        borderColor: '#0a0a0a', borderWidth: 3, hoverOffset: 8,
+      }],
+    },
+    options: {
+      responsive: true, cutout: '65%',
+      plugins: { legend: { position:'right', labels:{color:'#aaa',padding:14,font:{size:11}} } },
+    },
+  });
+}
+
+// ─────────────────────────────────────────────────
+//  RENDER ALL
+// ─────────────────────────────────────────────────
+
+function renderAll() {
+  if (FILTERED.length === 0 && ALL_DATA.length > 0) FILTERED = ALL_DATA;
+  updateStats(FILTERED);
+  buildVolumeChart(FILTERED);
+  buildHeatmap(ALL_DATA);       // always full 12 weeks
+  buildMuscleChart(FILTERED);
+  buildExerciseTable(FILTERED);
+  buildDayChart(FILTERED);
+  buildTypeChart(FILTERED);
+  document.getElementById('analytics-subtitle').textContent =
+    `${FILTERED.length} logged sets · ${[...new Set(FILTERED.map(e=>e.date))].length} training sessions · Data synced from your Workspace`;
+}
+
+// ─────────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  ALL_DATA = getAllWorkouts();
+
+  if (ALL_DATA.length === 0) {
+    document.getElementById('no-data-banner').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('analytics-header').style.display = 'block';
+  document.getElementById('stat-strip').style.display       = 'flex';
+  document.getElementById('charts-grid').style.display      = 'grid';
+  document.getElementById('analytics-footer').style.display = 'block';
+
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 30);
+  FILTERED = ALL_DATA.filter(e => new Date(e.date) >= cutoff);
+
+  renderAll();
+
+  // Auto-refresh every 10s if workspace is open in another tab
+  setInterval(() => {
+    const fresh = getAllWorkouts();
+    if (fresh.length !== ALL_DATA.length) {
+      ALL_DATA = fresh;
+      filterPeriod(document.querySelector('.tab.active'), ACTIVE_DAYS);
+    }
+  }, 10000);
 });
 </script>
-
-<!-- AI Coach Widget -->
-<script src="js/ai-coach.js"></script>
 </body>
 </html>
