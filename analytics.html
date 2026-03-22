@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Advanced Analytics — Limitless Fitness</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg:       #0a0a0f;
+      --surface:  #12121e;
+      --card:     #1a1a2e;
+      --border:   #2a2a4a;
+      --accent:   #6c63ff;
+      --accent2:  #a855f7;
+      --green:    #22c55e;
+      --red:      #ef4444;
+      --gold:     #f59e0b;
+      --text:     #e8e8ff;
+      --muted:    #888aaa;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ─────────────────────────────────────── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 40px;
+      background: rgba(10,10,15,0.95);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .nav-logo {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--text); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white !important;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    /* ── PAGE HEADER ─────────────────────────────── */
+    .page-header {
+      text-align: center;
+      padding: 60px 20px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header .tag {
+      display: inline-block;
+      background: rgba(108,99,255,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(108,99,255,0.3);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .page-header h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    .page-header h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .page-header p {
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── STAT STRIP ──────────────────────────────── */
+    .stat-strip {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .stat-item {
+      flex: 1;
+      min-width: 140px;
+      text-align: center;
+      padding: 20px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-value {
+      font-size: 26px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── MAIN GRID ───────────────────────────────── */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 24px;
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ── CHART CARD ──────────────────────────────── */
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color 0.3s;
+    }
+    .chart-card:hover { border-color: rgba(108,99,255,0.4); }
+    .chart-card.wide { grid-column: 1 / -1; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .card-sub { font-size: 12px; color: var(--muted); }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .badge.up   { background: rgba(34,197,94,0.15);  color: var(--green); }
+    .badge.down { background: rgba(239,68,68,0.15);  color: var(--red); }
+    .badge.info { background: rgba(108,99,255,0.15); color: var(--accent); }
+
+    .chart-wrap { position: relative; }
+
+    /* ── HEATMAP ─────────────────────────────────── */
+    .heatmap-container { overflow-x: auto; }
+    .heatmap-row { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+    .heatmap-label {
+      font-size: 11px;
+      color: var(--muted);
+      width: 32px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .heatmap-cell {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .heatmap-cell:hover { transform: scale(1.35); z-index: 2; position: relative; }
+    .heatmap-week-labels {
+      display: flex;
+      gap: 4px;
+      padding-left: 36px;
+      margin-bottom: 6px;
+    }
+    .heatmap-week-label {
+      width: 20px;
+      text-align: center;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .legend-cell { width: 14px; height: 14px; border-radius: 2px; }
+
+    /* ── PERIOD TABS ─────────────────────────────── */
+    .period-tabs { display: flex; gap: 6px; }
+    .tab {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 28px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 40px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { gap: 16px; }
+      .analytics-grid { grid-template-columns: 1fr; padding: 16px; }
+      .chart-card.wide { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────── -->
+<nav>
+  <a href="index.html" class="nav-logo">LIMITLESS</a>
+  <div class="nav-links">
+    <a href="index.html#features">Features</a>
+    <a href="index.html#exercises">Guides</a>
+    <a href="index.html#bmi">Tools</a>
+    <a href="pricing.html">Pro</a>
+    <a href="login.html" class="nav-cta">Sign In</a>
+  </div>
+</nav>
+
+<!-- ── PAGE HEADER ───────────────────────────────── -->
+<div class="page-header">
+  <div class="tag">Advanced Analytics</div>
+  <h1>Your Growth, <em>Visualized</em></h1>
+  <p>Deep-dive into your volume, consistency, and progressive overload journey with live charts.</p>
+</div>
+
+<!-- ── STAT STRIP ─────────────────────────────────── -->
+<div class="stat-strip">
+  <div class="stat-item">
+    <div class="stat-value" id="stat-streak">12</div>
+    <div class="stat-label">Day Streak</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="stat-volume">8,420</div>
+    <div class="stat-label">Weekly Volume (kg)</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="stat-pr">+18%</div>
+    <div class="stat-label">Strength Gain</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="stat-consistency">87%</div>
+    <div class="stat-label">Consistency Score</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="stat-calories">2,340</div>
+    <div class="stat-label">Avg Daily Calories</div>
+  </div>
+</div>
+
+<!-- ── CHARTS GRID ────────────────────────────────── -->
+<div class="analytics-grid">
+
+  <!-- 1. Progress Lineplot (wide) -->
+  <div class="chart-card wide">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Progress Over Time</div>
+        <div class="card-sub">Weight · Strength · Stamina — 12 week journey</div>
+      </div>
+      <div class="period-tabs">
+        <button class="tab" onclick="switchPeriod(this,'4w')">4W</button>
+        <button class="tab" onclick="switchPeriod(this,'8w')">8W</button>
+        <button class="tab active" onclick="switchPeriod(this,'12w')">12W</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="progressChart" height="90"></canvas>
+    </div>
+  </div>
+
+  <!-- 2. Workout Consistency Heatmap -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Workout Consistency</div>
+        <div class="card-sub">12-week calendar heatmap</div>
+      </div>
+      <span class="badge up">87% Consistent</span>
+    </div>
+    <div class="heatmap-container">
+      <div class="heatmap-week-labels" id="heatmap-week-labels"></div>
+      <div id="heatmap"></div>
+    </div>
+    <div class="heatmap-legend">
+      <span>Less</span>
+      <div class="legend-cell" style="background:#1a1a2e;border:1px solid #2a2a4a"></div>
+      <div class="legend-cell" style="background:#1a3a1a"></div>
+      <div class="legend-cell" style="background:#166534"></div>
+      <div class="legend-cell" style="background:#16a34a"></div>
+      <div class="legend-cell" style="background:#22c55e"></div>
+      <span>More</span>
+    </div>
+  </div>
+
+  <!-- 3. Muscle Group Barplot -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Muscle Group Strength Gains</div>
+        <div class="card-sub">% improvement since Day 1</div>
+      </div>
+      <span class="badge info">12 Weeks</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="muscleChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- 4. Sleep vs Performance Scatterplot -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Sleep vs Performance Score</div>
+        <div class="card-sub">Correlation — more sleep = better output</div>
+      </div>
+      <span class="badge up">r = 0.78</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="correlationChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- 5. Monthly Distribution -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Monthly Performance Distribution</div>
+        <div class="card-sub">Consistency improves each month</div>
+      </div>
+      <span class="badge up">Trending Up</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="distributionChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- 6. Workout Type Doughnut -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Workout Type Breakdown</div>
+        <div class="card-sub">Volume split across training styles</div>
+      </div>
+      <span class="badge info">This Month</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="typeChart" height="200"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── FOOTER ──────────────────────────────────────── -->
+<footer>
+  © 2026 Limitless Fitness · Built for champions ·
+  <a href="index.html">Back to Home</a>
+</footer>
+
+<script>
+// ─── CHART DEFAULTS ───────────────────────────────────────────────────────────
+Chart.defaults.color           = '#888aaa';
+Chart.defaults.borderColor     = '#2a2a4a';
+Chart.defaults.font.family     = "'Segoe UI', system-ui, sans-serif";
+Chart.defaults.font.size       = 12;
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.padding  = 16;
+
+const ACCENT  = '#6c63ff';
+const ACCENT2 = '#a855f7';
+const GREEN   = '#22c55e';
+const RED     = '#ef4444';
+const GOLD    = '#f59e0b';
+const BLUE    = '#3b82f6';
+const TEAL    = '#14b8a6';
+
+// ─── 1. PROGRESS LINEPLOT ─────────────────────────────────────────────────────
+const progressData = {
+  '12w': {
+    labels:   ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12'],
+    weight:   [82,81.5,80.8,80.2,79.5,79.0,78.3,77.8,77.2,76.8,76.1,75.5],
+    strength: [50,52,55,54,58,61,63,65,68,70,73,76],
+    stamina:  [30,33,35,38,40,43,45,48,50,53,56,60],
+  },
+  '8w': {
+    labels:   ['W1','W2','W3','W4','W5','W6','W7','W8'],
+    weight:   [82,81.5,80.8,80.2,79.5,79.0,78.3,77.8],
+    strength: [50,52,55,54,58,61,63,65],
+    stamina:  [30,33,35,38,40,43,45,48],
+  },
+  '4w': {
+    labels:   ['W1','W2','W3','W4'],
+    weight:   [82,81.5,80.8,80.2],
+    strength: [50,52,55,54],
+    stamina:  [30,33,35,38],
+  },
+};
+
+const progressChart = new Chart(document.getElementById('progressChart'), {
+  type: 'line',
+  data: {
+    labels: progressData['12w'].labels,
+    datasets: [
+      {
+        label: 'Weight (kg)',
+        data: progressData['12w'].weight,
+        borderColor: RED,
+        backgroundColor: 'rgba(239,68,68,0.08)',
+        fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6,
+        yAxisID: 'y',
+      },
+      {
+        label: 'Strength (kg lifted)',
+        data: progressData['12w'].strength,
+        borderColor: BLUE,
+        backgroundColor: 'rgba(59,130,246,0.08)',
+        fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6,
+        yAxisID: 'y1',
+      },
+      {
+        label: 'Stamina (min)',
+        data: progressData['12w'].stamina,
+        borderColor: GREEN,
+        backgroundColor: 'rgba(34,197,94,0.08)',
+        fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6,
+        yAxisID: 'y1',
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      y:  { position: 'left',  title: { display: true, text: 'Weight (kg)' },        grid: { color: '#1e1e3a' } },
+      y1: { position: 'right', title: { display: true, text: 'Score / Minutes' },    grid: { drawOnChartArea: false } },
+      x:  { grid: { color: '#1e1e3a' } },
+    },
+  },
+});
+
+function switchPeriod(btn, period) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const d = progressData[period];
+  progressChart.data.labels           = d.labels;
+  progressChart.data.datasets[0].data = d.weight;
+  progressChart.data.datasets[1].data = d.strength;
+  progressChart.data.datasets[2].data = d.stamina;
+  progressChart.update('active');
+}
+
+// ─── 2. HEATMAP ───────────────────────────────────────────────────────────────
+(function buildHeatmap() {
+  const days   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const weeks  = 12;
+  const colors = ['#1a1a2e','#1a3a1a','#166534','#16a34a','#22c55e'];
+  const labels = ['Rest','Light','Medium','Good','Intense'];
+
+  const data = Array.from({ length: 7 }, (_, d) =>
+    Array.from({ length: weeks }, () =>
+      d >= 5 && Math.random() < 0.5 ? 0 : Math.floor(Math.random() * 5)
+    )
+  );
+
+  const wlCtn = document.getElementById('heatmap-week-labels');
+  for (let w = 0; w < weeks; w++) {
+    const lbl = document.createElement('div');
+    lbl.className = 'heatmap-week-label';
+    lbl.textContent = `W${w + 1}`;
+    wlCtn.appendChild(lbl);
+  }
+
+  const container = document.getElementById('heatmap');
+  days.forEach((day, di) => {
+    const row = document.createElement('div');
+    row.className = 'heatmap-row';
+    const lbl = document.createElement('div');
+    lbl.className = 'heatmap-label';
+    lbl.textContent = day;
+    row.appendChild(lbl);
+    for (let w = 0; w < weeks; w++) {
+      const cell = document.createElement('div');
+      cell.className = 'heatmap-cell';
+      const val = data[di][w];
+      cell.style.background = colors[val];
+      cell.title = `${day} W${w + 1}: ${labels[val]}`;
+      row.appendChild(cell);
+    }
+    container.appendChild(row);
+  });
+})();
+
+// ─── 3. MUSCLE GROUP BARPLOT ──────────────────────────────────────────────────
+new Chart(document.getElementById('muscleChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Chest','Back','Shoulders','Arms','Legs','Core'],
+    datasets: [
+      {
+        label: 'Week 1 (kg)',
+        data: [50,60,30,25,80,20],
+        backgroundColor: 'rgba(108,99,255,0.3)',
+        borderColor: ACCENT, borderWidth: 1.5, borderRadius: 6,
+      },
+      {
+        label: 'Week 12 (kg)',
+        data: [70,82,44,36,110,35],
+        backgroundColor: 'rgba(168,85,247,0.5)',
+        borderColor: ACCENT2, borderWidth: 1.5, borderRadius: 6,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      y: { title: { display: true, text: 'kg Lifted' }, grid: { color: '#1e1e3a' } },
+      x: { grid: { color: '#1e1e3a' } },
+    },
+  },
+});
+
+// ─── 4. SLEEP vs PERFORMANCE SCATTERPLOT ──────────────────────────────────────
+const sleepData = Array.from({ length: 40 }, () => {
+  const sleep = 4 + Math.random() * 5;
+  const perf  = +(sleep * 8 + Math.random() * 15 - 5).toFixed(1);
+  return { x: +sleep.toFixed(1), y: perf };
+});
+
+new Chart(document.getElementById('correlationChart'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {
+        label: 'Daily Reading',
+        data: sleepData,
+        backgroundColor: 'rgba(108,99,255,0.55)',
+        pointRadius: 5, pointHoverRadius: 7,
+      },
+      {
+        label: 'Trend Line',
+        data: [{ x:4, y:32 }, { x:9, y:72 }],
+        type: 'line',
+        borderColor: GOLD, borderWidth: 2,
+        borderDash: [6,4], pointRadius: 0, fill: false,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      x: { title: { display: true, text: 'Sleep (hours)' },     grid: { color: '#1e1e3a' } },
+      y: { title: { display: true, text: 'Performance Score' }, grid: { color: '#1e1e3a' } },
+    },
+  },
+});
+
+// ─── 5. MONTHLY DISTRIBUTION ──────────────────────────────────────────────────
+new Chart(document.getElementById('distributionChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Month 1','Month 2','Month 3','Month 4'],
+    datasets: [
+      {
+        label: 'Avg Score',
+        data: [52,61,68,76],
+        backgroundColor: [
+          'rgba(59,130,246,0.5)',
+          'rgba(20,184,166,0.5)',
+          'rgba(168,85,247,0.5)',
+          'rgba(34,197,94,0.5)',
+        ],
+        borderColor: [BLUE,TEAL,ACCENT2,GREEN],
+        borderWidth: 2, borderRadius: 8,
+      },
+      {
+        label: 'Best Day',
+        data: [72,82,88,96],
+        type: 'line',
+        borderColor: GOLD, backgroundColor: 'transparent',
+        borderWidth: 2, pointRadius: 5, tension: 0.3,
+      },
+      {
+        label: 'Worst Day',
+        data: [32,42,50,60],
+        type: 'line',
+        borderColor: RED, backgroundColor: 'transparent',
+        borderWidth: 2, pointRadius: 5, tension: 0.3,
+        borderDash: [5,4],
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      y: { title: { display: true, text: 'Performance Score' }, grid: { color: '#1e1e3a' } },
+      x: { grid: { color: '#1e1e3a' } },
+    },
+  },
+});
+
+// ─── 6. WORKOUT TYPE DOUGHNUT ─────────────────────────────────────────────────
+new Chart(document.getElementById('typeChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Hypertrophy','Powerlifting','Cardio','HIIT','Yoga','Recovery'],
+    datasets: [{
+      data: [35,25,15,12,8,5],
+      backgroundColor: [
+        'rgba(108,99,255,0.8)',
+        'rgba(168,85,247,0.8)',
+        'rgba(59,130,246,0.8)',
+        'rgba(20,184,166,0.8)',
+        'rgba(34,197,94,0.8)',
+        'rgba(245,158,11,0.8)',
+      ],
+      borderColor: '#12121e',
+      borderWidth: 3,
+      hoverOffset: 8,
+    }],
+  },
+  options: {
+    responsive: true,
+    cutout: '68%',
+    plugins: { legend: { position: 'right' } },
+  },
+});
+</script>
+
+<!-- AI Coach Widget -->
+<script src="js/ai-coach.js"></script>
+</body>
+</html>
