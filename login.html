@@ -1,205 +1,406 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign In — Limitless Fitness</title>
-  <meta name="description" content="Sign in to your Limitless Fitness account and continue your transformation." />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!-- Security headers via meta (best effort on static sites) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
+<title>Sign In — Limitless Fitness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --accent: #e8ff47;
+    --text: #f0f0f0;
+    --muted: #666;
+    --error: #ef4444;
+    --success: #22c55e;
+    --radius: 10px;
+  }
 
-  <link rel="stylesheet" href="styles/tokens.css" />
-  <link rel="stylesheet" href="styles/global.css" />
-  <link rel="stylesheet" href="styles/auth.css" />
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* ── Left panel ── */
+  .hero-panel {
+    background: linear-gradient(160deg, #0f1e0a 0%, #0a0a0a 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 60px 56px;
+    border-right: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-panel::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(232,255,71,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-decoration: none;
+    margin-bottom: 64px;
+  }
+  .hero-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    line-height: 1.05;
+    margin-bottom: 24px;
+  }
+  .hero-heading em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero-sub {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-width: 360px;
+    margin-bottom: 48px;
+  }
+  .stats-row {
+    display: flex;
+    gap: 36px;
+  }
+  .stat-item { }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+
+  /* ── Right panel (form) ── */
+  .form-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 48px;
+    background: var(--bg);
+  }
+  .form-card {
+    width: 100%;
+    max-width: 400px;
+  }
+  .form-card h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .form-card .form-sub {
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin-bottom: 36px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .form-group input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 13px 16px;
+    border-radius: var(--radius);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus {
+    border-color: var(--accent);
+  }
+  .form-group input.invalid {
+    border-color: var(--error);
+  }
+  .field-error {
+    color: var(--error);
+    font-size: 0.78rem;
+    margin-top: 6px;
+    display: none;
+  }
+  .field-error.visible {
+    display: block;
+  }
+
+  .form-extras {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 28px;
+    margin-top: -8px;
+  }
+  .form-extras a {
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .form-extras a:hover { color: var(--accent); }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 14px;
+    border-radius: var(--radius);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .alert {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .alert.visible { display: block; }
+  .alert.error   { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+  .alert.success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+
+  .divider {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin: 24px 0;
+    position: relative;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider::before { left: 0; }
+  .divider::after  { right: 0; }
+
+  .form-footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin-top: 24px;
+  }
+  .form-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 768px) {
+    body { grid-template-columns: 1fr; }
+    .hero-panel { display: none; }
+    .form-panel { padding: 40px 24px; min-height: 100vh; }
+  }
+</style>
 </head>
 <body>
-<div class="auth-page">
 
-  <!-- ══════════════════════════════════
-       LEFT — Brand panel
-  ══════════════════════════════════ -->
-  <div class="auth-brand">
-    <div class="auth-brand__top">
-      <a href="index.html" class="auth-logo">LIMITLESS</a>
-    </div>
-
-    <div class="auth-brand__body">
-      <h1 class="auth-brand__headline">
-        YOUR<br>
-        IRON WILL<br>
-        <em>AWAITS.</em>
-      </h1>
-      <p class="auth-brand__sub">
-        Elite tools for elite results. Sign in to continue your transformation journey.
-      </p>
-      <div class="auth-brand__stats">
-        <div>
-          <span class="auth-brand__stat-num">1,200+</span>
-          <span class="auth-brand__stat-label">Members</span>
-        </div>
-        <div>
-          <span class="auth-brand__stat-num">85+</span>
-          <span class="auth-brand__stat-label">Exercises</span>
-        </div>
-        <div>
-          <span class="auth-brand__stat-num">98%</span>
-          <span class="auth-brand__stat-label">Satisfaction</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="auth-brand__accent-bar"></div>
+<!-- Left: Hero -->
+<div class="hero-panel">
+  <a href="./index.html" class="logo">LIMITLESS</a>
+  <h1 class="hero-heading">YOUR IRON WILL<br><em>AWAITS.</em></h1>
+  <p class="hero-sub">Elite tools for elite results. Sign in to access your AI diet planner, progressive overload tracker, and advanced analytics.</p>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-num">1,200+</div><div class="stat-label">Members</div></div>
+    <div class="stat-item"><div class="stat-num">85+</div><div class="stat-label">Exercises</div></div>
+    <div class="stat-item"><div class="stat-num">98%</div><div class="stat-label">Satisfaction</div></div>
   </div>
+</div>
 
-  <!-- ══════════════════════════════════
-       RIGHT — Login form
-  ══════════════════════════════════ -->
-  <div class="auth-form-side">
+<!-- Right: Form -->
+<div class="form-panel">
+  <div class="form-card">
+    <h2>Welcome back</h2>
+    <p class="form-sub">Sign in to your Limitless account</p>
 
-    <a href="index.html" class="auth-back">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="1.8"
-           stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5M12 5l-7 7 7 7"/>
-      </svg>
-      Back to home
-    </a>
+    <div class="alert error" id="alert-error" role="alert"></div>
+    <div class="alert success" id="alert-success" role="alert"></div>
 
-    <div class="auth-form-wrap">
-
-      <h2 class="auth-form-title">Welcome back</h2>
-      <p class="auth-form-sub">Sign in to your Limitless account</p>
-
-      <!-- Error banner — shown by handleLogin on failure -->
-      <div class="auth-error" id="form-error"></div>
-
-      <form id="login-form" onsubmit="handleLogin(event)" novalidate>
-
-        <!-- Email -->
-        <div class="field-wrap">
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Email address"
-            autocomplete="email"
-            required
-          />
-        </div>
-
-        <!-- Password -->
-        <div class="field-wrap field-wrap--password">
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Password"
-            autocomplete="current-password"
-            required
-          />
-          <button
-            type="button"
-            class="pw-toggle"
-            id="pw-toggle-login"
-            aria-label="Show password"
-            onclick="togglePw('password','pw-toggle-login')"
-          >
-            <!-- Eye icon — swaps to eye-off via JS -->
-            <svg id="eye-login" width="18" height="18" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.5"
-                 stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Forgot password link -->
-        <a href="forgot-password.html" class="auth-forgot">Forgot password?</a>
-
-        <!-- Submit -->
-        <button type="submit" class="auth-submit" id="login-btn">
-          <span class="auth-submit__text">Sign In</span>
-          <div class="auth-submit__dots" aria-hidden="true">
-            <span></span><span></span><span></span>
-          </div>
-        </button>
-
-      </form>
-
-      <div class="auth-switch">
-        Don't have an account?&nbsp;
-        <a href="signup.html">Create one free &rarr;</a>
+    <form id="login-form" novalidate>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
+        <div class="field-error" id="email-error"></div>
       </div>
 
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required>
+        <div class="field-error" id="password-error"></div>
+      </div>
+
+      <div class="form-extras">
+        <a href="./forgot-password.html">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn-primary" id="submit-btn">Sign In</button>
+    </form>
+
+    <div class="divider">or</div>
+
+    <div class="form-footer">
+      Don't have an account? <a href="./signup.html">Create one free →</a>
     </div>
   </div>
+</div>
 
-</div><!-- /.auth-page -->
-
-<script src="auth-client.js"></script>
+<script src="./js/auth.js"></script>
 <script>
-/* ── Show/hide password toggle ───────────────── */
-const EYE_OPEN = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
-const EYE_OFF  = `<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+  // Redirect if already logged in
+  document.addEventListener('DOMContentLoaded', () => {
+    Auth.redirectIfAuthed('./dashboard.html');
+  });
 
-function togglePw(inputId, btnId) {
-  const input = document.getElementById(inputId);
-  const icon  = document.getElementById('eye-' + btnId.replace('pw-toggle-', ''));
-  const isHidden = input.type === 'password';
-  input.type     = isHidden ? 'text' : 'password';
-  icon.innerHTML = isHidden ? EYE_OFF : EYE_OPEN;
-  input.focus();
-}
+  const form    = document.getElementById('login-form');
+  const emailIn = document.getElementById('email');
+  const passIn  = document.getElementById('password');
+  const submitBtn = document.getElementById('submit-btn');
+  const alertError   = document.getElementById('alert-error');
+  const alertSuccess = document.getElementById('alert-success');
 
-/* ── Override handleLogin to manage button state ─ */
-const _origLogin = window.handleLogin;
-window.handleLogin = async function (e) {
-  e.preventDefault();
-  const btn = document.getElementById('login-btn');
-  const err = document.getElementById('form-error');
-
-  err.textContent = '';
-  err.classList.remove('show');
-  btn.disabled = true;
-  btn.classList.add('loading');
-
-  try {
-    const res = await fetch('http://localhost:5000/api/auth/login', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email:    document.getElementById('email').value.trim(),
-        password: document.getElementById('password').value,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Login failed.');
-    window.location.href = 'dashboard.html';
-  } catch (ex) {
-    err.textContent = ex.message;
-    err.classList.add('show');
-    btn.disabled = false;
-    btn.classList.remove('loading');
-    document.getElementById('password').value = '';
-    document.getElementById('password').focus();
+  function showError(msg) {
+    alertError.textContent = msg;
+    alertError.classList.add('visible');
+    alertSuccess.classList.remove('visible');
   }
-};
 
-/* ── Redirect if already authenticated ────────── */
-(async () => {
-  try {
-    const res = await fetch('http://localhost:5000/api/auth/me', {
-      credentials: 'include',
-    });
-    if (res.ok) window.location.replace('dashboard.html');
-  } catch {}
-})();
+  function showSuccess(msg) {
+    alertSuccess.textContent = msg;
+    alertSuccess.classList.add('visible');
+    alertError.classList.remove('visible');
+  }
+
+  function clearAlerts() {
+    alertError.classList.remove('visible');
+    alertSuccess.classList.remove('visible');
+  }
+
+  function setFieldError(fieldId, errId, msg) {
+    const input = document.getElementById(fieldId);
+    const err   = document.getElementById(errId);
+    if (msg) {
+      input.classList.add('invalid');
+      err.textContent = msg;
+      err.classList.add('visible');
+    } else {
+      input.classList.remove('invalid');
+      err.classList.remove('visible');
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearAlerts();
+
+    const email    = emailIn.value.trim();
+    const password = passIn.value;
+
+    // Client-side validation
+    let valid = true;
+    if (!email) { setFieldError('email', 'email-error', 'Email is required.'); valid = false; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setFieldError('email', 'email-error', 'Enter a valid email address.'); valid = false; }
+    else { setFieldError('email', 'email-error', ''); }
+
+    if (!password) { setFieldError('password', 'password-error', 'Password is required.'); valid = false; }
+    else { setFieldError('password', 'password-error', ''); }
+
+    if (!valid) return;
+
+    // Disable button & show spinner
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Signing In…';
+
+    try {
+      const result = await Auth.login({ email, password });
+
+      if (!result.ok) {
+        showError(result.error || 'Sign in failed. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+        return;
+      }
+
+      showSuccess('Signed in! Redirecting to your dashboard…');
+      setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+        const next   = params.get('next');
+        window.location.href = next ? decodeURIComponent(next) : './dashboard.html';
+      }, 800);
+
+    } catch (err) {
+      showError('An unexpected error occurred. Please try again.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In';
+      console.error('Login error:', err);
+    }
+  });
+
+  // Clear field error on input
+  emailIn.addEventListener('input', () => setFieldError('email', 'email-error', ''));
+  passIn.addEventListener('input', () => setFieldError('password', 'password-error', ''));
 </script>
-<script src="js/ai-coach.js"></script>
 </body>
 </html>
