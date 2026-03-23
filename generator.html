@@ -45,7 +45,7 @@
         <div style="display:flex; gap: 1.5rem; margin-bottom: 1.5rem;">
           <div class="form-group" style="flex:1; margin-bottom: 0;">
             <label>Age</label>
-            <input type="number" id="age" class="form-control" placeholder="25" min="14" max="100" required>
+            <input type="number" id="age" class="form-control" placeholder="25" min="14" max="100">
           </div>
           <div class="form-group" style="flex:1; margin-bottom: 0;">
             <label>Weight (kg)</label>
@@ -74,30 +74,46 @@
         <div class="form-group">
           <label>Cultural Modifiers</label>
           <select id="region" class="form-control" required>
-            <option value="indian">Indian (Spices & Staples)</option>
+            <option value="indian">Indian (Spices &amp; Staples)</option>
             <option value="western">Western Standard (Pantry)</option>
             <option value="jain">Jain (No Onion/Garlic)</option>
             <option value="halal">Halal Certified Sources</option>
           </select>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-full btn-glow" style="padding: 1rem; font-size:1rem; margin-top:1rem;"><i class="fas fa-bolt"></i> Generate Master Plan</button>
+        <button type="submit" class="btn btn-primary btn-full btn-glow" style="padding: 1rem; font-size:1rem; margin-top:1rem;">
+          <i class="fas fa-bolt"></i> Generate Master Plan
+        </button>
       </form>
     </div>
 
+    <!-- Error message box -->
+    <div id="errorMsg" style="display:none; margin-top:1.5rem; padding:1rem 1.5rem; background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:12px; color:#ef4444; font-weight:600; font-size:14px;"></div>
+
+    <!-- Result panel -->
     <div id="planResult" class="plan-result glass-card" style="margin-top: 2rem; background: var(--bg-2); border-color: var(--primary-color);">
       <h3 style="margin-bottom: 1rem; color: var(--primary-color); font-weight: 700;">Your Limitless Protocol</h3>
+
       <div style="font-size: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; margin-bottom: 1.5rem; color: var(--text-1);">
         <strong>🔥 Daily Target:</strong> <span id="resCalories" style="font-weight:800; color:var(--primary-color);"></span> Kcal
+      </div>
+
+      <div style="margin-bottom:1.5rem; padding:1rem; background:rgba(0,200,150,0.06); border:1px solid rgba(0,200,150,0.2); border-radius:10px;">
+        <h4 style="margin:0 0 8px 0; color:var(--text-1);"><i class="fas fa-info-circle" style="color:var(--primary-color);"></i> Diet Framework</h4>
+        <p id="resDietSummary" style="color:var(--text-2); margin:0; font-size:0.9rem; line-height:1.6;"></p>
       </div>
       
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
         <div>
-          <h4 style="margin-bottom: 1rem; color: var(--text-1); display:flex; align-items:center; gap:8px;"><i class="fas fa-utensils" style="color:var(--primary-color);"></i> Diet Structure</h4>
+          <h4 style="margin-bottom: 1rem; color: var(--text-1); display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-utensils" style="color:var(--primary-color);"></i> Daily Meal Plan
+          </h4>
           <ul id="resDiet" style="color: var(--text-2); line-height: 1.8; padding-left: 1.2rem; font-size: 0.9rem;"></ul>
         </div>
         <div>
-          <h4 style="margin-bottom: 1rem; color: var(--text-1); display:flex; align-items:center; gap:8px;"><i class="fas fa-dumbbell" style="color:var(--primary-color);"></i> Training Split</h4>
+          <h4 style="margin-bottom: 1rem; color: var(--text-1); display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-dumbbell" style="color:var(--primary-color);"></i> Training Split
+          </h4>
           <ul id="resRoutine" style="color: var(--text-2); line-height: 1.8; padding-left: 1.2rem; font-size: 0.9rem;"></ul>
         </div>
       </div>
@@ -105,43 +121,88 @@
   </div>
 
   <script>
+    // ── Map generator.html dropdown values → server-expected field values ──────
+    // server.js /api/generate-plan expects: { weight, goal, dietPref, religion, geography }
+    const GOAL_MAP     = { 'muscle-gain': 'bulk',     'fat-loss': 'cut',           'maintain': 'maintain'       };
+    const DIET_MAP     = { 'veg':         'balanced', 'vegan':    'vegan',          'non-veg':  'balanced'       };
+    const RELIGION_MAP = { 'indian':      'none',     'western':  'none',           'jain':     'jain', 'halal': 'halal' };
+    const GEO_MAP      = { 'indian':      'indian',   'western':  'western',        'jain':     'indian',        'halal': 'middle-eastern' };
+
     document.getElementById('generatorForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = e.target.querySelector('button');
-      btn.innerText = 'Calculating Variables...'; btn.disabled = true;
 
+      const errorDiv = document.getElementById('errorMsg');
+      errorDiv.style.display = 'none';
+
+      const weight  = (document.getElementById('weight').value || '').trim();
+      const goalRaw = document.getElementById('goal').value;
+      const prefRaw = document.getElementById('pref').value;
+      const region  = document.getElementById('region').value;
+
+      // Validate weight
+      if (!weight || isNaN(+weight) || +weight < 30 || +weight > 250) {
+        errorDiv.textContent = '⚠️ Please enter a valid weight between 30–250 kg.';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating your plan...';
+      btn.disabled  = true;
+
+      // Build payload using the correct server field names
       const payload = {
-        age: document.getElementById('age').value,
-        weight: document.getElementById('weight').value,
-        goal: document.getElementById('goal').value,
-        dietParams: {
-          preference: document.getElementById('pref').value,
-          region: document.getElementById('region').value
-        }
+        weight,
+        goal:      GOAL_MAP[goalRaw]     || 'maintain',
+        dietPref:  DIET_MAP[prefRaw]     || 'balanced',
+        religion:  RELIGION_MAP[region]  || 'none',
+        geography: GEO_MAP[region]       || 'indian'
       };
 
       try {
-        const res = await fetch('/api/generate-plan', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
+        const res  = await fetch('/api/generate-plan', {
+          method: 'POST',
+          credentials: 'include',                             // sends auth cookie
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
-        
-        if (data.success) {
-          document.getElementById('resCalories').innerText = data.plan.targetCalories;
-          document.getElementById('resDiet').innerHTML = data.plan.dailyDiet.map(d => `<li>${d}</li>`).join('');
-          document.getElementById('resRoutine').innerHTML = data.plan.weeklyRoutine.map(r => `<li>${r}</li>`).join('');
-          
-          document.getElementById('planResult').style.display = 'block';
-          document.getElementById('planResult').scrollIntoView({ behavior: 'smooth' });
+
+        if (!res.ok || !data.success) {
+          const msg = data.error || `Server error (${res.status}). Please log in first.`;
+          errorDiv.textContent  = '⚠️ ' + msg;
+          errorDiv.style.display = 'block';
+          return;
         }
+
+        // Parse calorie number out of the diet string e.g. "2200 kcal/day. Focus on..."
+        const calMatch = (data.diet || '').match(/(\d[\d,]+)\s*kcal/i);
+        document.getElementById('resCalories').textContent    = calMatch ? calMatch[1] : '—';
+        document.getElementById('resDietSummary').textContent = data.diet || '';
+
+        // data.dailyMeals = ["Breakfast: ...", "Lunch: ...", ...]
+        document.getElementById('resDiet').innerHTML =
+          (data.dailyMeals || []).map(m => `<li style="margin-bottom:6px;">${m}</li>`).join('');
+
+        // data.routine = ["Day 1: Heavy Push...", "Day 2: ...", ...]
+        document.getElementById('resRoutine').innerHTML =
+          (data.routine || []).map(r => `<li style="margin-bottom:6px;">${r}</li>`).join('');
+
+        const resultEl = document.getElementById('planResult');
+        resultEl.style.display = 'block';
+        resultEl.scrollIntoView({ behavior: 'smooth' });
+
       } catch (err) {
-        alert('Generation engine failed to connect.');
+        console.error('Generator error:', err);
+        errorDiv.textContent  = '⚠️ Network error — ensure the server is running on port 5000.';
+        errorDiv.style.display = 'block';
+      } finally {
+        btn.innerHTML = '<i class="fas fa-bolt"></i> Generate Master Plan';
+        btn.disabled  = false;
       }
-      btn.innerHTML = '<i class="fas fa-bolt"></i> Generate Master Plan'; btn.disabled = false;
     });
   </script>
   <script src="cursor.js"></script>
-<script src="js/ai-coach.js"></script>
+  <script src="js/ai-coach.js"></script>
 </body>
 </html>

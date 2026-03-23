@@ -11,7 +11,18 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const { spawn } = require('child_process');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'limitless_super_secret_key_123';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ FATAL: JWT_SECRET is not set in .env — refusing to start.');
+  process.exit(1);
+}
+
+// Startup security warnings
+if (!process.env.GROQ_API_KEY) console.warn('⚠️  WARNING: GROQ_API_KEY not set — AI chat will fail.');
+if (!process.env.CLAUDE_API_KEY) console.warn('⚠️  WARNING: CLAUDE_API_KEY not set — Claude fallback disabled.');
+if (!process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_KEY_SECRET === 'your_razorpay_secret_here') {
+  console.warn('⚠️  WARNING: RAZORPAY_KEY_SECRET is not configured — payments will fail signature verification.');
+}
 
 // Setup Razorpay instance (using env variables)
 const razorpay = new Razorpay({
@@ -115,7 +126,22 @@ initDB();
 
 // ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
 
-app.use(cors({ origin: true, credentials: true }));
+// ─── CORS: Whitelist allowed origins ────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  'http://localhost:5000',
+  'http://127.0.0.1:5000',
+  'http://127.0.0.1:5500',  // VS Code Live Server
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman in dev)
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: Origin ${origin} not allowed`));
+  },
+  credentials: true
+}));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname)));
@@ -356,9 +382,21 @@ const authenticateToken = (req, res, next) => {
 app.post('/api/workouts/log', authenticateToken, async (req, res) => {
   try {
     const { exercise, sets, reps, weight } = req.body;
+
+    // ── Input Validation ────────────────────────────────────────────────────
+    if (!exercise || typeof exercise !== 'string' || exercise.trim().length < 2 || exercise.trim().length > 100) {
+      return res.status(400).json({ error: 'Exercise name must be 2–100 characters.' });
+    }
+    const parsedSets   = parseInt(sets, 10);
+    const parsedReps   = parseInt(reps, 10);
+    const parsedWeight = parseFloat(weight);
+    if (isNaN(parsedSets)   || parsedSets   < 1 || parsedSets   > 100)  return res.status(400).json({ error: 'Sets must be a number between 1 and 100.' });
+    if (isNaN(parsedReps)   || parsedReps   < 1 || parsedReps   > 1000) return res.status(400).json({ error: 'Reps must be a number between 1 and 1000.' });
+    if (isNaN(parsedWeight) || parsedWeight < 0 || parsedWeight > 1000) return res.status(400).json({ error: 'Weight must be a number between 0 and 1000 kg.' });
+
     await pool.query(
       'INSERT INTO workout_logs (user_id, exercise, sets, reps, weight) VALUES (?, ?, ?, ?, ?)',
-      [req.user.id, exercise, sets, reps, weight]
+      [req.user.id, exercise.trim(), parsedSets, parsedReps, parsedWeight]
     );
     res.json({ success: true, message: 'Workout logged successfully!' });
   } catch (err) {
@@ -625,6 +663,17 @@ app.post('/api/contact', async (req, res) => {
     return res.status(400).json({ error: 'Name, email, and message are required.' });
   }
 
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim())) {
+    return res.status(400).json({ error: 'Please provide a valid email address.' });
+  }
+
+  // Name and message length limits
+  if (name.trim().length > 100) return res.status(400).json({ error: 'Name too long (max 100 chars).' });
+  if (message.trim().length > 2000) return res.status(400).json({ error: 'Message too long (max 2000 chars).' });
+  if (message.trim().length < 10) return res.status(400).json({ error: 'Message too short (min 10 chars).' });
+
   try {
     const [result] = await pool.query(
       'INSERT INTO clients (name, email, goal, message) VALUES (?, ?, ?, ?)',
@@ -649,8 +698,8 @@ app.post('/api/contact', async (req, res) => {
 
 // ─── ROUTES — ADMIN (Client Management) ──────────────────────────────────────
 
-// GET all clients
-app.get('/api/clients', async (req, res) => {
+// GET all clients — PROTECTED: requires admin JWT
+app.get('/api/clients', authenticateToken, async (req, res) => {
   try {
     const { search } = req.query;
     let clients;
@@ -672,8 +721,8 @@ app.get('/api/clients', async (req, res) => {
   }
 });
 
-// GET single client by ID
-app.get('/api/clients/:id', async (req, res) => {
+// GET single client by ID — PROTECTED
+app.get('/api/clients/:id', authenticateToken, async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM clients WHERE id = ?', [parseInt(req.params.id, 10)]);
     const client = rows[0];
@@ -687,8 +736,8 @@ app.get('/api/clients/:id', async (req, res) => {
   }
 });
 
-// DELETE a client by ID
-app.delete('/api/clients/:id', async (req, res) => {
+// DELETE a client by ID — PROTECTED
+app.delete('/api/clients/:id', authenticateToken, async (req, res) => {
   try {
     const [result] = await pool.query('DELETE FROM clients WHERE id = ?', [parseInt(req.params.id, 10)]);
     if (result.affectedRows === 0) {
@@ -870,26 +919,55 @@ async function streamClaude(messages, systemPrompt, res) {
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
-    if (!message) return res.status(400).json({ error: 'Message is required.' });
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return res.status(400).json({ error: 'Message is required.' });
+    }
+    if (message.length > 2000) {
+      return res.status(400).json({ error: 'Message too long (max 2000 chars).' });
+    }
 
     // Spawn the bespoke Python AI Agent connected to Groq
-    const pythonAgent = spawn('python', ['fuaak_agent.py', message]);
+    const pythonAgent = spawn('python', ['fuaak_agent.py', message.trim()]);
     let stdoutData = '';
     let stderrData = '';
+    let finished = false;
+
+    // ── Hard timeout: kill agent if it takes > 25 seconds ──────────────────
+    const agentTimeout = setTimeout(() => {
+      if (!finished) {
+        finished = true;
+        pythonAgent.kill('SIGTERM');
+        console.error('⏰ /api/chat: Python agent timed out after 25s');
+        if (!res.headersSent) {
+          res.status(504).json({ error: 'AI agent timed out. Please try again.' });
+        }
+      }
+    }, 25000);
 
     pythonAgent.stdout.on('data', data => { stdoutData += data.toString(); });
     pythonAgent.stderr.on('data', data => { stderrData += data.toString(); });
 
     pythonAgent.on('close', (code) => {
+      if (finished) return;  // already handled by timeout
+      finished = true;
+      clearTimeout(agentTimeout);
       try {
         if (code !== 0 && !stdoutData.trim()) {
             return res.status(500).json({ error: stderrData.trim() || 'Internal agent error' });
         }
         res.json({ success: true, reply: stdoutData.trim() });
       } catch (err) {
-        console.error("AI Bridge Parsing Error:", err);
-        res.status(500).json({ error: 'Failed to process AI response.' });
+        console.error('AI Bridge Parsing Error:', err);
+        if (!res.headersSent) res.status(500).json({ error: 'Failed to process AI response.' });
       }
+    });
+
+    pythonAgent.on('error', (err) => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(agentTimeout);
+      console.error('Python spawn error:', err.message);
+      if (!res.headersSent) res.status(500).json({ error: 'Could not start AI agent. Ensure Python is installed.' });
     });
 
   } catch (err) {

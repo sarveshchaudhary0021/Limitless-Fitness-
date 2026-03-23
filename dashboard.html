@@ -64,6 +64,148 @@
       border-radius: 8px; border: 1px solid var(--border);
       display: inline-block;
     }
+
+    /* ── AI Planner Premium Styles ── */
+    .planner-header {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 6px;
+    }
+    .planner-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+      box-shadow: 0 8px 24px rgba(var(--accent-rgb, 59,130,246),0.3);
+    }
+    .planner-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px; margin-bottom: 20px;
+    }
+    .planner-field {
+      display: flex; flex-direction: column; gap: 7px;
+    }
+    .planner-field label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-mid);
+    }
+    .planner-select {
+      width: 100%; padding: 11px 14px; background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border); color: var(--text-hi);
+      border-radius: 10px; font-family: var(--font-body); font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none; cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+      padding-right: 38px;
+    }
+    .planner-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+    .planner-select option { background: #1a1a1e; color: var(--text-hi); }
+    [data-theme="light"] .planner-select { background-color: rgba(255,255,255,0.6); }
+    [data-theme="light"] .planner-select option { background: #f4f4f5; }
+
+    .planner-generate-btn {
+      width: 100%; padding: 15px; border-radius: 12px; border: none; cursor: pointer;
+      font-family: var(--font-display); font-size: 18px; letter-spacing: 2px;
+      background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+      color: white; position: relative; overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+    }
+    .planner-generate-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(59,130,246,0.4); }
+    .planner-generate-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .planner-generate-btn .btn-shimmer {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      transform: translateX(-100%);
+    }
+    .planner-generate-btn:hover .btn-shimmer { animation: shimmer 1.2s infinite; }
+    @keyframes shimmer { to { transform: translateX(200%); } }
+
+    /* Result Panel */
+    .planner-result {
+      margin-top: 28px; display: none;
+      animation: fadeUp 0.5s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+    .calorie-hero {
+      background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(139,92,246,0.12));
+      border: 1px solid rgba(59,130,246,0.25); border-radius: 16px;
+      padding: 24px 28px; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .calorie-number {
+      font-family: var(--font-display); font-size: 52px; line-height: 1;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .calorie-label { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-mid); }
+    .diet-summary-text { color: var(--text-mid); font-size: 14px; line-height: 1.65; max-width: 480px; }
+
+    .macro-chips {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;
+    }
+    .macro-chip {
+      padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .macro-chip.protein { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+    .macro-chip.carbs   { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+    .macro-chip.fats    { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+
+    /* Tabs */
+    .result-tabs {
+      display: flex; gap: 4px; background: rgba(0,0,0,0.2);
+      border-radius: 12px; padding: 4px; margin-bottom: 20px; width: fit-content;
+    }
+    .result-tab {
+      padding: 9px 20px; border-radius: 9px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; background: transparent;
+      color: var(--text-mid); transition: all 0.2s; letter-spacing: 0.03em;
+    }
+    .result-tab.active {
+      background: var(--bg-surface); color: var(--text-hi);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeUp 0.35s ease; }
+
+    .meal-list { list-style: none; padding: 0; margin: 0; }
+    .meal-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 14px 18px; border-radius: 12px; margin-bottom: 10px;
+      background: rgba(0,0,0,0.15); border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .meal-item:hover { border-color: var(--border-hover); }
+    .meal-icon { font-size: 20px; flex-shrink: 0; width: 32px; text-align: center; padding-top: 1px; }
+    .meal-text { color: var(--text-mid); font-size: 14px; line-height: 1.5; }
+    .meal-text strong { color: var(--text-hi); display: block; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+
+    .training-day {
+      display: flex; gap: 14px; align-items: center;
+      padding: 12px 18px; border-radius: 12px; margin-bottom: 8px;
+      background: rgba(0,0,0,0.15); border: 1px solid var(--border);
+      transition: border-color 0.15s;
+    }
+    .training-day:hover { border-color: rgba(59,130,246,0.4); }
+    .training-day-num {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: 15px; color: white; letter-spacing: 1px;
+    }
+    .training-day-text { color: var(--text-mid); font-size: 14px; flex: 1; }
+
+    .planner-error {
+      padding: 16px 20px; border-radius: 12px;
+      background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3);
+      color: #f87171; font-size: 14px; font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    /* Loading spinner */
+    .spin { display: inline-block; animation: spin 0.8s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -112,44 +254,114 @@
       <div id="today-logs-list" style="margin-top:16px"></div>
     </div>
 
-    <!-- Quick Planner -->
+    <!-- AI Diet & Training Planner -->
     <div class="glass-card" style="grid-column: 1 / -1;">
-      <h3>Quick Planner</h3>
-      <p class="subtitle">Instantly generate a customized workout and diet plan using our AI logic.</p>
-      <form id="plannerForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <input type="number" id="planWeight" class="form-control" style="margin-bottom:0;" placeholder="Weight (kg)" required>
-        <select id="planGoal" class="form-control" style="margin-bottom:0;" required>
-          <option value="" disabled selected>Select Goal...</option>
-          <option value="cut">Fat Loss (Cut)</option>
-          <option value="bulk">Muscle Gain (Bulk)</option>
-          <option value="maintain">Maintenance</option>
-        </select>
-        <select id="planDiet" class="form-control" style="margin-bottom:0;" required>
-          <option value="" disabled selected>Diet Preference...</option>
-          <option value="balanced">Balanced</option>
-          <option value="high-protein">High Protein Med Carbs</option>
-          <option value="keto">Keto / Low Carb</option>
-          <option value="vegan">Vegan High Protein</option>
-        </select>
-        <select id="planReligion" class="form-control" style="margin-bottom:0;" required>
-          <option value="" disabled selected>Dietary Belief...</option>
-          <option value="none">None / Any</option>
-          <option value="hindu">Hindu (Sattvic friendly)</option>
-          <option value="halal">Non Hindu / Halal</option>
-          <option value="jain">Jain (No Root Veg)</option>
-          <option value="sikh">Sikh (Jhatka / Pure Veg)</option>
-          <option value="buddha">Buddhist (Mindful Plant-Based)</option>
-        </select>
-        <select id="planGeography" class="form-control" style="margin-bottom:0;" required>
-          <option value="" disabled selected>Regional Spices...</option>
-          <option value="western">Western / Continental</option>
-          <option value="indian">Indian Spices (Desi)</option>
-          <option value="asian">East Asian</option>
-          <option value="middle-eastern">Middle Eastern</option>
-        </select>
-        <button type="submit" class="btn btn-ghost" style="grid-column: 1 / -1; padding-top:12px; padding-bottom:12px; margin-top:8px;">Generate Plan</button>
+      <div class="planner-header">
+        <div class="planner-icon">🧬</div>
+        <div>
+          <h3 style="margin-bottom: 4px;">AI Diet & Training Planner</h3>
+          <p class="subtitle" style="margin-bottom:0;">Generate your personalized nutrition protocol and training split instantly.</p>
+        </div>
+      </div>
+
+      <div style="height:1px; background:var(--border); margin: 20px 0;"></div>
+
+      <form id="plannerForm">
+        <div class="planner-grid">
+          <div class="planner-field">
+            <label>⚖️ Body Weight</label>
+            <input type="number" id="planWeight" class="planner-select" placeholder="e.g. 75 kg" min="20" max="300" required style="background-image:none;">
+          </div>
+          <div class="planner-field">
+            <label>🎯 Fitness Goal</label>
+            <select id="planGoal" class="planner-select" required>
+              <option value="" disabled selected>Select goal...</option>
+              <option value="cut">🔥 Fat Loss (Cut)</option>
+              <option value="bulk">💪 Muscle Gain (Bulk)</option>
+              <option value="maintain">⚡ Maintenance / Recomp</option>
+            </select>
+          </div>
+          <div class="planner-field">
+            <label>🥗 Diet Style</label>
+            <select id="planDiet" class="planner-select" required>
+              <option value="" disabled selected>Select diet...</option>
+              <option value="balanced">Balanced Macros</option>
+              <option value="high-protein">High Protein, Med Carbs</option>
+              <option value="keto">Keto / Low Carb</option>
+              <option value="vegan">Vegan High Protein</option>
+            </select>
+          </div>
+          <div class="planner-field">
+            <label>🙏 Dietary Belief</label>
+            <select id="planReligion" class="planner-select" required>
+              <option value="" disabled selected>Select belief...</option>
+              <option value="none">None / Any</option>
+              <option value="hindu">Hindu (Sattvic)</option>
+              <option value="halal">Halal</option>
+              <option value="jain">Jain (No Root Veg)</option>
+              <option value="sikh">Sikh (Pure Veg)</option>
+              <option value="buddha">Buddhist (Plant-Based)</option>
+            </select>
+          </div>
+          <div class="planner-field">
+            <label>🌍 Regional Cuisine</label>
+            <select id="planGeography" class="planner-select" required>
+              <option value="" disabled selected>Select region...</option>
+              <option value="indian">🇮🇳 Indian (Desi Spices)</option>
+              <option value="western">🌎 Western / Continental</option>
+              <option value="asian">🌏 East Asian</option>
+              <option value="middle-eastern">🌙 Middle Eastern</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="planner-generate-btn" id="plannerBtn">
+          <span class="btn-shimmer"></span>
+          ✦ GENERATE MY PLAN
+        </button>
       </form>
-      <div id="plannerResult" style="display: none; padding: 24px; background: rgba(0,0,0,0.1); border-radius: var(--radius-md); border: 1px solid var(--border);"></div>
+
+      <!-- Result Panel -->
+      <div class="planner-result" id="plannerResult">
+
+        <!-- Error state -->
+        <div class="planner-error" id="plannerError" style="display:none;">
+          <span>⚠️</span>
+          <span id="plannerErrorText"></span>
+        </div>
+
+        <!-- Success state -->
+        <div id="plannerSuccess" style="display:none;">
+          <!-- Calorie Hero -->
+          <div class="calorie-hero">
+            <div>
+              <div class="calorie-label">Daily Calorie Target</div>
+              <div class="calorie-number" id="resCalories">—</div>
+              <div class="calorie-label" style="margin-top:4px;">KCAL / DAY</div>
+            </div>
+            <div class="diet-summary-text" id="resDietSummary"></div>
+          </div>
+
+          <!-- Macro chips -->
+          <div class="macro-chips" id="resMacroChips"></div>
+
+          <!-- Tabs -->
+          <div class="result-tabs">
+            <button class="result-tab active" onclick="switchTab('diet', this)">🍽️ Meal Plan</button>
+            <button class="result-tab" onclick="switchTab('training', this)">🏋️ Training Split</button>
+          </div>
+
+          <!-- Meal Plan Tab -->
+          <div class="tab-panel active" id="tab-diet">
+            <ul class="meal-list" id="resDiet"></ul>
+          </div>
+
+          <!-- Training Tab -->
+          <div class="tab-panel" id="tab-training">
+            <div id="resRoutine"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Advanced Analytics — links to analytics.html -->
@@ -212,26 +424,8 @@
       }
     }
 
-    async function loadTodayRoutine() {
-      try {
-        const res = await fetch('/api/dashboard/today', { credentials: 'include' });
-        const data = await res.json();
-        if (data.success) {
-          const r = data.routine;
-          document.getElementById('routineContent').innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <h4 style="margin:0; font-size:18px; color:var(--text-hi);">${data.dayName}</h4>
-            </div>
-            <h5 style="margin:0 0 8px 0; font-size:22px; color:var(--accent);">${r.title}</h5>
-            <p style="margin:0 0 16px 0; color:var(--text-mid); font-size:15px;">Target: ${r.target}</p>
-            <div style="background:rgba(0,0,0,0.1); padding:16px; border-radius:var(--radius-sm); border:1px solid var(--border);">
-              <span style="font-weight:600; color:var(--text-hi);">Suggested Volume:</span>
-              <br> <span style="color:var(--text-mid);">${r.sets} Sets × ${r.reps} Reps per exercise.</span>
-            </div>
-          `;
-        }
-      } catch (err) {}
-    }
+    // NOTE: Today's routine card is managed by workspace.js (buildTodayRoutine).
+    // The inline loadTodayRoutine() has been removed to avoid duplicate / conflicting DOM writes.
 
     let progressChart, pieChartInst;
 
@@ -341,83 +535,141 @@
       });
     }
 
-    document.getElementById('logForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const payload = {
-        exercise: document.getElementById('exercise').value,
-        sets: document.getElementById('sets').value,
-        reps: document.getElementById('reps').value,
-        weight: document.getElementById('weight').value
-      };
+    // Workout log form is handled by workspace.js (saveWorkout via save-workout-btn click).
 
-      try {
-        const res = await fetch('/api/workouts/log', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          const btn = e.target.querySelector('button');
-          btn.textContent = 'Logged ✔';
-          btn.style.background = '#10b981';
-          btn.style.borderColor = '#10b981';
-          btn.style.color = '#fff';
-          setTimeout(() => {
-            btn.textContent = 'Save Workout';
-            btn.style.background = '';
-            btn.style.borderColor = '';
-            btn.style.color = '';
-            e.target.reset();
-            loadAnalytics(); // Reload charts to reflect new data
-          }, 2000);
-        }
-      } catch (err) { alert('Error logging workout'); }
-    });
+    // ── Tab switching ──────────────────────────────────────────────────────────
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.result-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      btn.classList.add('active');
+    }
 
+    // ── Meal time icons ────────────────────────────────────────────────────────
+    const MEAL_ICONS = ['🌅','🥣','🍎','🍱','☕','🍽️','🌙'];
+    const MEAL_LABELS = ['Early Morning','Breakfast','Mid-Morning','Lunch','Pre-Workout','Dinner','Evening Snack'];
+
+    // ── Quick Planner ──────────────────────────────────────────────────────────
     document.getElementById('plannerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const payload = {
-        weight: document.getElementById('planWeight').value,
-        goal: document.getElementById('planGoal').value,
-        dietPref: document.getElementById('planDiet').value,
-        religion: document.getElementById('planReligion').value,
-        geography: document.getElementById('planGeography').value
-      };
+
+      const weight   = document.getElementById('planWeight').value.trim();
+      const goal     = document.getElementById('planGoal').value;
+      const dietPref = document.getElementById('planDiet').value;
+      const religion = document.getElementById('planReligion').value;
+      const geography= document.getElementById('planGeography').value;
+
+      // Client-side validation
+      if (!weight || isNaN(parseFloat(weight)) || parseFloat(weight) < 20 || parseFloat(weight) > 300)
+        return showPlannerError('Please enter a valid weight between 20–300 kg.');
+      if (!goal)      return showPlannerError('Please select a fitness goal.');
+      if (!dietPref)  return showPlannerError('Please select a diet preference.');
+      if (!religion)  return showPlannerError('Please select a dietary belief.');
+      if (!geography) return showPlannerError('Please select a regional cuisine.');
+
+      const btn       = document.getElementById('plannerBtn');
+      const resultDiv = document.getElementById('plannerResult');
+      const errorDiv  = document.getElementById('plannerError');
+      const successDiv= document.getElementById('plannerSuccess');
+
+      // Loading state
+      btn.disabled    = true;
+      btn.innerHTML   = '<span class="spin">⟳</span>  Crafting your plan...';
+      resultDiv.style.display = 'block';
+      errorDiv.style.display  = 'none';
+      successDiv.style.display= 'none';
 
       try {
         const res = await fetch('/api/generate-plan', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ weight, goal, dietPref, religion, geography })
         });
+
         const data = await res.json();
-        if (data.success) {
-          const resultDiv = document.getElementById('plannerResult');
-          resultDiv.style.display = 'block';
-          resultDiv.innerHTML = `
-            <h4 style="color:var(--accent); font-size:20px; font-family:var(--font-display); margin:0 0 12px 0;">Your Customized Program</h4>
-            <div style="margin-bottom:16px;">
-              <strong style="color:var(--text-hi);">Diet Framework:</strong><br>
-              <span style="color:var(--text-mid);">${data.diet}</span>
-            </div>
-            <div style="margin-bottom:16px;">
-              <strong style="color:var(--text-hi);">Daily Meal Plan (Hit your calories):</strong><br>
-              <ul style="color:var(--text-mid); padding-left:20px; margin-top:8px;">
-                ${data.dailyMeals.map(m => '<li style="margin-bottom:4px;">'+m+'</li>').join('')}
-              </ul>
-            </div>
-            <div>
-              <strong style="color:var(--text-hi);">Training Split:</strong><br>
-              <ul style="color:var(--text-mid); padding-left:20px; margin-top:8px;">
-                ${data.routine.map(r => '<li style="margin-bottom:4px;">'+r+'</li>').join('')}
-              </ul>
-            </div>
-          `;
+
+        if (!res.ok || !data.success) {
+          showPlannerError(data.error || `Server error (${res.status}). Are you logged in?`);
+          return;
         }
-      } catch (err) { alert('Error generating plan'); }
+
+        // ── Parse calories from diet string ──
+        const calMatch = (data.diet || '').match(/(\d[\d,]+)\s*kcal/i);
+        document.getElementById('resCalories').textContent = calMatch ? calMatch[1] : '—';
+
+        // ── Diet summary (strip calorie part for cleaner display) ──
+        document.getElementById('resDietSummary').textContent = data.diet || '';
+
+        // ── Macro chips (derive from goal + diet) ──
+        const macroMap = {
+          cut:      { protein:'~2.2g/kg', carbs:'~2g/kg', fats:'~0.8g/kg' },
+          bulk:     { protein:'~2g/kg',   carbs:'~4g/kg', fats:'~1g/kg'   },
+          maintain: { protein:'~1.8g/kg', carbs:'~3g/kg', fats:'~0.9g/kg' }
+        };
+        const macros = macroMap[goal] || macroMap.maintain;
+        document.getElementById('resMacroChips').innerHTML = `
+          <div class="macro-chip protein">🥩 Protein ${macros.protein}</div>
+          <div class="macro-chip carbs">🍚 Carbs ${macros.carbs}</div>
+          <div class="macro-chip fats">🥑 Fats ${macros.fats}</div>
+        `;
+
+        // ── Meal Plan ──
+        const meals = data.dailyMeals || [];
+        document.getElementById('resDiet').innerHTML = meals.map((m, i) => {
+          const icon  = MEAL_ICONS[i]  || '🍽️';
+          const label = MEAL_LABELS[i] || `Meal ${i+1}`;
+          const esc   = String(m).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          return `<li class="meal-item">
+            <div class="meal-icon">${icon}</div>
+            <div class="meal-text"><strong>${label}</strong>${esc}</div>
+          </li>`;
+        }).join('');
+
+        // ── Training Split ──
+        const routine = data.routine || [];
+        document.getElementById('resRoutine').innerHTML = routine.map((r, i) => {
+          const parts = String(r).split(':');
+          const dayLabel = parts[0] ? parts[0].trim() : `Day ${i+1}`;
+          const detail   = parts.slice(1).join(':').trim();
+          const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          return `<div class="training-day">
+            <div class="training-day-num">D${i+1}</div>
+            <div class="training-day-text"><strong style="color:var(--text-hi); font-size:13px;">${esc(dayLabel)}</strong>${detail ? '<br>' + esc(detail) : ''}</div>
+          </div>`;
+        }).join('');
+
+        // Show success
+        successDiv.style.display = 'block';
+
+        // Switch to meal plan tab by default
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.result-tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-diet').classList.add('active');
+        document.querySelector('.result-tab').classList.add('active');
+
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      } catch (err) {
+        console.error('Planner error:', err);
+        showPlannerError('Network error — ensure the server is running and you are logged in.');
+      } finally {
+        btn.disabled  = false;
+        btn.innerHTML = '<span class="btn-shimmer"></span>✦ GENERATE MY PLAN';
+      }
     });
+
+    function showPlannerError(msg) {
+      const resultDiv  = document.getElementById('plannerResult');
+      const errorDiv   = document.getElementById('plannerError');
+      const successDiv = document.getElementById('plannerSuccess');
+      resultDiv.style.display  = 'block';
+      errorDiv.style.display   = 'flex';
+      successDiv.style.display = 'none';
+      document.getElementById('plannerErrorText').textContent = msg;
+      const btn = document.getElementById('plannerBtn');
+      if (btn) { btn.disabled = false; btn.innerHTML = '<span class="btn-shimmer"></span>✦ GENERATE MY PLAN'; }
+    }
 
     async function logout() {
       try {
@@ -429,7 +681,7 @@
 
     (async () => {
       await verifyAuth();
-      loadTodayRoutine();
+      // workspace.js handles buildTodayRoutine() on DOMContentLoaded
       loadAnalytics();
     })();
   </script>
