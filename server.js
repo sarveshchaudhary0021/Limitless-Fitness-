@@ -932,7 +932,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // Spawn the bespoke Python AI Agent connected to Gemini
-    const pythonAgent = spawn('python', ['fuaak_agent.py', message.trim()]);
+    const pythonAgent = spawn('python', ['fuaak_agent.py', message.trim()], { env: process.env });
     let stdoutData = '';
     let stderrData = '';
     let finished = false;
