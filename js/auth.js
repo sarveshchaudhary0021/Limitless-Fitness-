@@ -230,6 +230,7 @@ const Auth = {
    */
   logout() {
     sessionStorage.removeItem(SESSION_KEY);
+    window.location.href = 'login.html';
   },
 
   /**
@@ -264,7 +265,7 @@ const Auth = {
   guard(returnPath) {
     if (!this.isLoggedIn()) {
       const next = encodeURIComponent(returnPath || window.location.pathname);
-      window.location.replace(`/Limitless-Fitness-/login.html?next=${next}`);
+      window.location.replace(`login.html?next=${next}`);
       return false;
     }
     return true;
@@ -273,7 +274,7 @@ const Auth = {
   /**
    * Redirect away from login/signup if already authenticated
    */
-  redirectIfAuthed(defaultPath = '/Limitless-Fitness-/dashboard.html') {
+  redirectIfAuthed(defaultPath = 'dashboard.html') {
     if (this.isLoggedIn()) {
       const params = new URLSearchParams(window.location.search);
       const next   = params.get('next');
@@ -281,6 +282,26 @@ const Auth = {
       return true;
     }
     return false;
+  },
+
+  /**
+   * Reset password for an existing account (mocking server-side logic)
+   */
+  async resetPassword(email, newPassword) {
+    const key = await emailKey(email);
+    const db  = loadUsers();
+    
+    // Always return success even if email doesn't exist (security practice)
+    if (!db[key]) return { ok: true, message: 'If an account exists, your password has been reset.' };
+
+    const { hash, salt } = await hashPassword(newPassword);
+    db[key].hash = hash;
+    db[key].salt = salt;
+    saveUsers(db);
+
+    // Clear any active session for safety
+    sessionStorage.removeItem(SESSION_KEY);
+    return { ok: true };
   },
 };
 

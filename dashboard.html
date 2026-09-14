@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('user-name').textContent = session.name.split(' ')[0];
   }
 
-  // Restore saved planner inputs from profile
+  // Restore saved planner inputs and plan
   const profile = Auth.getProfile() || {};
   if (profile.plannerInputs) {
     const pi = profile.plannerInputs;
@@ -512,6 +512,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pi.diet)    document.getElementById('p-diet').value    = pi.diet;
     if (pi.belief)  document.getElementById('p-belief').value  = pi.belief;
     if (pi.cuisine) document.getElementById('p-cuisine').value = pi.cuisine;
+  }
+  
+  if (profile.activePlan) {
+    const outBox = document.getElementById('plan-output');
+    outBox.innerHTML = DietPlanner.renderPlanHTML(profile.activePlan);
+    DietPlanner.initPlanTabs(outBox);
   }
 
   loadTodayRoutine();
@@ -558,11 +564,6 @@ document.getElementById('generate-btn').addEventListener('click', () => {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Generating Your Plan…';
 
-  // Save inputs to profile for persistence
-  Auth.saveProfile({
-    plannerInputs: { weight, goal, diet, belief, cuisine }
-  });
-
   // Small artificial delay for UX
   setTimeout(() => {
     try {
@@ -572,6 +573,12 @@ document.getElementById('generate-btn').addEventListener('click', () => {
         dietStyle: diet,
         belief: belief || 'any',
         cuisine: cuisine || 'indian',
+      });
+
+      // Save plan and inputs to profile for persistence
+      Auth.saveProfile({
+        plannerInputs: { weight, goal, diet, belief, cuisine },
+        activePlan: plan
       });
 
       outBox.innerHTML = DietPlanner.renderPlanHTML(plan);
@@ -590,6 +597,7 @@ document.getElementById('generate-btn').addEventListener('click', () => {
 
 /* ─────────────────────── WORKOUT LOGGER ─────────────────────── */
 const LOG_KEY = '__lf_workout_log__';
+const ANALYTICS_KEY = 'limitless_workouts';
 
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
@@ -608,6 +616,48 @@ function getTodayLogs() {
   return loadAllLogs()[getTodayKey()] || [];
 }
 
+/**
+ * Syncs the local date-based logs with the flat analytics-friendly array.
+ */
+function syncAnalytics() {
+  const all = loadAllLogs();
+  const flat = [];
+  const routines = WEEKLY_ROUTINES;
+  
+  Object.keys(all).forEach(date => {
+    const dow = new Date(date).getDay();
+    const routine = routines[dow];
+    
+    all[date].forEach(entry => {
+      // Map exercise to muscle group (basic heuristic)
+      let muscle = 'Other';
+      const ex = entry.exercise.toLowerCase();
+      if (ex.includes('bench') || ex.includes('dips') || ex.includes('chest')) muscle = 'Chest';
+      else if (ex.includes('row') || ex.includes('pull') || ex.includes('deadlift')) muscle = 'Back';
+      else if (ex.includes('squat') || ex.includes('leg') || ex.includes('calf')) muscle = 'Quads';
+      else if (ex.includes('press') || ex.includes('lateral')) muscle = 'Shoulders';
+      else if (ex.includes('curl')) muscle = 'Biceps';
+      else if (ex.includes('exten') || ex.includes('skull')) muscle = 'Triceps';
+      else if (ex.includes('run') || ex.includes('cycle') || ex.includes('jump')) muscle = 'Cardio';
+
+      flat.push({
+        date,
+        exercise: entry.exercise,
+        sets: entry.sets,
+        reps: entry.reps,
+        weight: entry.weight,
+        volume: entry.sets * entry.reps * entry.weight,
+        oneRepMax: Math.round(entry.weight * (1 + (entry.reps / 30))), // Epley formula
+        muscle,
+        routineType: routine.name,
+        timestamp: entry.ts
+      });
+    });
+  });
+  
+  localStorage.setItem(ANALYTICS_KEY, JSON.stringify(flat));
+}
+
 function saveTodayLog(entries) {
   const all = loadAllLogs();
   all[getTodayKey()] = entries;
@@ -617,6 +667,7 @@ function saveTodayLog(entries) {
     keys.slice(0, keys.length - 90).forEach(k => delete all[k]);
   }
   saveLogs(all);
+  syncAnalytics();
 }
 
 function loadTodayLogs() {

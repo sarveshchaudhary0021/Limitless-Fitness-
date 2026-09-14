@@ -4,12 +4,18 @@ import json
 import requests
 import openclaw_tools
 
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-MODEL = "llama-3.3-70b-versatile"
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
-if not GROQ_API_KEY:
-    print("Error: GROQ_API_KEY environment variable is not set.")
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+MODEL = "gemini-3.6-flash"
+
+if not GEMINI_API_KEY:
+    print("Error: GEMINI_API_KEY environment variable is not set.")
     sys.exit(1)
 
 def get_workout_stats():
@@ -21,7 +27,7 @@ def get_workout_stats():
     ]
     return openclaw_tools.process_workout_logs(logs)
 
-def chat_with_groq(user_message):
+def chat_with_gemini(user_message):
     system_prompt = (
         "You are a supportive, caring, and highly knowledgeable gym buddy/friend for Limitless Fitness. "
         "Your tone is very casual, friendly, and empathetic. You talk to the user like they are your best friend, trying to help them fix their routine, deal with their struggles, and stay consistent. "
@@ -45,7 +51,7 @@ def chat_with_groq(user_message):
         })
 
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": f"Bearer {GEMINI_API_KEY}",
         "Content-Type": "application/json"
     }
 
@@ -57,7 +63,7 @@ def chat_with_groq(user_message):
     }
 
     try:
-        response = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=20)
+        response = requests.post(GEMINI_API_URL, headers=headers, json=payload, timeout=20)
         if response.status_code == 200:
             data = response.json()
             reply = data.get("choices", [{}])[0].get("message", {}).get("content", "")
@@ -72,6 +78,6 @@ if __name__ == "__main__":
         # Prevent encoding errors in cmd
         sys.stdout.reconfigure(encoding='utf-8')
         user_msg = " ".join(sys.argv[1:])
-        chat_with_groq(user_msg)
+        chat_with_gemini(user_msg)
     else:
         print("Message required")

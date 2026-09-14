@@ -17,11 +17,11 @@ The Fuaak AI Coach utilizes a highly optimized cross-platform orchestration pipe
    - The finalized query string routes to `POST http://localhost:5000/api/chat`.
    - `server.js` captures the payload string, sanitizes it, and spawns a native backend child-process bound specifically mapped to the Python execution module (`fuaak_agent.py`) rather than the restrictive `npx openclaw` engine.
 
-3. **Cognitive Computing (Python & Groq API)**
+3. **Cognitive Computing (Python & Gemini API)**
    - `fuaak_agent.py` evaluates the `sys.argv[1]` string payload.
    - Using the custom-built `openclaw_tools.py`, it executes backend keyword analytics on the query (e.g. checking recent "workout" database sets or analytics algorithms to provide deep Limitless Fitness personalization constraints).
    - Generates an intensive Fuaak branded `system_prompt` mapped accurately stringing regional constraint checks to intercept Indian Languages strictly dynamically based on input inference (`Hindi`, `Marathi`, `Tamil`, etc).
-   - Secures a Lightning Fast REST push to the **Groq Gateway** (`llama-3.3-70b-versatile`) bypassing intensive local memory loads and outputting the absolute AI translation and calculation inside an ASCII standard `JSON` envelope locally to stdout.
+   - Secures a Lightning Fast REST push to the **Gemini Gateway** (`gemini-3.6-flash`) bypassing intensive local memory loads and outputting the absolute AI translation and calculation inside an ASCII standard `JSON` envelope locally to stdout.
 
 4. **Response Parsing & Callback**
    - The Node container listens actively to standard out buffer closures, scraping strictly using regex mappings (`/\{[\s\S]*"success"[\s\S]*"reply"[\s\S]*\}/`) to ignore intermediate python OS logs and extracting the clean reply JSON.

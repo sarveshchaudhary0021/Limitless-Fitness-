@@ -18,7 +18,7 @@ if (!JWT_SECRET) {
 }
 
 // Startup security warnings
-if (!process.env.GROQ_API_KEY) console.warn('⚠️  WARNING: GROQ_API_KEY not set — AI chat will fail.');
+if (!process.env.GEMINI_API_KEY) console.warn('⚠️  WARNING: GEMINI_API_KEY not set — AI chat will fail.');
 if (!process.env.CLAUDE_API_KEY) console.warn('⚠️  WARNING: CLAUDE_API_KEY not set — Claude fallback disabled.');
 if (!process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_KEY_SECRET === 'your_razorpay_secret_here') {
   console.warn('⚠️  WARNING: RAZORPAY_KEY_SECRET is not configured — payments will fail signature verification.');
@@ -754,10 +754,10 @@ app.delete('/api/clients/:id', authenticateToken, async (req, res) => {
 // API CONFIGS
 // ─────────────────────────────────────────────────
 
-const GROQ = {
-  url:   'https://api.groq.com/openai/v1/chat/completions',
-  key:   process.env.GROQ_API_KEY,
-  model: 'llama-3.3-70b-versatile', // Specifically mapped to the available Versatile model
+const GEMINI = {
+  url:   'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+  key:   process.env.GEMINI_API_KEY,
+  model: 'gemini-3.6-flash',
 };
 
 const CLAUDE = {
@@ -828,18 +828,18 @@ For serious health issues, always advise consulting a doctor.`,
 };
 
 // ─────────────────────────────────────────────────
-// STREAM FROM GROQ  (OpenAI-compatible SSE)
+// STREAM FROM GEMINI  (OpenAI-compatible SSE)
 // ─────────────────────────────────────────────────
 
-async function streamGroq(messages, res) {
-  const response = await fetch(GROQ.url, {
+async function streamGemini(messages, res) {
+  const response = await fetch(GEMINI.url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GROQ.key}`,
+      'Authorization': `Bearer ${GEMINI.key}`,
     },
     body: JSON.stringify({
-      model: GROQ.model,
+      model: GEMINI.model,
       messages,
       stream: true,
       temperature: 0.7,
@@ -847,7 +847,7 @@ async function streamGroq(messages, res) {
     }),
   });
 
-  if (!response.ok) throw new Error(`Groq error: ${response.status}`);
+  if (!response.ok) throw new Error(`Gemini error: ${response.status}`);
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
@@ -860,8 +860,13 @@ async function streamGroq(messages, res) {
       const raw = line.slice(6);
       if (raw === '[DONE]') { res.write('data: [DONE]\n\n'); return; }
       try {
-        const token = JSON.parse(raw).choices?.[0]?.delta?.content;
+        const parsed = JSON.parse(raw);
+        const token = parsed.choices?.[0]?.delta?.content;
         if (token) res.write(`data: ${JSON.stringify({ token })}\n\n`);
+        if (parsed.choices?.[0]?.finish_reason === 'stop') {
+          res.write('data: [DONE]\n\n');
+          return;
+        }
       } catch {}
     }
   }
@@ -926,7 +931,7 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'Message too long (max 2000 chars).' });
     }
 
-    // Spawn the bespoke Python AI Agent connected to Groq
+    // Spawn the bespoke Python AI Agent connected to Gemini
     const pythonAgent = spawn('python', ['fuaak_agent.py', message.trim()]);
     let stdoutData = '';
     let stderrData = '';
@@ -999,7 +1004,7 @@ app.post('/api/chat/stream', async (req, res) => {
     if (process.env.PRIMARY_AI === 'claude') {
       await streamClaude(messages, systemPrompt, res);
     } else {
-      await streamGroq(messages, res);
+      await streamGemini(messages, res);
     }
   } catch (primaryError) {
     console.error('Primary AI failed:', primaryError.message);
@@ -1007,7 +1012,7 @@ app.post('/api/chat/stream', async (req, res) => {
     try {
       console.log('Falling back to secondary AI...');
       if (process.env.PRIMARY_AI === 'claude') {
-        await streamGroq(messages, res);
+        await streamGemini(messages, res);
       } else {
         await streamClaude(messages, systemPrompt, res);
       }
@@ -1025,8 +1030,8 @@ app.post('/api/chat/stream', async (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    primaryAI: process.env.PRIMARY_AI || 'groq',
-    groqKey: !!process.env.GROQ_API_KEY,
+    primaryAI: process.env.PRIMARY_AI || 'gemini',
+    geminiKey: !!process.env.GEMINI_API_KEY,
     claudeKey: !!process.env.CLAUDE_API_KEY,
   });
 });
